@@ -25,12 +25,12 @@ Suggests:
  debconf-utils,
  duplicity,
  genisoimage,
- hwinfo,
- mdadm,
+ hwinfo [linux-any],
+ mdadm [linux-any],
  rdiff-backup,
  rsync,
  subversion,
- trickle,
+ trickle [!hurd-i386],
  wodim
 Description: lightweight, extensible meta-backup system
  Backupninja lets you drop simple config files in /etc/backup.d to
