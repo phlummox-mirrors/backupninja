@@ -7,7 +7,7 @@ Version:    %{version}
 Release:    1
 License:    GPL
 Group:      Applications/System
-URL:        https://labs.riseup.net/code/projects/show/backupninja
+URL:        https://0xacab.org/backupninja/backupninja
 Source:     %{name}-%{version}.tar.gz
 Requires:   bash, gawk, rdiff-backup, gzip
 Provides:   %{name}
