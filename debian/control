@@ -8,9 +8,9 @@ Build-Depends:
  dh-autoreconf
 Build-Conflicts: autoconf2.13
 Standards-Version: 3.9.4
-Homepage: https://labs.riseup.net/code/projects/backupninja
-Vcs-Browser: https://0xacab.org/backupninja/backupninja/tree/debian
-Vcs-Git: https://0xacab.org/backupninja/backupninja.git
+Homepage: https://0xacab.org/riseuplabs/backupninja
+Vcs-Browser: https://0xacab.org/riseuplabs/backupninja/tree/debian
+Vcs-Git: https://0xacab.org/riseuplabs/backupninja.git
 
 Package: backupninja
 Architecture: all
