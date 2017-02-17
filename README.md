@@ -13,6 +13,8 @@ coordinate many different backup utilities.
 
 # Features
 
+The key features of backupninja are:
+
  - easy to read ini style configuration files
  - you can drop in scripts to handle new types of backups
  - backup actions can be scheduled
@@ -23,7 +25,7 @@ coordinate many different backup utilities.
  - passwords are never sent via the command line to helper programs
  - works with [Linux-Vservers](http://linux-vserver.org/)
 
-# Backup types
+The following backup types are supported:
 
  - secure, remote, incremental filesytem backup (via rdiff-backup)
    incremental data is compressed. permissions are retained even
@@ -85,9 +87,11 @@ To add an additional 'wizard' to ninjahelper, follow these steps:
    would think, try to make your helper as simple as possible. Walk like a cat,
    become your shadow, don't let your senses betray you.
 
+Configuration
+=============
 
 Configuration files
-===================
+-------------------
 
 The general configuration file is `/etc/backupninja.conf`. In this file
 you can set the log level and change the default directory locations.
@@ -143,7 +147,7 @@ The [example configuration files](examples) document all options
 supported by the handlers shipped with backupninja.
 
 Scheduling
-==========
+----------
 
 By default, each configuration file is processed everyday at 01:00 (1
 AM). This can be changed by specifying the 'when' option in a config
@@ -179,6 +183,72 @@ These values for `when` are invalid:
         when = tuesday at 2
         when = tues at 02
 
+SSH keys
+--------
+
+In order for rdiff-backup to sync files over ssh unattended, you must
+create ssh keys on the source server and copy the public key to the
+remote user's authorized keys file. For example:
+
+        root@srchost# ssh-keygen -t rsa -b 4096
+        root@srchost# ssh-copy-id -i /root/.ssh/id_rsa.pub backup@desthost
+
+Now, you should be able to ssh from user `root` on `srchost` to
+user `backup` on `desthost` without specifying a password.
+
+Note: when prompted for a password by `ssh-keygen`, just leave it
+blank by hitting return.
+
+The included helper program `ninjahelper` will walk you through creating
+an rdiff-backup configuration, and will set up the ssh keys for you.
+
+
+Amazon Simple Storage Service (S3)
+----------------------------------
+
+Duplicity can store backups on Amazon S3 buckets, taking care of encryption.
+Since it performs incremental backups it minimizes the number of request per
+operation therefore reducing the costs. The boto Python interface to Amazon
+Web Services is needed to use duplicity with S3 (Debian package: `python-boto`).
+
+
+Vservers
+--------
+
+If you are using [Linux-Vservers](http://linux-vserver.org/) there are some
+special capabilities that different handlers have to make vserver
+backups easier.
+
+Set the variable `vservers` to be `yes` in `/etc/backupninja.conf` and see the
+example configuration files for each handler to configure the vserver specific
+variables.
+
+Additional vserver variables that can be configured in `/etc/backupninja.conf`,
+but they probably don't need to be changed:
+
+ - `VSERVERINFO` (default: `/usr/sbin/vserver-info`)
+ - `VSERVER` (default: `/usr/sbin/vserver`)
+ - `VROOTDIR` (default: `$VSERVERINFO info SYSINFO |grep vserver-Rootdir | awk '{print $2}'`)
+
+.sh configuration files
+-----------------------
+
+Shell jobs may use the following features:
+
+  * logging and control flow functions:
+    `halt`, `fatal`, `error`, `warning`, `info`, `debug`, `passthru`.
+    All such functions take a list of strings a parameters.
+    Those strings are passed to whatever logging mechanism is enabled,
+    and colored if relevant.
+
+  * Using `exit N` is useless, and has unspecified consequences.
+    Just don't do it.
+
+  * `when=TIME` works as documented above; at may also be written
+    `when = TIME`.
+
+  * The `$BACKUPNINJA_DEBUG` environment variable is set when
+    backupninja is invoked with the `-d` option.
 
 Real world usage
 ================
@@ -205,71 +275,3 @@ strategy outlined above is the way to go because:
    have root on the production server;
 3. rdiff-backup is more space efficient and featureful than using
    rsync + hard links.
-
-
-SSH keys
-========
-
-In order for rdiff-backup to sync files over ssh unattended, you must
-create ssh keys on the source server and copy the public key to the
-remote user's authorized keys file. For example:
-
-        root@srchost# ssh-keygen -t rsa -b 4096
-        root@srchost# ssh-copy-id -i /root/.ssh/id_rsa.pub backup@desthost
-
-Now, you should be able to ssh from user `root` on `srchost` to
-user `backup` on `desthost` without specifying a password.
-
-Note: when prompted for a password by `ssh-keygen`, just leave it
-blank by hitting return.
-
-The included helper program `ninjahelper` will walk you through creating
-an rdiff-backup configuration, and will set up the ssh keys for you.
-
-
-Amazon Simple Storage Service (S3)
-==================================
-
-Duplicity can store backups on Amazon S3 buckets, taking care of encryption.
-Since it performs incremental backups it minimizes the number of request per
-operation therefore reducing the costs. The boto Python interface to Amazon
-Web Services is needed to use duplicity with S3 (Debian package: `python-boto`).
-
-
-Vservers
-========
-
-If you are using [Linux-Vservers](http://linux-vserver.org/) there are some
-special capabilities that different handlers have to make vserver
-backups easier.
-
-Set the variable `vservers` to be `yes` in `/etc/backupninja.conf` and see the
-example configuration files for each handler to configure the vserver specific
-variables.
-
-Additional vserver variables that can be configured in `/etc/backupninja.conf`,
-but they probably don't need to be changed:
-
- - `VSERVERINFO` (default: `/usr/sbin/vserver-info`)
- - `VSERVER` (default: `/usr/sbin/vserver`)
- - `VROOTDIR` (default: `$VSERVERINFO info SYSINFO |grep vserver-Rootdir | awk '{print $2}'`)
-
-.sh configuration files
-=======================
-
-Shell jobs may use the following features:
-
-  * logging and control flow functions:
-    `halt`, `fatal`, `error`, `warning`, `info`, `debug`, `passthru`.
-    All such functions take a list of strings a parameters.
-    Those strings are passed to whatever logging mechanism is enabled,
-    and colored if relevant.
-
-  * Using `exit N` is useless, and has unspecified consequences.
-    Just don't do it.
-
-  * `when=TIME` works as documented above; at may also be written
-    `when = TIME`.
-
-  * The `$BACKUPNINJA_DEBUG` environment variable is set when
-    backupninja is invoked with the `-d` option.
