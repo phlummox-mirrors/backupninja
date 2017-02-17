@@ -139,6 +139,9 @@ For example:
         pear = no thanks \
         i will not have a pear.
 
+The [example configuration files](examples) document all options
+supported by the handlers shipped with backupninja.
+
 Scheduling
 ==========
 
