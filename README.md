@@ -279,7 +279,17 @@ strategy outlined above is the way to go because:
 3. rdiff-backup is more space efficient and featureful than using
    rsync + hard links.
 
+More information
+================
+
 FAQ
-===
+---
 
 See the [FAQ](FAQ.md).
+
+Mailing list
+------------
+
+The backupninja
+[mailing list](https://lists.riseup.net/www/info/backupninja) is
+suitable for usage and development questions.
