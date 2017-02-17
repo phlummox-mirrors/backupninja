@@ -13,25 +13,25 @@ coordinate many different backup utilities.
 
 # Features
 
- - easy to read ini style configuration files.
- - you can drop in scripts to handle new types of backups.
+ - easy to read ini style configuration files
+ - you can drop in scripts to handle new types of backups
  - backup actions can be scheduled
  - you can choose when status report emails are mailed to you
-   (always, on warning, on error, never).
+   (always, on warning, on error, never)
  - console-based wizard (ninjahelper) makes it easy to create
-   backup action configuration files.
- - passwords are never sent via the command line to helper programs.
+   backup action configuration files
+ - passwords are never sent via the command line to helper programs
  - works with [Linux-Vservers](http://linux-vserver.org/)
 
 # Backup types
 
- - secure, remote, incremental filesytem backup (via rdiff-backup).
+ - secure, remote, incremental filesytem backup (via rdiff-backup)
    incremental data is compressed. permissions are retained even
-   with an unpriviledged backup user.
- - backup of mysql databases (via mysqlhotcopy and mysqldump).
+   with an unpriviledged backup user
+ - backup of mysql databases (via mysqlhotcopy and mysqldump)
  - basic system and hardware info
- - encrypted remote backups (via duplicity).
- - backup of subversion repositories.
+ - encrypted remote backups (via duplicity)
+ - backup of subversion repositories
 
 # Options
 
@@ -39,7 +39,7 @@ The following options are available:
 
  - `-h`, `--help`: this usage message
  - `-d`, `--debug`: run in debug mode, where all log messages are
-   output to the current shell.
+   output to the current shell
  - `-f`, `--conffile FILE`: use FILE for the main configuration
    instead of `/etc/backupninja.conf`
  - `-t`, `--test`: test run mode. This will test if the backup could
@@ -59,11 +59,11 @@ configuring backupninja. Ninjahelper has a menu driven curses based interface
 
 To add an additional 'wizard' to ninjahelper, follow these steps:
 
-1. to add a helper for the handler "blue", create the file
+1. To add a helper for the handler "blue", create the file
    `blue.helper` in the directory where the handlers live.
    (ie `/usr/share/backupninja`).
 
-2. next, you need to add your helper to the global `HELPERS` variable
+2. Next, you need to add your helper to the global `HELPERS` variable
    and define the main function for your helper (the function name
    is always `<helper>_wizard`). for example, `blue.helper`:
 
@@ -72,11 +72,11 @@ To add an additional 'wizard' to ninjahelper, follow these steps:
              ... do work here ...
            }
 
-3. look at the existing helpers to see how they are written. Try to re-use
+3. Look at the existing helpers to see how they are written. Try to re-use
    functions, such as the dialog functions that are defined in `easydialog.sh`,
    or the vserver functions defined in `lib/vserver`.
 
-4. test, re-test, and test again. Try to break the helper by going backwards,
+4. Test, re-test, and test again. Try to break the helper by going backwards,
    try to think like someone who has no idea how to configure your handler
    would think, try to make your helper as simple as possible. Walk like a cat,
    become your shadow, don't let your senses betray you.
