@@ -1,6 +1,14 @@
 Installation
 ============
-   
+
+On Debian, Ubuntu and derivatives
+---------------------------------
+
+Run `apt-get install backupninja`.
+
+By hand
+-------
+
 Requirements:
 
         bash gawk
