@@ -33,6 +33,10 @@ coordinate many different backup utilities.
  - encrypted remote backups (via duplicity)
  - backup of subversion repositories
 
+# Installation
+
+See the [installation documentation](INSTALL.md).
+
 # Options
 
 The following options are available:
