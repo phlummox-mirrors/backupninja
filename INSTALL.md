@@ -1,20 +1,20 @@
-INSTALLATION
+Installation
 ============
    
 Requirements:
-  bash gawk
 
-Recommended: 
-  rdiff-backup duplicity rsync gzip hwinfo sfdisk cryptsetup flashrom hwinfo
+        bash gawk
 
-Installation:
-  To install backupninja, simply do the following:
+Recommended:
 
-  $ ./autogen.sh
-  $ ./configure
-  $ make
-  $ make install
+        rdiff-backup duplicity rsync gzip hwinfo sfdisk cryptsetup flashrom hwinfo
 
-  You may wish to change the install locations, or other options. To find
-  the available possibilities, run ./configure --help.
+To install backupninja, simply do the following:
 
+        $ ./autogen.sh
+        $ ./configure
+        $ make
+        $ make install
+
+You may wish to change the install locations, or other options. To find
+the available possibilities, run `./configure --help`.
