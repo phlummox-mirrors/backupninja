@@ -11,7 +11,8 @@ might use for making backups don't have their own configuration file
 format. Backupninja provides a centralized way to configure and
 coordinate many different backup utilities.
 
-# Features
+Features
+========
 
 The key features of backupninja are:
 
@@ -35,11 +36,13 @@ The following backup types are supported:
  - encrypted remote backups (via duplicity)
  - backup of subversion repositories
 
-# Installation
+Installation
+============
 
 See the [installation documentation](INSTALL.md).
 
-# Options
+Options
+=======
 
 The following options are available:
 
