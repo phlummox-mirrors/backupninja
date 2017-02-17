@@ -278,3 +278,8 @@ strategy outlined above is the way to go because:
    have root on the production server;
 3. rdiff-backup is more space efficient and featureful than using
    rsync + hard links.
+
+FAQ
+===
+
+See the [FAQ](FAQ.md).
