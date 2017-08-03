@@ -238,7 +238,7 @@ then
    then
       if [ $usevserver = yes ]
       then
-         debug 'set -o pipefail ; echo show databases | $VSERVER $vsname exec su $user -c \"$MYSQL $defaultsfile\" | grep -v Database | grep -v \"^\(information\|performance\)_schema$\"'
+         debug 'set -o pipefail ; echo show databases | $VSERVER $vsname exec su $user -c \"$MYSQL $defaultsfile\" | grep -v Database | grep -v '"'"'^\(information\|performance\)_schema$'"'"
          databases=`set -o pipefail ; echo 'show databases' | $VSERVER $vsname exec su $user -c "$MYSQL $defaultsfile" | grep -v Database | grep -v '^\(information\|performance\)_schema$'`
          if [ $? -ne 0 ]
          then
