@@ -68,6 +68,9 @@ version 1.0.2  -- UNRELEASED
 	 . README.md: reorganize, reformat, and point to the examples
 	   configuration files.
 	 . INSTALL.md: recommend using packages on Debian and derivatives.
+	 . bandwidthlimit for the dup handler needs to be given in KB/s,
+	   and not (as wrongly advertised previously) in Kbit/s.
+	   (Closes: GitLab#7603)
 
 version 1.0.1 -- June 29, 2012
     handler changes
