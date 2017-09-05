@@ -1,4 +1,4 @@
-version 1.0.2  -- UNRELEASED
+version 1.0.2 -- September 05, 2017
     handler changes
 	dsync:
 	 . Miscellaneous improvements to this experimental handler.
@@ -60,6 +60,9 @@ version 1.0.2  -- UNRELEASED
 	 . Indentation fixes, thanks to exobuzz. (Redmine#6726)
 	 . Ignore jobs whose filename ends with "~".
 	   Thanks to Mark Janssen <mark@sig-io.nl> for the patch.
+    build system changes
+	 · Pass the "foreign" option to AM_INIT_AUTOMAKE: README has been
+	   renamed to README.md.
     documentation changes
 	 . Update INSTALL file to add some missing recommended programs.
 	 . Document release process.
