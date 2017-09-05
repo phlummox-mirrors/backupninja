@@ -56,7 +56,7 @@
 
 ## when set to yes, encryptkey variable must be set below; if you want to use
 ## two different keys for encryption and signing, you must also set the signkey
-## variable below.
+## variable (and probably signpassword) below.
 ## default is set to no, for backwards compatibility with backupninja <= 0.5.
 ##
 ## Default:
@@ -77,13 +77,22 @@
 ## Default:
 # signkey = 
 
-## password
-## NB: neither quote this, nor should it contain any quotes, 
+## password used to unlock the encryption key
+## NB: neither quote this, nor should it contain any quotes,
 ## an example setting would be:
 ## password = a_very_complicated_passphrase
 ##
 ## Default:
 # password = 
+
+## password used to unlock the signature key, used only if
+## it differs from the encryption key
+## NB: neither quote this, nor should it contain any quotes,
+## an example setting would be:
+## signpassword = a_very_complicated_passphrase
+##
+## Default:
+# signpassword =
 
 ######################################################
 ## source section
@@ -180,6 +189,7 @@ exclude = /var/cache/backupninja/duplicity
 ## desturl = rsync://user@other.host//var/backup/bla
 ## desturl = s3+http://
 ## desturl = ftp://myftpuser@ftp.example.org/remote/ftp/path
+## desturl = dpbx:///myserver
 ## the default value of this configuration option is not set:
 ##
 ## Default:
@@ -204,14 +214,24 @@ exclude = /var/cache/backupninja/duplicity
 # cfapikey = 
 # cfauthurl = 
 
+## Dropbox requires a valid authentication token. To obtain one, you will need
+## to create a Dropbox API application at https://www.dropbox.com/developers/apps/create.
+## See the "A note on Dropbox access" section of the Duplicity manpage for more
+## details: http://duplicity.nongnu.org/duplicity.1.html#sect12
+##
+## Default:
+# dropboxappkey =
+# dropboxappsecret =
+# dropboxaccesstoken =
+
 ## FTP password, needed for backups using desturl = ftp://...
 ##
 ## Default:
 # ftp_password = 
 
-## bandwith limit, in Kbit/s ; default is 0, i.e. no limit
+## bandwith limit, in KB/s ; default is 0, i.e. no limit
 ## if using 'desturl' above, 'bandwidthlimit' must not be set
-## an example setting of 128 Kbit/s would be:
+## an example setting of 128 KB/s would be:
 ## bandwidthlimit = 128
 ##
 ## Default:
@@ -226,8 +246,10 @@ exclude = /var/cache/backupninja/duplicity
 ## sshoptions = -o IdentityFile=/root/.ssh/id_rsa_duplicity
 ##
 ## duplicity >= 0.6.17
-## ------------------
-## supports only "-o IdentityFile=..."
+## -------------------
+## supports only "-oIdentityFile=..." since duplicity >=0.6.17 uses paramiko,
+## a ssh python module.
+## warning: requires no space beetween "-o" and "IdentityFile=...".
 ##
 ## Default:
 # sshoptions = 

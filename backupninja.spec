@@ -1,5 +1,5 @@
 %define name    backupninja
-%define version 1.0.1
+%define version 1.0.2
 
 Summary:    Backupninja backup tool
 Name:       %{name}
@@ -7,7 +7,7 @@ Version:    %{version}
 Release:    1
 License:    GPL
 Group:      Applications/System
-URL:        https://labs.riseup.net/code/projects/show/backupninja
+URL:        https://0xacab.org/riseuplabs/backupninja
 Source:     %{name}-%{version}.tar.gz
 Requires:   bash, gawk, rdiff-backup, gzip
 Provides:   %{name}
@@ -50,7 +50,7 @@ rm -fr %{buildroot}
 
 %ghost %{_localstatedir}/log/backupninja.log
 
-%doc AUTHORS COPYING ChangeLog INSTALL NEWS README
+%doc AUTHORS COPYING ChangeLog INSTALL.md NEWS README.md
 %{_mandir}/man1/*
 %{_mandir}/man5/*
 
