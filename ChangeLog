@@ -1,3 +1,80 @@
+version 1.0.2 -- September 05, 2017
+    handler changes
+	dsync:
+	 . Miscellaneous improvements to this experimental handler.
+	dup:
+	 . For local backups, check that the destination directory exists.
+	   Thanks to ulrich for the preliminary patch. (Redmine#4049)
+	 . Gracefully handle legacy spaces between -o and IdentityFile.
+	 . Don't remove useful signature files with --extra-clean,
+	   on duplicity versions that have a sane handling of the cache.
+	   Thanks to Alexander Mette <mail@amette.eu> for the patch!
+	   (Closes: Redmine#6357)
+	 . Fix buggy version comparison. (Redmine#6746)
+	 . Support using a different passphrase for the signing key
+	   from the one used for the encryption key (Closes: #726072).
+	   Thanks to Dominik George <nik@naturalnet.de> for the patch!
+	 · Run duplicity in a C locales environment (Closes: #736280).
+	   Thanks to Jonathan Dupart <jonathan@dupart.org> for the report,
+	   and the initial patch!
+	 . Fix handling of Dropbox access token (Closes: GitLab#11260).
+	mysql:
+	 . Make "nodata" option compatible with compress=no.
+	 . Fix non-qualified table name extraction. (Closes: Redmine#4373)
+	 . Skip dumping information and performance_schema databasase.
+	   (Closes: GitLab#11148)
+	rdiff:
+	 . Add option to include rdiff-backup output in reports.
+	   Thanks to David Gasaway <dave@gasaway.org> for the patch!
+	rsync:
+	 . Solve quoting issue with "su". (Closes: #683731, Redmine#4019)
+	 . Update increment folder date to avoid ending up with contradictory
+	   information. (Closes: Redmine#3929)
+	 . Force rsync handler run bash at the remote destination.
+	   (Closes: Redmine#3003)
+	 . Support running in test mode (Closes: Redmine#8196).
+	   Thanks to shred for the initial patch.
+	sys:
+	 . Fix LUKS header backup to properly detect partitions.
+	 . Provide the ability to backup the MBR for every device found,
+	   and to backup the BIOS (if the flashrom program is installed,
+	   and the mainboard is supported).
+	 . Add suse to the list of supported OS (Redmine#7101).
+	   Thanks to Christian Prause <cprause@suse.com> for the patch.
+	 . Fix indentation. Thanks to Jools Wills <jools@oxfordinspire.co.uk>
+	   for the patch. (Closes: Redmine#6802)
+	 . Exclude tmpfs filesystems from df output. (Closes: Debian#745818)
+	tar:
+	 . Support test mode and xz compression.
+	   Thanks to Pierre ROUDIER <contact@pierreroudier.net> for the patches.
+    helper changes
+	rdiff:
+	 . Don't give misleading information regarding required fields.
+	   (Redmine#4410)
+	 . Support output_as_info.
+	   Thanks to David Gasaway <dave@gasaway.org> for the patch!
+	sys:
+	 . Remove spurious quotes that broke the helper (Closes: Redmine#6803).
+	   Thanks to Jools Wills <jools@oxfordinspire.co.uk> for the patch.
+    backupninja changes
+	 . Indentation fixes, thanks to exobuzz. (Redmine#6726)
+	 . Ignore jobs whose filename ends with "~".
+	   Thanks to Mark Janssen <mark@sig-io.nl> for the patch.
+    build system changes
+	 · Pass the "foreign" option to AM_INIT_AUTOMAKE: README has been
+	   renamed to README.md.
+    documentation changes
+	 . Update INSTALL file to add some missing recommended programs.
+	 . Document release process.
+	 . Merge FAQ content from the Redmine wiki into the one shipped
+	   with backupninja.
+	 . README.md: reorganize, reformat, and point to the examples
+	   configuration files.
+	 . INSTALL.md: recommend using packages on Debian and derivatives.
+	 . bandwidthlimit for the dup handler needs to be given in KB/s,
+	   and not (as wrongly advertised previously) in Kbit/s.
+	   (Closes: GitLab#7603)
+
 version 1.0.1 -- June 29, 2012
     handler changes
 	rsync:
