@@ -1,6 +1,7 @@
 version 1.0.3 -- UNRELEASED
 
-    Enter history by adding your changes here.
+    documentation changes
+	 · Fix typos in README.md and manpages. Thank you, Lintian!
 
 version 1.0.2 -- September 05, 2017
     handler changes
