@@ -21,6 +21,10 @@ override_dh_auto_install:
 override_dh_compress:
 	dh_compress -Xexample
 
+override_dh_fixperms:
+	dh_fixperms
+	chmod 770 $(TMP)/etc/backup.d
+
 override_dh_installchangelogs:
 	dh_installchangelogs ChangeLog
 
