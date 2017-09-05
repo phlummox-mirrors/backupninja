@@ -23,7 +23,7 @@ override_dh_compress:
 
 override_dh_fixperms:
 	dh_fixperms
-	chmod 770 $(TMP)/etc/backup.d
+	chmod 2770 $(TMP)/etc/backup.d
 
 override_dh_installchangelogs:
 	dh_installchangelogs ChangeLog
