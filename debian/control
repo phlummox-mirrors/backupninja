@@ -49,7 +49,7 @@ Description: lightweight, extensible meta-backup system
  and CD/DVD.
  .
  Most handlers have their own dependencies/recommendations, shown in brackets
- bellow:
+ below:
  .
   - dup [duplicity, trickle]
   - rdiff [rdiff-backup]
