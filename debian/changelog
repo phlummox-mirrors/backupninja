@@ -1,3 +1,33 @@
+backupninja (1.0.2-1) unstable; urgency=medium
+
+  * Import new upstream release (Closes: #683731, #736280, #745818).
+  * Add backwards-compatible dependency on fdisk, that now ships sfdisk
+    (Closes: #872100).
+  * Update URLs for upstream website and Git repository.
+  * Drop debian/watch: upstream does not publish tarballs anymore.
+  * Bump debhelper compat level to 10, adjust versioned build-dependency
+    accordingly.
+  * Declare compatibility with Standards-Version 4.0.0.
+  * Fix typo in long description.
+  * Have dh_auto_configure pass arch-independent paths to --libdir
+    and --libexec.
+  * Don't (try to) install manpages ourselves: debhelper does it
+    automatically nowadays.
+  * Mangle /etc/backup.d permissions at build time rather than at postinst time.
+  * Drop postinst maintainer script, that is now a no-op.
+  * Don't manually enable the autoreconf sequence anymore: since compatibility
+    level 10, debhelper does it for us.
+  * Drop build-dependency on dh-autoreconf: not needed with debhelper 10.
+  * Make /etc/backup.d 2770 instead of 0770, to be closer to what
+    Debian Policy 10.9 recommends.
+  * Override the debian-watch-file-is-missing Lintian flag: we can't
+    do anything about it.
+  * Override the non-standard-dir-perm Lintian flag for /etc/backup.d,
+    documenting why it is shipped this way.
+  * Override one (mistaken) spelling-error-in-description Lintian flag.
+
+ -- intrigeri <intrigeri@debian.org>  Tue, 05 Sep 2017 12:01:25 +0000
+
 backupninja (1.0.1-2) unstable; urgency=low
 
   * Use chmod a-x instead of chmod -x, to avoid build failure with
