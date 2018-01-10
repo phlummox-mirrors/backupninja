@@ -50,7 +50,9 @@ destdir=${destdir%/}
 [ -n "$desturl" -o -n "$destdir" ]  || fatal "The destination directory (destdir) must be set when desturl is not used."
 [ -n "$include" -o -n "$vsinclude" ]  || fatal "No source includes specified"
 [ -n "$password" ] || fatal "The password option must be set."
-[ -n "$signpassword" -a -n "$signkey" -a -n "$encryptkey" -a "$signkey" != "$encryptkey" ] || fatal "The signpassword option must be set because signkey is different from encryptkey."
+if [ -n "$signkey" -a -n "$encryptkey" -a "$signkey" != "$encryptkey" ]; then
+   [ -n "$signpassword" ] || fatal "The signpassword option must be set because signkey is different from encryptkey."
+fi
 if [ "`echo $desturl | @AWK@ -F ':' '{print $1}'`" == "s3+http" ]; then
    [ -n "$awsaccesskeyid" -a -n "$awssecretaccesskey" ]  || fatal "AWS access keys must be set for S3 backups."
 fi
