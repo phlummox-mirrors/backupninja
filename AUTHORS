@@ -56,3 +56,6 @@ Jools Wills <jools@oxfordinspire.co.uk> -- Bugfix in the sys helper, indentation
 Mark Janssen <mark@sig-io.nl> -- ignore jobs whose filename ends with "~"
 shred <riseup@ml.shredzone.de> -- Initial patch for test mode support in the rsync handler
 Daniel Lo Nigro <daniel@dan.cx> -- Dropbox support for Duplicity
+Matthijs Wensveen <matthijs.wensveen@gmail.com> -- fix symmetric encryption in dup handler
+ulrich <ulrich@habmalnefrage.de> -- Added validation check for when
+Romain Dessort <romain@univers-libre.net> -- Fix list of devices when dumping partition tables
