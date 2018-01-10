@@ -107,6 +107,7 @@ getconf sysreportfile $parentdir/sysreport.txt
 
 getconf SFDISK `which sfdisk`
 getconf HWINFO `which hwinfo`
+getconf LSBLK `which lsblk`
 getconf sfdisk_options ""
 getconf hwinfo_options ""
 
@@ -607,7 +608,7 @@ fi
 
 if [ "$partitions" == "yes" ]; then
    if [ "$dosfdisk" == "yes" ]; then
-      devices=`LC_ALL=C $SFDISK -l 2>/dev/null | grep "^Disk /dev" | @AWK@ '{print $2}' | cut -d: -f1`
+      devices=`LC_ALL=C $LSBLK --output NAME,TYPE --list --paths 2>/dev/null | grep "disk$" | @AWK@ '{print $1}'`
       if [ "$devices" == "" ]; then
          warning "No harddisks found"
       fi
