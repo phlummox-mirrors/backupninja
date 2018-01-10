@@ -94,10 +94,10 @@ if [ "$ldif" == "yes" ]; then
          output=`su root -s /bin/bash -c "set -o pipefail ; $execstr" 2>&1`
          code=$?
          if [ "$code" == "0" ]; then
-            debug $output
+            debug "$output"
             info "Successfully finished ldif export of $dbsuffix"
          else
-            warning $output
+            warning "$output"
             warning "Failed ldif export of $dbsuffix"
          fi
 

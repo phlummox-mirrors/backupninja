@@ -194,10 +194,10 @@ then
          code=$?
          if [ "$code" == "0" ]
          then
-            debug $output
+            debug "$output"
             info "Successfully finished hotcopy of all mysql databases"
          else
-            warning $output
+            warning "$output"
             warning "Failed to hotcopy all mysql databases"
          fi
       fi
@@ -217,10 +217,10 @@ then
             code=$?
             if [ "$code" == "0" ]
             then
-               debug $output
+               debug "$output"
                info "Successfully finished hotcopy of mysql database $db"
             else
-               warning $output
+               warning "$output"
                warning "Failed to hotcopy mysql database $db"
             fi
          fi
@@ -303,10 +303,10 @@ then
          code=$?
          if [ "$code" == "0" ]
          then
-            debug $output
+            debug "$output"
             info "Successfully finished dump of mysql database $db"
          else
-            warning $output
+            warning "$output"
             warning "Failed to dump mysql databases $db"
          fi
       fi

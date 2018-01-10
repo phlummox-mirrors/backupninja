@@ -184,13 +184,13 @@ if [ "$keep" != yes ]; then
       output="`su -c "$removestr" 2>&1`"
       if [ $? = 0 ]; then
          if [ "$output_as_info" == "yes" ]; then
-            info $output
+            info "$output"
          else
-            debug $output
+            debug "$output"
          fi
          info "Removing backups older than $keep days succeeded."
       else
-         warning $output
+         warning "$output"
          warning "Failed removing backups older than $keep."
       fi
    fi
@@ -274,13 +274,13 @@ if [ $test = 0 ]; then
    output=`nice -n $nicelevel su -c "$execstr" 2>&1`
    if [ $? = 0 ]; then
       if [ "$output_as_info" == "yes" ]; then
-         info $output
+         info "$output"
       else
-         debug $output
+         debug "$output"
       fi
       info "Successfully finished backing up source $label"
    else
-      error $output
+      error "$output"
       fatal "Failed backup up source $label"
    fi
 fi

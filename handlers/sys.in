@@ -664,10 +664,10 @@ if [ "$luksheaders" == "yes" ]; then
       output=`$DD if="${dev}" of="${outputfile}" bs=512 count="${headersize}" 2>&1`
       exit_code=$?
       if [ $exit_code -eq 0 ]; then
-         debug $output
+         debug "$output"
          info "The LUKS header of $dev was saved to $outputfile."
       else
-         debug $output
+         debug "$output"
          fatal "The LUKS header of $dev could not be saved."
       fi
    done
@@ -720,7 +720,7 @@ function doLvmBackup () {
       output=`$VGCFGBACKUP --file "${lvmdir}"/'%s' $vg`
    done
    exit_code=$?
-   debug $output
+   debug "$output"
    case $exit_code in
       0)
          info "LVM metadata was saved to $lvmdir for volume groups: $vgs"
