@@ -253,12 +253,12 @@ function isnow() {
        warning "The 'when' variable in the configuration file is malformed. You either didn't specify the day or the time. Please read the README for examples."
        return 0
    fi
-   
+
    if [ "$at" != "at" ]; then
        warning "The 'when' option in the configuration doesn't contain an 'at'. Please read the README for examples."
        return 0
    fi
-   
+
    if [[ "$whentimeoriginal" != @([0-9][0-9])?(:[0-9][0-9]) ]]; then
        warning "The time in the 'when' option in the configuration is malformed. Please read the README for examples."
        return 0
