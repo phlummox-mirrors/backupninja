@@ -252,6 +252,7 @@ do_borg_prune() {
    set -o noglob
    REPLY=
    formBegin "$borg_title - pruning (how many backups to keep)"
+      formItem "hourly" "$borg_keephourly"
       formItem "daily" "$borg_keepdaily"
       formItem "weekly" "$borg_keepweekly"
       formItem "monthly" "$borg_keepmonthly"
@@ -259,9 +260,10 @@ do_borg_prune() {
 
    [ $? = 0 ] || return
    tmp_array=($REPLY)
-   borg_keepdaily=${tmp_array[0]}
-   borg_keepweekly=${tmp_array[1]}
-   borg_keepmonthly=${tmp_array[2]}
+   borg_keephourly=${tmp_array[0]}
+   borg_keepdaily=${tmp_array[1]}
+   borg_keepweekly=${tmp_array[2]}
+   borg_keepmonthly=${tmp_array[3]}
 
    set +o noglob
 
@@ -293,6 +295,7 @@ EOF
    cat >> $next_filename <<EOF
 
 ## for more info see : borg prune -h
+keephourly = $borg_keephourly
 keepdaily = $borg_keepdaily
 keepweekly = $borg_keepweekly
 keepmonthly = $borg_keepmonthly
@@ -357,6 +360,7 @@ borg_wizard() {
    borg_compression=lz4
    borg_encryption=none
    borg_passphrase=
+   borg_keephourly=1
    borg_keepdaily=7
    borg_keepweekly=4
    borg_keepmonthly=-1

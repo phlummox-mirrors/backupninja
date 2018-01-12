@@ -29,10 +29,11 @@
 
 [source]
 
-## how many days, weeks and months of data to keep
+## how many hours, days, weeks and months of data to keep
 ## for more info see : borg prune -h
 ##
 ## Default:
+# keephourly = 1
 # keepdaily = 7
 # keepweekly = 4
 # keepmonthly = -1
