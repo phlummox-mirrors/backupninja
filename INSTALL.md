@@ -15,7 +15,7 @@ Requirements:
 
 Recommended:
 
-        rdiff-backup duplicity rsync gzip hwinfo sfdisk cryptsetup flashrom hwinfo
+        rdiff-backup duplicity rsync borgbackup gzip hwinfo sfdisk cryptsetup flashrom hwinfo
 
 To install backupninja, simply do the following:
 
