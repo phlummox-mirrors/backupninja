@@ -79,7 +79,7 @@ do_borg_dest() {
 
    set -o noglob
    REPLY=
-   while [ -z "$REPLY" -o -z "$borg_directory" -o -z "$borg_host" -o -z "$borg_user" -o -z "$borg_archive" -o -z "$borg_compression" -o -z "$borg_encryption" -o -z "$borg_passphrase" ]
+   while [ -z "$REPLY" -o -z "$borg_directory" -o -z "$borg_host" -o -z "$borg_user" -o -z "$borg_archive" -o -z "$borg_compression" ]
    do
      formBegin "$borg_title - destination"
         formItem "directory" "$borg_directory"
@@ -87,8 +87,6 @@ do_borg_dest() {
         formItem "user" "$borg_user"
         formItem "archive_name" "$borg_archive"
         formItem "compression" "$borg_compression"
-        formItem "encryption" "$borg_encryption"
-        formItem "passphrase" "$borg_passphrase"
 
         formDisplay
      [ $? = 0 ] || return
@@ -98,8 +96,6 @@ do_borg_dest() {
      borg_user=${tmp_array[2]}
      borg_archive=${tmp_array[3]}
      borg_compression=${tmp_array[4]}
-     borg_encryption=${tmp_array[5]}
-     borg_passphrase=${tmp_array[6]}
   done
   set +o noglob
 
@@ -107,6 +103,25 @@ do_borg_dest() {
   setDefault conn
 }
 
+do_borg_enc() {
+   radioBox "$borg_title" "Encryption mode" \
+       "none"     "no encryption and no authentication" off \
+       "repokey"  "encryption with a passphrase" on
+   [ $? = 1 ] && return;
+   borg_encryption="$REPLY"
+
+   if [ "$borg_encryption" = "repokey" ]; then
+      local question="Enter the passphrase needed to encrypt/decrypt the repository:"
+      REPLY=
+      while [ -z "$REPLY" -o -z "$borg_passphrase" ]; do
+         passwordBox "$borg_title - " "$question"
+         [ $? = 0 ] || return 1
+         borg_passphrase="$REPLY"
+      done
+   fi
+
+  _enc_done="(DONE)"
+}
 
 do_borg_local_dir() {
    local dir_status="ok"
@@ -317,11 +332,13 @@ borg_main_menu() {
    while true; do
       srcitem="choose files to include & exclude $_src_done"
       destitem="configure backup destination $_dest_done"
+      encitem="configure encryption mode $_enc_done"
       conitem="test connection and destination dir $_con_done"
       pruneitem="configure pruning (optional) $_prune_done"
       menuBox "$borg_title" "choose a step:" \
          src "$srcitem" \
          dest "$destitem" \
+         enc "$encitem" \
          conn "$conitem" \
          prune "$pruneitem" \
          finish "finish and create config file"
@@ -330,10 +347,11 @@ borg_main_menu() {
       case "$result" in
          "src") do_borg_src;;
          "dest") do_borg_dest;;
+         "enc") do_borg_enc;;
          "conn") do_borg_con;;
          "prune") do_borg_prune;;
          "finish")
-            if [[ "$_con_done$_dest_done$_src_done" != "(DONE)(DONE)(DONE)" ]]; then
+            if [[ "$_con_done$_dest_done$_dest_done$_src_done" != "(DONE)(DONE)(DONE)(DONE)" ]]; then
                msgBox "$borg_title" "You cannot create the configuration file until mandatory steps are completed."
             else
                do_borg_finish
@@ -351,6 +369,7 @@ borg_wizard() {
 
    _src_done=
    _dest_done=
+   _enc_done=
    _con_done=
 
    borg_directory=/backup/`hostname`
