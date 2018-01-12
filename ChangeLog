@@ -5,6 +5,8 @@ version 1.0.3 -- UNRELEASED
 
 version 1.0.2 -- September 05, 2017
     handler changes
+	borg:
+	 . Added initial support
 	dsync:
 	 . Miscellaneous improvements to this experimental handler.
 	dup:
