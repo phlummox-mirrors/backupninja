@@ -105,8 +105,8 @@ do_borg_dest() {
 
 do_borg_enc() {
    radioBox "$borg_title" "Encryption mode" \
-       "none"     "no encryption and no authentication" off \
-       "repokey"  "encryption with a passphrase" on
+       "none"     "no encryption and no authentication" on \
+       "repokey"  "encryption with a passphrase" off
    [ $? = 1 ] && return;
    borg_encryption="$REPLY"
 
