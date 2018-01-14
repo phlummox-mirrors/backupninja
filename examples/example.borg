@@ -21,7 +21,7 @@
 ## default is yes. set to no to skip the test if the remote host is alive
 ##
 ## Default:
-# testconnect = no
+# testconnect = yes
 
 ######################################################
 ## source section
