@@ -181,8 +181,8 @@ do_borg_ssh_con() {
    ssh -o PreferredAuthentications=publickey $borg_host -l $borg_user "exit" 2> /dev/null
    if [ $? -ne 0 ]; then
       echo "Copying root's public ssh key to authorized_keys of $borg_user@$borg_host. When prompted, specify the password for user $borg_user@$borg_host."
-      ssh-copy-id -i /root/.ssh/id_[rd]sa.pub $borg_user@$borg_host
-      if [ $? -ne 0 ]; then
+      pubkeys=( /root/.ssh/id_[rd]sa.pub )
+      if ! ssh-copy-id -i ${pubkeys[0]} $borg_user@$borg_host; then
          echo "FAILED: Couldn't copy root's public ssh key to authorized_keys of $borg_user@$borg_host."
          ssh $borg_user@$borg_host 'test -w .ssh || test -w .'
          result=$?
