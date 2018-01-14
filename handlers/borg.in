@@ -37,7 +37,7 @@ getconf directory
 directory=${directory%/}
 getconf archive {now:%Y-%m-%d}
 getconf compression lz4
-getconf encryption
+getconf encryption none
 getconf passphrase
 
 export BORG_PASSPHRASE="$passphrase"
