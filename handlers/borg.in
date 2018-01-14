@@ -83,14 +83,14 @@ initstr="borg init --encryption=$encryption $execstr_repository"
 debug "$initstr"
 
 if [ $test = 0 ]; then
-    output="`su -c "$initstr" 2>&1`"
-    if [ $? = 2 ]; then
-       debug $output
-       info "Repository was already initialized"
-    else
-       warning $output
-       warning "Repository has been initialized"
-    fi
+   output="`su -c "$initstr" 2>&1`"
+   if [ $? = 2 ]; then
+      debug $output
+      info "Repository was already initialized"
+   else
+      warning $output
+      warning "Repository has been initialized"
+   fi
 fi
 
 ### EXECUTE ###
