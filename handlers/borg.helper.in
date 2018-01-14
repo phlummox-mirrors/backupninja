@@ -192,7 +192,7 @@ do_borg_ssh_con() {
             0 )   msgBox "$borg_title: error" "Directories are writable: Probably just a typo the first time." ;;
             1 )   msgBox "$borg_title: error" "Connected successfully to $borg_user@$borg_host, but unable to write. Check ownership and modes of ~$borg_user on $borg_host." ;;
             255 ) msgBox "$borg_title: error" "Failed to connect to $borg_user@$borg_host. Check hostname, username, and password. Also, make sure sshd is running on the destination host." ;;
-            * )   msgBox "$borg_title: error" "Unexpected error." ;;
+            * )   msgBox "$borg_title: error" "Unexpected error (return code ${result})." ;;
          esac
          return
       else
