@@ -348,7 +348,7 @@ borg_main_menu() {
          "conn") do_borg_con;;
          "prune") do_borg_prune;;
          "finish")
-            if [[ "$_con_done$_dest_done$_dest_done$_src_done" != "(DONE)(DONE)(DONE)(DONE)" ]]; then
+            if [[ "$_con_done$_dest_done$_enc_done$_src_done" != "(DONE)(DONE)(DONE)(DONE)" ]]; then
                msgBox "$borg_title" "You cannot create the configuration file until mandatory steps are completed."
             else
                do_borg_finish
