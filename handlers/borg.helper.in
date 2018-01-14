@@ -372,7 +372,7 @@ borg_wizard() {
    borg_directory=/backup/`hostname`
    borg_user=root
    borg_host=localhost
-   borg_archive='{now:%Y-%m-%d}'
+   borg_archive='{now:%Y-%m-%dT%H:%M:%S}'
    borg_compression=lz4
    borg_encryption=none
    borg_passphrase=

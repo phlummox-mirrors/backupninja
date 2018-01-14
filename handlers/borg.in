@@ -35,7 +35,7 @@ getconf host
 getconf directory
 # strip trailing /
 directory=${directory%/}
-getconf archive {now:%Y-%m-%d}
+getconf archive {now:%Y-%m-%dT%H:%M:%S}
 getconf compression lz4
 getconf encryption none
 getconf passphrase
