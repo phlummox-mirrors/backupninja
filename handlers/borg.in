@@ -22,6 +22,7 @@ getconf testconnect yes
 getconf nicelevel 0
 
 setsection source
+getconf prune yes
 getconf keephourly 1
 getconf keepdaily 7
 getconf keepweekly 4
@@ -138,7 +139,7 @@ fi
 prunestr="borg prune --keep-hourly $keephourly --keep-daily $keepdaily --keep-weekly $keepweekly --keep-monthly $keepmonthly $execstr_repository"
 debug "$prunestr"
 
-if [ $test = 0 ]; then
+if [ $test = 0 ] && [ "$prune" == "yes" ]; then
    output="`su -c "$prunestr" 2>&1`"
    if [ $? = 0 ]; then
       debug $output

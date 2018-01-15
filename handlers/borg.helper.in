@@ -259,25 +259,32 @@ do_borg_con() {
 }
 
 do_borg_prune() {
-   declare -a tmp_array
+   radioBox "$borg_title" "pruning (how many backups to keep" \
+       "yes" "regularly prune old backups" on \
+       "no"  "keep all backups" off
+   [ $? = 1 ] && return;
+   borg_prune="$REPLY"
 
-   set -o noglob
-   REPLY=
-   formBegin "$borg_title - pruning (how many backups to keep)"
-      formItem "hourly" "$borg_keephourly"
-      formItem "daily" "$borg_keepdaily"
-      formItem "weekly" "$borg_keepweekly"
-      formItem "monthly" "$borg_keepmonthly"
-      formDisplay
+   if [ "$borg_prune" = "yes" ]; then
+      declare -a tmp_array
+      set -o noglob
+      REPLY=
+      formBegin "$borg_title - pruning (how many backups to keep)"
+         formItem "hourly" "$borg_keephourly"
+         formItem "daily" "$borg_keepdaily"
+         formItem "weekly" "$borg_keepweekly"
+         formItem "monthly" "$borg_keepmonthly"
+         formDisplay
 
-   [ $? = 0 ] || return
-   tmp_array=($REPLY)
-   borg_keephourly=${tmp_array[0]}
-   borg_keepdaily=${tmp_array[1]}
-   borg_keepweekly=${tmp_array[2]}
-   borg_keepmonthly=${tmp_array[3]}
+      [ $? = 0 ] || return
+      tmp_array=($REPLY)
+      borg_keephourly=${tmp_array[0]}
+      borg_keepdaily=${tmp_array[1]}
+      borg_keepweekly=${tmp_array[2]}
+      borg_keepmonthly=${tmp_array[3]}
 
-   set +o noglob
+      set +o noglob
+   fi
 
   _prune_done="(DONE)"
 }
@@ -307,6 +314,7 @@ EOF
    cat >> $next_filename <<EOF
 
 ## for more info see : borg prune -h
+prune = $borg_prune
 keephourly = $borg_keephourly
 keepdaily = $borg_keepdaily
 keepweekly = $borg_keepweekly
