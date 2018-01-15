@@ -121,6 +121,7 @@ do_borg_enc() {
    fi
 
   _enc_done="(DONE)"
+  setDefault prune
 }
 
 do_borg_local_dir() {
@@ -255,7 +256,7 @@ do_borg_con() {
    read
 
    _con_done="(DONE)"
-   setDefault finish
+   setDefault enc
 }
 
 do_borg_prune() {
@@ -287,6 +288,7 @@ do_borg_prune() {
    fi
 
   _prune_done="(DONE)"
+   setDefault finish
 }
 
 do_borg_finish() {
@@ -337,14 +339,14 @@ borg_main_menu() {
    while true; do
       srcitem="choose files to include & exclude $_src_done"
       destitem="configure backup destination $_dest_done"
-      encitem="configure encryption mode $_enc_done"
       conitem="test connection and destination dir $_con_done"
+      encitem="configure encryption mode $_enc_done"
       pruneitem="configure pruning (optional) $_prune_done"
       menuBox "$borg_title" "choose a step:" \
          src "$srcitem" \
          dest "$destitem" \
-         enc "$encitem" \
          conn "$conitem" \
+         enc "$encitem" \
          prune "$pruneitem" \
          finish "finish and create config file"
       [ $? = 0 ] || return
@@ -352,8 +354,8 @@ borg_main_menu() {
       case "$result" in
          "src") do_borg_src;;
          "dest") do_borg_dest;;
-         "enc") do_borg_enc;;
          "conn") do_borg_con;;
+         "enc") do_borg_enc;;
          "prune") do_borg_prune;;
          "finish")
             if [[ "$_con_done$_dest_done$_enc_done$_src_done" != "(DONE)(DONE)(DONE)(DONE)" ]]; then
