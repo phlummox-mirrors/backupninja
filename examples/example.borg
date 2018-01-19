@@ -101,7 +101,7 @@ exclude = /var/lib/mysql
 ## for more info see : borg create -h
 ##
 ## Default:
-# archive = {now:%Y-%m-%d}
+# archive = {now:%Y-%m-%dT%H:%M:%S} 
 
 ## compression algorithm
 ## can be "none", "lz4", "zlib", "zlib,0..zlib,9", "lzma", "lzma,0..lzma,9".
