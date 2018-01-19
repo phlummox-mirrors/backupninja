@@ -30,7 +30,8 @@
 [source]
 
 ## how many hours, days, weeks and months of data to keep
-## for more info see : borg prune -h
+##
+## for more info see : borg help prune
 ##
 ## Default:
 # keephourly = 1
@@ -44,7 +45,9 @@
 ##    shell-style matching, where, for example, '*' matches any number of
 ##    characters. for more info, see : borg help patterns
 ## 3. Symlinks are preserved (not followed).
-
+##
+## for more info see : borg help patterns
+##
 ## files to include in the backup
 include = /opt
 include = /srv
@@ -98,7 +101,8 @@ exclude = /var/lib/mysql
 ## archive name, should be unique every day.
 ## Format tags available :
 ## {now}, {utcnow}, {fqdn}, {hostname}, {user}, {pid}
-## for more info see : borg create -h
+##
+## for more info see : borg help create
 ##
 ## Default:
 # archive = {now:%Y-%m-%dT%H:%M:%S} 
@@ -125,8 +129,7 @@ exclude = /var/lib/mysql
 ## - "repokey" = encryption with key stored inside the repository
 ## - "repofile" = encryption with key stored in ~/.config/borg/keys/
 ##
-## for more info see :
-## https://github.com/borgbackup/borg/blob/master/docs/quickstart.rst#repository-encryption
+## for more info see : borg help init
 ##
 ## Default:
 # encryption = none
@@ -135,9 +138,6 @@ exclude = /var/lib/mysql
 ##
 ## must be set if encryption != none
 ## encryption is disabled by default
-##
-## for more info see :
-## https://github.com/borgbackup/borg/blob/master/docs/quickstart.rst#repository-encryption
 ##
 ## Default:
 # passphrase =
