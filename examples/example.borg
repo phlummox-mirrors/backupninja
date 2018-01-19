@@ -74,6 +74,16 @@ exclude = /var/lib/mlocate
 exclude = /var/lib/postgresql
 exclude = /var/lib/mysql
 
+## exclude directories that contain a CACHEDIR.TAG file
+##
+## Default:
+# excludecaches = no
+
+## exclude files flagged NODUMP
+##
+## Default:
+# excludenodump = no
+
 ######################################################
 ## destination section
 ## (where the files are copied to)
