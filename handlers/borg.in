@@ -151,17 +151,18 @@ fi
 ### REMOVE OLD BACKUPS ###
 
 # borg prune
-prunestr="borg prune --keep-hourly $keephourly --keep-daily $keepdaily --keep-weekly $keepweekly --keep-monthly $keepmonthly $execstr_repository"
-debug "$prunestr"
-
-if [ $test = 0 ] && [ "$prune" == "yes" ]; then
-   output="`su -c "$prunestr" 2>&1`"
-   if [ $? = 0 ]; then
-      debug $output
-      info "Removing old backups succeeded."
-   else
-      warning $output
-      warning "Failed removing old backups."
+if [ "$prune" == "yes" ]; then
+  prunestr="borg prune --keep-hourly $keephourly --keep-daily $keepdaily --keep-weekly $keepweekly --keep-monthly $keepmonthly $execstr_repository"
+  debug "$prunestr"
+   if [ $test = 0 ]; then
+      output="`su -c "$prunestr" 2>&1`"
+      if [ $? = 0 ]; then
+         debug $output
+         info "Removing old backups succeeded."
+      else
+         warning $output
+         warning "Failed removing old backups."
+      fi
    fi
 fi
 
