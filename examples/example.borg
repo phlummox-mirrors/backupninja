@@ -23,6 +23,12 @@
 ## Default:
 # testconnect = yes
 
+## default is not to limit bandwidth. 
+## set to a number in kiBytes/second to limit bandwidth usage. 
+##
+## Default:
+# bwlimit = 0
+
 ######################################################
 ## source section
 ## (where the files to be backed up are coming from)

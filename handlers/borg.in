@@ -20,6 +20,7 @@ export BORG_RELOCATED_REPO_ACCESS_IS_OK=yes
 
 getconf testconnect yes
 getconf nicelevel 0
+getconf bwlimit
 
 setsection source
 getconf prune yes
@@ -117,6 +118,10 @@ done
 IFS=$SAVEIFS
 
 set +o noglob
+
+if [ ! -z $bwlimit ]; then
+   execstr="${execstr} --remote-ratelimit=${bwlimit}"
+fi
 
 # include client-part and server-part
 execstr="${execstr} ${excludes} $execstr_repository::$execstr_archive ${includes}"
