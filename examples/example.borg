@@ -104,12 +104,16 @@ exclude = /var/lib/mysql
 # archive = {now:%Y-%m-%dT%H:%M:%S} 
 
 ## compression algorithm
-## can be "none", "lz4", "zlib", "zlib,0..zlib,9", "lzma", "lzma,0..lzma,9".
+## can be "none", "lz4", "zstd[,L]", "zlib[,L]", "lzma[,L]", "auto,C[,L]".
 ## - "none" stands for "no compression"
-## - "lz4" is super fast, but low compression
-## - "zlib" is less fast, but higher compression
-## - "lzma" is even slower, even higher compression
-## for more info see : borg create -h
+## - "lz4" offers very high speed, very low compression
+## - "zstd" is a modern wide-range algorithm
+## - "zlib" offers medium speed, medium compression
+## - "lzma" offers low speed, high compression
+## - "auto,C" will use a heuristic to decide whether to compress using
+##            selected algorithm C
+##
+## for more info see : borg help compression
 ##
 ## Default:
 # compression = lz4
