@@ -59,3 +59,5 @@ Daniel Lo Nigro <daniel@dan.cx> -- Dropbox support for Duplicity
 Matthijs Wensveen <matthijs.wensveen@gmail.com> -- fix symmetric encryption in dup handler
 ulrich <ulrich@habmalnefrage.de> -- Added validation check for when
 Romain Dessort <romain@univers-libre.net> -- Fix list of devices when dumping partition tables
+Guillaume Subiron <ben@wainei.net> -- borg handler
+Jerome Charaoui <jerome@riseup.net> -- borg handler
