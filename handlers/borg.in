@@ -27,8 +27,7 @@ setsection source
 getconf init yes
 getconf include
 getconf exclude
-getconf excludecaches no
-getconf excludenodump no
+getconf create_options
 getconf prune yes
 getconf keep 30d
 getconf prune_options
@@ -125,12 +124,8 @@ if [ ! -z $bwlimit ]; then
    execstr="${execstr} --remote-ratelimit=${bwlimit}"
 fi
 
-if [ "$excludecaches" == "yes" ]; then
-   execstr="${execstr} --exclude-caches"
-fi
-
-if [ "$excludenodump" == "yes" ]; then
-   execstr="${execstr} --exclude-nodump"
+if [ ! -z $create_options ]; then
+   execstr="${execstr} ${create_options}"
 fi
 
 # include client-part and server-part

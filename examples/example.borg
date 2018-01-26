@@ -70,15 +70,15 @@ exclude = /var/lib/mlocate
 exclude = /var/lib/postgresql
 exclude = /var/lib/mysql
 
-## exclude directories that contain a CACHEDIR.TAG file
+## define extra command-line options for the "borg create" operation.
+##
+## Example:
+## create_options = --exclude-caches
+##
+## for more info see : borg help create
 ##
 ## Default:
-# excludecaches = no
-
-## exclude files flagged NODUMP
-##
-## Default:
-# excludenodump = no
+# create_options =
 
 ## whether to prune (remove) older backups
 ##
