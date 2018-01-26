@@ -41,16 +41,6 @@
 ## Default:
 # init = yes
 
-## how many hours, days, weeks and months of data to keep
-##
-## for more info see : borg help prune
-##
-## Default:
-# keephourly = 1
-# keepdaily = 7
-# keepweekly = 4
-# keepmonthly = -1
-
 ## A few notes about includes and excludes:
 ## 1. include paths do not support any kind of pattern matching
 ## 2. exclude paths support several types of pattern matching, the default being
@@ -89,6 +79,33 @@ exclude = /var/lib/mysql
 ##
 ## Default:
 # excludenodump = no
+
+## whether to prune (remove) older backups
+##
+## Default:
+# prune = yes
+
+## keep all backups within this time frame.
+## must be defined as a number followed by one of the
+## following characters: "H", "d", "w", "m", "y"
+##
+## this option will be ignored if set to 0
+##
+## the default is to keep all backups made within the
+## last 30 days
+##
+## Default:
+# keep = 30d
+
+## define extra command-line options for the "borg prune" operation.
+##
+## Example:
+## prune_options = --keep-daily=7 --keep-weekly=4 --keep-monthly=6
+##
+## for more info see : borg help prune
+##
+## Default:
+# prune_options =
 
 ######################################################
 ## destination section

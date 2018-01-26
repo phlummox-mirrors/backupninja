@@ -270,19 +270,13 @@ do_borg_prune() {
       declare -a tmp_array
       set -o noglob
       REPLY=
-      formBegin "$borg_title - pruning (how many backups to keep)"
-         formItem "hourly" "$borg_keephourly"
-         formItem "daily" "$borg_keepdaily"
-         formItem "weekly" "$borg_keepweekly"
-         formItem "monthly" "$borg_keepmonthly"
+      formBegin "$borg_title - keep all backups made within this number of days"
+         formItem "keep" "$borg_keep"
          formDisplay
 
       [ $? = 0 ] || return
       tmp_array=($REPLY)
-      borg_keephourly=${tmp_array[0]}
-      borg_keepdaily=${tmp_array[1]}
-      borg_keepweekly=${tmp_array[2]}
-      borg_keepmonthly=${tmp_array[3]}
+      borg_keep=${tmp_array[0]}
 
       set +o noglob
    fi
@@ -317,10 +311,7 @@ EOF
 
 ## for more info see : borg prune -h
 prune = $borg_prune
-keephourly = $borg_keephourly
-keepdaily = $borg_keepdaily
-keepweekly = $borg_keepweekly
-keepmonthly = $borg_keepmonthly
+keep = "${borg_keep}d"
 
 [dest]
 directory = $borg_directory
@@ -386,10 +377,7 @@ borg_wizard() {
    borg_compression=lz4
    borg_encryption=none
    borg_passphrase=
-   borg_keephourly=1
-   borg_keepdaily=7
-   borg_keepweekly=4
-   borg_keepmonthly=-1
+   borg_keep=30
 
    # Global variables whose '*' shall not be expanded
    set -o noglob

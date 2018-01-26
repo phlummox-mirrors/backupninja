@@ -24,15 +24,13 @@ getconf bwlimit
 
 setsection source
 getconf init yes
-getconf prune yes
-getconf keephourly 1
-getconf keepdaily 7
-getconf keepweekly 4
-getconf keepmonthly -1
 getconf include
 getconf exclude
 getconf excludecaches no
 getconf excludenodump no
+getconf prune yes
+getconf keep 30d
+getconf prune_options
 
 setsection dest
 getconf user
@@ -153,8 +151,11 @@ fi
 
 # borg prune
 if [ "$prune" == "yes" ]; then
-  prunestr="borg prune --keep-hourly $keephourly --keep-daily $keepdaily --keep-weekly $keepweekly --keep-monthly $keepmonthly $execstr_repository"
-  debug "$prunestr"
+   if [ ! -z $keep ] && [ ! "$keep" == "0" ]; then
+      prune_options="${prune_options} --keep-within=${keep}"
+   fi
+   prunestr="borg prune $prune_options $execstr_repository"
+   debug "$prunestr"
    if [ $test = 0 ]; then
       output="`su -c "$prunestr" 2>&1`"
       if [ $? = 0 ]; then
