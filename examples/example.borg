@@ -35,6 +35,12 @@
 
 [source]
 
+## default is to initialize the backup repository if absent
+## set to no to skip this step
+##
+## Default:
+# init = yes
+
 ## how many hours, days, weeks and months of data to keep
 ##
 ## for more info see : borg help prune
