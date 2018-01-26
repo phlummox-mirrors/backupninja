@@ -152,7 +152,7 @@ fi
 
 # borg prune
 if [ "$prune" == "yes" ]; then
-   if [ ! -z $keep ] && [ ! "$keep" == "0" ]; then
+   if [ ! "$keep" == "0" ]; then
       prune_options="${prune_options} --keep-within=${keep}"
    fi
    prunestr="borg prune $prune_options $execstr_repository"
