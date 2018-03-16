@@ -255,6 +255,9 @@ then
 
    for db in $databases
    do
+      # Sanitize database name
+      db=$(echo $db | tr -d \'\;)
+
       DUMP_BASE="$MYSQLDUMP $defaultsfile $sqldumpoptions"
 
       # Dumping structure and data
