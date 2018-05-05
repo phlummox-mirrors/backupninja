@@ -588,9 +588,9 @@ for file in $files; do
 
    check_perms ${file%/*} # check containing dir
    check_perms $file
-   suffix="${file##*.}"
    base=`basename $file`
-   if [ "${base:0:1}" == "0" -o "$suffix" == "disabled" ]; then
+   suffix="${base##*.}"
+   if [ "${base:0:1}" == "0" -o "$suffix" == "disabled" -o "$suffix" == "$base" ]; then
       info "Skipping $file"
       continue
    fi
