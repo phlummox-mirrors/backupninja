@@ -1,0 +1,78 @@
+#
+# restic handler example file
+#
+# Mandatory options are un-commented with suggested values
+# Other options are commented out with their default values
+#
+
+# when = everyday at 01
+
+[general]
+repository = /mnt/backup
+password = secret
+# backup = yes
+# forget = no
+# check = no
+# prune = no
+# rebuild_index = no
+
+# [s3]
+# aws_access_key_id =
+# aws_secret_access_key = 
+
+# [swift]
+# os_auth_url =
+# os_tenant_id =
+# os_tenant_name =
+# os_username =
+# os_password =
+
+# [b2]
+# b2_account_id =
+# b2_account_key =
+
+# [azure]
+# azure_account_name =
+# azure_account_key =
+
+# [gs]
+# google_project_id =
+# google_application_credentials =
+
+# [backup]
+# include = /
+# exclude = /dev
+# exclude = /lost+found
+# exclude = /media
+# exclude = /mnt
+# exclude = /proc
+# exclude = /run
+# exclude = /sys
+# exclude = /tmp
+# exclude = /var/cache
+# exclude = /var/lock
+# exclude = /var/spool
+# exclude = /var/run
+# exclude = /var/tmp
+# flag = --one-file-system
+# tag =
+
+# [forget]
+# keep_last = 7
+# keep_hourly = 24
+# keep_daily = 7
+# keep_weekly = 4
+# keep_monthly = 12
+# keep_yearly = 3
+# keep_within =
+# keep_tag =
+# flag = --prune
+
+# [check]
+# flag =
+
+# [prune]
+# flag =
+
+# [rebuild_index]
+# flag =
