@@ -45,12 +45,12 @@ getconf google_application_credentials
 ### SANITY CHECKS ##############################################################
 
 [ -n "$repository" ] \
-   && export RESTIC_REPOSITORY=$repository \
+   && export RESTIC_REPOSITORY="$repository" \
    && debug "The restic repository is: $repository" \
    || fatal "The repo option must be set."
 
 [ -n "$password" ] \
-   && export RESTIC_PASSWORD=$password \
+   && export RESTIC_PASSWORD="$password" \
    && debug "The restic password is set." \
    || fatal "The password option must be set."
 
@@ -309,7 +309,6 @@ if [[ "$check" == "yes" ]]; then
    setsection check
 
    getconf flag
-   done
 
    # format command
    cmd="restic check $flag"
