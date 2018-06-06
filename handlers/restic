@@ -1,18 +1,32 @@
-# -*- mode: sh; sh-basic-offset: 3; indent-tabs-mode: nil; -*-
-# vim: set filetype=sh sw=3 sts=3 expandtab autoindent:
+#!/usr/bin/env bash
+# -*- mode: sh; sh-basic-offset: 2; indent-tabs-mode: nil; -*-
+# vim: set filetype=sh sw=2 sts=2 expandtab autoindent:
 #
 # restic script for backupninja
 #
 
 setsection general
 
-getconf repository
-getconf password
 getconf backup        "yes"
-getconf forget        "no"
+getconf forget        "yes"
 getconf check         "no"
 getconf prune         "no"
 getconf rebuild_index "no"
+getconf cacert
+getconf cache_dir
+getconf cleanup_cache
+getconf json
+getconf limit_download
+getconf limit_upload
+getconf no_cache
+getconf no_lock
+getconf option
+getconf password
+getconf password_file
+getconf quiet
+getconf repository
+getconf tls_client_cert
+getconf verbose
 
 setsection s3
 
@@ -42,182 +56,226 @@ setsection gs
 getconf google_project_id
 getconf google_application_credentials
 
-### SANITY CHECKS ##############################################################
+### GLOBAL OPTIONS ############################################################
 
-[ -n "$repository" ] \
-  && export RESTIC_REPOSITORY="$repository" \
-  && debug "The restic repository is: $repository" \
-  || fatal "The repo option must be set."
+[ -n "$cacert" ] && \
+  cmd_global_options+="--cacert $cacert "
 
-[ -n "$password" ] \
-  && export RESTIC_PASSWORD="$password" \
-  && debug "The restic password is set." \
-  || fatal "The password option must be set."
+[ -n "$cache_dir" ] && \
+  cmd_global_options+="--cache-dir $cache_dir "
+
+[ -n "$cleanup_cache" ] && \
+  cmd_global_options+="--cleanup-cache "
+
+[ -n "$json" ] && \
+  cmd_global_options+="--json "
+
+[ -n "$limit_download" ] && \
+  cmd_global_options+="--limit-download $limit_download "
+
+[ -n "$limit_upload" ] && \
+  cmd_global_options+="--limit-upload $limit_upload "
+
+[ -n "$no_cache" ] && \
+  cmd_global_options+="--no-cache "
+
+[ -n "$no_lock" ] && \
+  cmd_global_options+="--no-lock "
+
+[ -n "$option" ] && \
+  cmd_global_options+="$(for i in $option; do echo "--option $i "; done)"
+
+[ -z "$password" -a -z "$password_file" ] && \
+    fatal "The password must be set by option 'password' or 'password_file'."
+
+[ -n "$password" ] && \
+  export RESTIC_PASSWORD="$password"
+
+[ -n "$password_file" ] && \
+  cmd_global_options+="--password-file $password_file "
+
+[ -n "$quiet" ] && \
+  cmd_global_options+="--quiet "
+
+[ -z "$repository" ] && \
+  fatal "The repo option must be set."
+
+[ -n "$repository" ] && \
+  export RESTIC_REPOSITORY="$repository"
+
+[ -n "$tls_client_cert" ] && \
+  cmd_global_options+="--tls-client-cert $tls_client_cert "
+
+[ -n "$verbose" ] && \
+  cmd_global_options+="--verbose $verbose "
+
+### REPOSITORY ################################################################
 
 # SFTP repository
-if [ "$(echo $repository | /usr/bin/awk -F ':' '{print $1}')" == "sftp" ]; then
+if [ "$(echo "$repository" | /usr/bin/awk -F ':' '{print $1}')" == "sftp" ]; then
 
-  remote="$(echo $repository | /usr/bin/awk -F ':' '{print $2}')"
+  remote="$(echo "$repository" | /usr/bin/awk -F ':' '{print $2}')"
 
   # try SSH connection
-  ssh -q $remote exit \
-    && debug "Connection to '$remote' established successfully." \
-    || fatal "Cannot connect to '$remote'."
+  ssh -q "$remote" exit || \
+    fatal "Cannot connect to '$remote'."
 
 fi
 
 # REST Server repository
-if [ "$(echo $repository | /usr/bin/awk -F ':' '{print $1}')" == "rest" ]; then
+if [ "$(echo "$repository" | /usr/bin/awk -F ':' '{print $1}')" == "rest" ]; then
 
-  remote="$(echo ${repository#rest:})"
+  remote="${repository#rest:}"
 
   # try HTTP connection
-  [[ "$(curl -I $remote 2>/dev/null | head -n 1 | cut -d$' ' -f2)" == "200" ]] \
-    && debug "Connection to '$remote' established successfully." \
-    || fatal "Cannot connect to '$remote'."
+  [ "$(curl -I "$remote" 2>/dev/null | head -n 1 | cut -d$' ' -f2)" == "200" ] || \
+    fatal "Cannot connect to '$remote'."
 
 fi
 
 # Amazon S3 repository
-if [ "$(echo $repository | /usr/bin/awk -F ':' '{print $1}')" == "s3" ]; then
+if [ "$(echo "$repository" | /usr/bin/awk -F ':' '{print $1}')" == "s3" ]; then
 
-  [ -n "$aws_access_key_id" ] \
-    && export AWS_ACCESS_KEY_ID=$aws_access_key_id \
-    && debug "The Amazon access key ID is: $aws_access_key_id" \
-    || fatal "Amazon access key ID option must be set for S3 backups."
+  [ -z "$aws_access_key_id" -o -z "$aws_secret_access_key" ] && \
+    fatal "Missing some S3 credentials."
 
-  [ -n "$aws_secret_access_key" ] \
-    && export AWS_SECRET_ACCESS_KEY=$aws_secret_access_key \
-    && debug "The Amazon secret access key is set." \
-    || fatal "Amazon secret access key option must be set for S3 backups."
+  export AWS_ACCESS_KEY_ID="$aws_access_key_id"
+  export AWS_SECRET_ACCESS_KEY="$aws_secret_access_key"
+
 fi
 
 # OpenStack Swift repository
-if [ "$(echo $repository | /usr/bin/awk -F ':' '{print $1}')" == "swift" ]; then
+if [ "$(echo "$repository" | /usr/bin/awk -F ':' '{print $1}')" == "swift" ]; then
 
-  [ -n "$os_auth_url" ] \
-    && export OS_AUTH_URL=$os_auth_url \
-    && debug "The OpenStack Auth URL is: $os_auth_url" \
-    || fatal "OpenStack authentication URL option must be set for Swift backups."
+  [ -z "$os_auth_url" -o -z "$os_tenant_id" -o -z "$os_tenant_name" -o -z "$os_username" -o -z "$os_password" ] && \
+    fatal "Missing some Swift credentials."
 
-  [ -n "$os_tenant_id" ] \
-    && export OS_TENANT_ID=$os_tenant_id \
-    && debug "The OpenStack tenant ID is: $os_tenant_id" \
-    || fatal "OpenStack tenant ID option must be set for Swift backups."
-
-  [ -n "$os_tenant_name" ] \
-    && export OS_TENANT_NAME=$os_tenant_name \
-    && debug "The OpenStack tenant name is: $os_tenant_name" \
-    || fatal "OpenStack tenant name option must be set for Swift backups."
-
-  [ -n "$os_username" ] \
-    && export OS_USERNAME=$os_username \
-    && debug "The OpenStack username is: $os_username" \
-    || fatal "OpenStack username option must be set for Swift backups."
-
-  [ -n "$os_password" ] \
-    && export OS_PASSWORD=$os_password \
-    && debug "The OpenStack password is set." \
-    || fatal "OpenStack password option must be set for Swift backups."
+  export OS_AUTH_URL="$os_auth_url"
+  export OS_TENANT_ID="$os_tenant_id"
+  export OS_TENANT_NAME="$os_tenant_name"
+  export OS_USERNAME="$os_username"
+  export OS_PASSWORD="$os_password"
 
 fi
 
 # Backblaze B2 repository
-if [ "$(echo $repository | /usr/bin/awk -F ':' '{print $1}')" == "b2" ]; then
+if [ "$(echo "$repository" | /usr/bin/awk -F ':' '{print $1}')" == "b2" ]; then
 
-  [ -n "$b2_account_id" ] \
-    && export B2_ACCOUNT_ID=$b2_account_id \
-    && debug "The Blackbaze account ID is: $b2_account_id" \
-    || fatal "Blackbaze account ID option must be set for B2 backups."
+  [ -z "$b2_account_id" -o -z "$b2_account_key" ] && \
+    fatal "Missing some B2 credentials."
 
-  [ -n "$b2_account_key" ] \
-    && export B2_ACCOUNT_KEY=$b2_account_key \
-    && debug "The Blackbaze account key is set." \
-    || fatal "Blackbaze account key option must be set for B2 backups."
+  export B2_ACCOUNT_ID="$b2_account_id"
+  export B2_ACCOUNT_KEY="$b2_account_key"
+
 fi
 
 # Microsoft Azure Blob Storage repository
-if [ "$(echo $repository | /usr/bin/awk -F ':' '{print $1}')" == "azure" ]; then
+if [ "$(echo "$repository" | /usr/bin/awk -F ':' '{print $1}')" == "azure" ]; then
 
-  [ -n "$azure_account_name" ] \
-    && export AZURE_ACCOUNT_NAME=$azure_account_name \
-    && debug "The Azure account name is: $azure_account_name" \
-    || fatal "Azure account name option must be set for Azure backups."
+  [ -z "$azure_account_name" -o -z "$azure_account_key" ] && \
+    fatal "Missing some Azure credentials."
 
-  [ -n "$azure_account_key" ] \
-    && export AZURE_ACCOUNT_KEY=$azure_account_key \
-    && debug "The Blackbaze account key is set." \
-    || fatal "Azure account key option must be set for Azure backups."
+  export AZURE_ACCOUNT_NAME="$azure_account_name"
+  export AZURE_ACCOUNT_KEY="$azure_account_key"
+
 fi
 
 # Google Cloud Storage repository
-if [ "$(echo $repository | /usr/bin/awk -F ':' '{print $1}')" == "gs" ]; then
+if [ "$(echo "$repository" | /usr/bin/awk -F ':' '{print $1}')" == "gs" ]; then
 
-  [ -n "$google_project_id" ] \
-    && export GOOGLE_PROJECT_ID=$google_project_id \
-    && debug "The Google project ID is: $google_project_id" \
-    || fatal "Google project ID option must be set for GS Storage backups."
+  [ -z "$google_project_id" -o -z "$google_application_credentials" ] && \
+    fatal "Missing some Google credentials."
 
-  [ -n "$google_application_credentials" ] \
-    && export GOOGLE_APPLICATION_CREDENTIALS=$google_application_credentials \
-    && debug "The Google application credentials path is set." \
-    || fatal "Google application credentials path option must be set for GS Storage backups."
+  export GOOGLE_PROJECT_ID="$google_project_id"
+  export GOOGLE_APPLICATION_CREDENTIALS="$google_application_credentials"
+
 fi
 
+debug "Repository: $RESTIC_REPOSITORY"
 
 ### BACKUP #####################################################################
 
-if [[ "$backup" == "yes" ]]; then
+if [ "$backup" == "yes" ]; then
 
   setsection backup
 
   getconf include "/"
   getconf exclude "/dev /lost+found /media /mnt /proc /run /sys /tmp /var/cache /var/lock /var/spool /var/run /var/tmp"
-  getconf flag    "--one-file-system"
+  getconf exclude_caches
+  getconf exclude_file
+  getconf exclude_if_present
+  getconf files_from
+  getconf force
+  getconf hostname
+  getconf one_file_system
+  getconf parent
   getconf tag
+  getconf time
+  getconf with_atime
 
   # prevent bash from expanding glob
   set -f
 
-  [ -n "$include" ] \
-    && debug "These files and directories will be included in backups: $include" \
-    || fatal "No files or directories specified for backup."
+  [ -z "$include" -a -z "$files_from" ] && \
+    fatal "No files or directories specified for backup."
 
-  [ -n "$exclude" ] \
-    && debug "Files matching the following patterns will be excluded from backups: $exclude" \
-    || debug "No exclusion patterns defined."
+  [ -n "$include" ] && \
+    cmd_options+="$(for i in $include; do echo "$i "; done)"
 
-  [ -n "$flag" ] \
-    && debug "The following additional flags will be applied to backups: $flag" \
-    || debug "No additional flags defined."
+  [ -n "$files_from" ] && \
+    cmd_options+="$(for i in $files_from; do echo "--files-from $i "; done)"
 
-  [ -n "$tag" ] \
-    && debug "The following tags will be added to backups: $tag" \
-    || debug "No tags defined."
+  [ -d "$repostory" ] && \
+    cmd_options+="--exclude $repository "
 
-  # format exclusion list
-  exclude=$(for i in $exclude; do echo "--exclude=$i "; done)
+  [ -n "$exclude" ] && \
+    cmd_options+="$(for i in $exclude; do echo "--exclude $i "; done)"
 
-  # exclude local repository from backups
-  [ -d "$repostory" ] \
-    && exclude+="--exclude=$repository"
+  [ "$exclude_caches" == "yes" ] && \
+    cmd_options+="--exclude-caches "
 
-  # format tags list
-  tag=$(for i in $tag; do echo "--tag=$i "; done)
+  [ -n "$exclude_file" ] && \
+    cmd_options+="$(for i in $exclude_file; do echo "--exclude-file $i "; done)"
+
+  [ -n "$exclude_if_present" ] && \
+    cmd_options+="$(for i in $exclude_if_present; do echo "--exclude-if-present $i "; done)"
+
+  [ "$force" == "yes" ] && \
+    cmd_options+="--force "
+
+  [ -n "$hostname" ] && \
+    cmd_options+="--hostname $hostname "
+
+  [ -n "$one_file_system" ] && \
+    cmd_options+="--one-file-system "
+
+  [ -n "$parent" ] && \
+    cmd_options+="--parent $parent "
+
+  [ -n "$tag" ] && \
+    cmd_options+="$(for i in $tag; do echo "--tag=$i "; done)"
+
+  [ -n "$time" ] && \
+    cmd_options+="--time $time "
+
+  [ "$with_atime" == "yes" ] && \
+    cmd_options+="--with_atime "
 
   # format command
-  cmd="restic backup $flag $tag $include $exclude"
-  cmd="${cmd//$'\n'/' '}"
+  cmd="restic backup ${cmd_global_options//$'\n'}${cmd_options//$'\n'}"
 
   # execute backup
   info "Taking backup snapshot."
   debug "Running: $cmd"
-  $cmd \
-    || fatal "Restic backup failed."
+  $cmd || \
+    fatal "Restic backup failed."
 
   # set bash orginal globbing behavior
   set +f
 
+  debug "Unsetting variables"
+  unset cmd
+  unset cmd_options
 fi
 
 ### FORGET #####################################################################
@@ -226,139 +284,149 @@ if [[ "$forget" == "yes" ]]; then
 
   setsection forget
 
-  getconf keep_last    "7"
-  getconf keep_hourly  "24"
-  getconf keep_daily   "7"
-  getconf keep_weekly  "4"
-  getconf keep_monthly "12"
-  getconf keep_yearly  "3"
+  getconf keep_last "7"
+  getconf keep_hourly
+  getconf keep_daily
+  getconf keep_weekly
+  getconf keep_monthly
+  getconf keep_yearly
   getconf keep_within
   getconf keep_tag
-  getconf flag         "--prune"
+  getconf host
+  getconf tag
+  getconf path
+  getconf compact
+  getconf group_by
+  getconf prune
 
-  [ -n "$keep_last" ] \
-    && ( [[ "$keep_last" =~ ^[0-9]+$ ]] || fatal "If 'keep_last' is set, it must be an integer." ) \
-    && debug "Never delete the $keep_last last (most recent) snapshots." \
-    || debug "Option 'keep_last' is not set."
+  [ -n "$keep_last" ] && \
+    cmd_options+="--keep-last $keep_last "
 
-  [ -n "$keep_hourly" ] \
-    && ( [[ "$keep_hourly" =~ ^[0-9]+$ ]] || fatal "If 'keep_hourly' is set, it must be an integer." ) \
-    && debug "For the last $keep_hourly hours in which a snapshot was made, keep only the last snapshot for each hour." \
-    || debug "Option 'keep_hourly' is not set."
+  [ -n "$keep_hourly" ] && \
+    cmd_options+="--keep-hourly $keep_hourly "
 
-  [ -n "$keep_daily" ] \
-    && ( [[ "$keep_daily" =~ ^[0-9]+$ ]] || fatal "If 'keep_daily' is set, it must be an integer." ) \
-    && debug "For the last $keep_daily days which have one or more snapshots, only keep the last one for that day." \
-    || debug "Option 'keep_daily' is not set."
+  [ -n "$keep_daily" ] && \
+    cmd_options+="--keep-daily $keep_daily "
 
-  [ -n "$keep_weekly" ] \
-    && ( [[ "$keep_weekly" =~ ^[0-9]+$ ]] || fatal "If 'keep_weekly' is set, it must be an integer." ) \
-    && debug "For the last $keep_weekly weeks which have one or more snapshots, only keep the last one for that week." \
-    || debug "Option 'keep_weekly' is not set."
+  [ -n "$keep_weekly" ] && \
+    cmd_options+="--keep-weekly $keep_weekly "
 
-  [ -n "$keep_monthly" ] \
-    && ( [[ "$keep_monthly" =~ ^[0-9]+$ ]] || fatal "If 'keep_monthly' is set, it must be an integer." ) \
-    && debug "For the last $keep_monthly months which have one or more snapshots, only keep the last one for that month." \
-    || debug "Option 'keep_monthly' is not set."
+  [ -n "$keep_monthly" ] && \
+    cmd_options+="--keep-monthly $keep_monthly "
 
-  [ -n "$keep_yearly" ] \
-    && ( [[ "$keep_yearly" =~ ^[0-9]+$ ]] || fatal "If 'keep_yearly' is set, it must be an integer." ) \
-    && debug "For the last $keep_year years which have one or more snapshots, only keep the last one for that year." \
-    || debug "Option 'keep_yearly' is not set."
+  [ -n "$keep_yearly" ] && \
+    cmd_options+="--keep-yearly $keep_yearly "
 
-  [ -n "$keep_within" ] \
-    && ( [[ "$keep_within" =~ ^([0-9]+[ymwdh])+$ ]] || fatal "If 'keep_within' is set, it must looks like '2y5m7d'." ) \
-    && debug "Keep all snapshots which have been made within '$keep_within' of the latest snapshot." \
-    || debug "Option 'keep_within' is not set."
+  [ -n "$keep_within" ] && \
+    cmd_options+="--keep-within $keep_within "
 
-  [ -n "$keep_tag" ] \
-    && debug "Keep all snapshots tagged: $keep_tag" \
-    || debug "Option 'keep_tag' is not set."
+  [ -n "$keep_tag" ] && \
+    cmd_options+="$(for i in $keep_tag; do echo "--keep-tag=$i "; done)"
 
-  [ -n "$flag" ] \
-    && debug "The following additional flags will be applied to backups: $flag" \
-    || debug "No additional flags defined."
+  [ -n "$host" ] && \
+    cmd_options+="--host $host "
 
-  # format tags list
-  keep_options=$(for i in $keep_tag; do echo "--tag=$i "; done)
+  [ -n "$tag" ] && \
+    cmd_options+="$(for i in $tag; do echo "--tag=$i "; done)"
 
-  # concatenate range options
-  keeps=( last hourly daily weekly monthly yearly within )
-  for range in "${keeps[@]}"; do
-    keep_range="keep_${range}"
-    [ -n "${!keep_range}" ] \
-       && keep_options+=" --keep-${range} ${!keep_range}"
-  done
+  [ -n "$path" ] && \
+    cmd_options+="$(for i in $path; do echo "--path=$i "; done)"
+
+  [ -n "$compact" ] && \
+    cmd_options+="--compact "
+
+  [ -n "$group_by" ] && \
+    cmd_options+="--group-by $group_by "
+
+  [ -n "$prune" ] && \
+    cmd_options+="--prune "
 
   # format command
-  cmd="restic forget $flag $keep_options"
-  cmd="${cmd//$'\n'/' '}"
+  cmd="restic forget ${cmd_global_options//$'\n'}${cmd_options//$'\n'}"
 
   # execute forget
   info "Removing old snapshots based on defined retention policy."
   debug "Running: $cmd"
-  $cmd \
-    || fatal "Restic forget expired snapshots failed."
+  $cmd || \
+    fatal "Restic forget expired snapshots failed."
+
+  debug "Unsetting variables"
+  unset cmd
+  unset cmd_options
 
 fi
 
 ### CHECK ######################################################################
 
-if [[ "$check" == "yes" ]]; then
+if [ "$check" == "yes" ]; then
 
   setsection check
 
-  getconf flag
+  getconf check_unused
+  getconf read_data
+  getconf read_data_subset
+  getconf with_cache
+
+  [ -n "$check_unused" ] && \
+    cmd_options+="--check-unused "
+
+  [ -n "$read_data" ] && \
+    cmd_options+="--read-data "
+
+  [ -n "$read_data_subset" ] && \
+    cmd_options+="--read-data-subset $read_data_subset "
+
+  [ -n "$with_cache" ] && \
+    cmd_options+="--with-cache "
 
   # format command
-  cmd="restic check $flag"
-  cmd="${cmd//$'\n'/' '}"
+  cmd="restic check ${cmd_global_options//$'\n'}${cmd_options//$'\n'}"
 
   # execute check
   info "Checking repository integrity and consistency."
   debug "Running: $cmd"
-  $cmd \
-    || fatal "Restic check repository integrity and consistency failed."
+  $cmd || \
+    fatal "Restic check repository integrity and consistency failed."
+
+  debug "Unsetting variables"
+  unset cmd
+  unset cmd_options
 
 fi
 
 ### PRUNE ######################################################################
 
-if [[ "$prune" == "yes" ]]; then
-
-  setsection prune
-
-  getconf flag
+if [ "$prune" == "yes" ]; then
 
   # format command
-  cmd="restic prune $flag"
-  cmd="${cmd//$'\n'/' '}"
+  cmd="restic prune ${cmd_global_options//$'\n'}"
 
   # execute prune
   info "Removing data not referenced and not needed any more."
   debug "Running: $cmd"
-  $cmd \
-    || fatal "Restic prune repository failed."
+  $cmd || \
+    fatal "Restic prune repository failed."
+
+  debug "Unsetting variables"
+  unset cmd
 
 fi
 
 ### REBUILD INDEX ##############################################################
 
-if [[ "$rebuild_index" == "yes" ]]; then
-
-  setsection rebuild_index
-
-  getconf flag
+if [ "$rebuild_index" == "yes" ]; then
 
   # format command
-  cmd="restic rebuild-index $flag"
-  cmd="${cmd//$'\n'/' '}"
+  cmd="restic rebuild-index ${cmd_global_options//$'\n'}"
 
   # execute rebuild-index
   info "Rebuilding index based on files in the repository."
   debug "Running: $cmd"
-  $cmd \
-    || fatal "Restic rebuild index repository failed."
+  $cmd || \
+    fatal "Restic rebuild index repository failed."
+
+  debug "Unsetting variables"
+  unset cmd
 
 fi
 
@@ -380,5 +448,6 @@ unset AZURE_ACCOUNT_NAME
 unset AZURE_ACCOUNT_KEY
 unset GOOGLE_PROJECT_ID
 unset GOOGLE_APPLICATION_CREDENTIALS
+unset cmd_global_options
 
 return 0
