@@ -72,7 +72,7 @@ getconf google_application_credentials
 [ -z "$repository" ] && \
   fatal "The repo option must be set."
 
-[ -z "$password" -a -z "$password_file" ] && \
+[ -z "$password" ] && [ -z "$password_file" ] && \
     fatal "The password must be set by option 'password' or 'password_file'."
 
 [ -n "$repository" ] && \
@@ -147,7 +147,7 @@ fi
 # Amazon S3 repository
 if [ "$(echo "$repository" | /usr/bin/awk -F ':' '{print $1}')" == "s3" ]; then
 
-  [ -z "$aws_access_key_id" -o -z "$aws_secret_access_key" ] && \
+  ( [ -z "$aws_access_key_id" ] || [ -z "$aws_secret_access_key" ] ) && \
     fatal "Missing some S3 credentials."
 
   export_debug AWS_ACCESS_KEY_ID "$aws_access_key_id"
@@ -158,7 +158,10 @@ fi
 # OpenStack Swift repository
 if [ "$(echo "$repository" | /usr/bin/awk -F ':' '{print $1}')" == "swift" ]; then
 
-  [ -z "$os_auth_url" -o -z "$os_tenant_id" -o -z "$os_tenant_name" -o -z "$os_username" -o -z "$os_password" -o -z "$os_region_name" ] && \
+  (
+    [ -z "$os_auth_url" ] || [ -z "$os_tenant_id" ] || [ -z "$os_tenant_name" ] || \
+    [ -z "$os_username" ] || [ -z "$os_password" ] || [ -z "$os_region_name" ]
+  ) && \
     fatal "Missing some Swift credentials."
 
   export_debug OS_AUTH_URL "$os_auth_url"
@@ -173,7 +176,7 @@ fi
 # Backblaze B2 repository
 if [ "$(echo "$repository" | /usr/bin/awk -F ':' '{print $1}')" == "b2" ]; then
 
-  [ -z "$b2_account_id" -o -z "$b2_account_key" ] && \
+  ( [ -z "$b2_account_id" ] || [ -z "$b2_account_key" ] ) && \
     fatal "Missing some B2 credentials."
 
   export_debug B2_ACCOUNT_ID "$b2_account_id"
@@ -184,7 +187,7 @@ fi
 # Microsoft Azure Blob Storage repository
 if [ "$(echo "$repository" | /usr/bin/awk -F ':' '{print $1}')" == "azure" ]; then
 
-  [ -z "$azure_account_name" -o -z "$azure_account_key" ] && \
+  ( [ -z "$azure_account_name" ] || [ -z "$azure_account_key" ] ) && \
     fatal "Missing some Azure credentials."
 
   export_debug AZURE_ACCOUNT_NAME "$azure_account_name"
@@ -195,7 +198,7 @@ fi
 # Google Cloud Storage repository
 if [ "$(echo "$repository" | /usr/bin/awk -F ':' '{print $1}')" == "gs" ]; then
 
-  [ -z "$google_project_id" -o -z "$google_application_credentials" ] && \
+  ( [ -z "$google_project_id" ] || [ -z "$google_application_credentials" ] ) && \
     fatal "Missing some Google credentials."
 
   export_debug GOOGLE_PROJECT_ID "$google_project_id"
@@ -226,7 +229,7 @@ if [ "$run_backup" == "yes" ]; then
   # prevent bash from expanding glob
   set -f
 
-  [ -z "$include" -a -z "$files_from" ] && \
+  [ -z "$include" ] && [ -z "$files_from" ] && \
     fatal "No files or directories specified for backup."
 
   [ -n "$include" ] && \
