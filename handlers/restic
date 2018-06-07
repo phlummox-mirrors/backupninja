@@ -305,6 +305,7 @@ if [[ "$run_forget" == "yes" ]]; then
   getconf path
   getconf compact
   getconf group_by
+  getconf dry_run
   getconf prune
 
   [ -n "$keep_last" ] && \
@@ -345,6 +346,9 @@ if [[ "$run_forget" == "yes" ]]; then
 
   [ -n "$group_by" ] && \
     cmd_options+="--group-by $group_by "
+
+  [ -n "$dry_run" ] && \
+    cmd_options+="--dry-run "
 
   [ -n "$prune" ] && \
     cmd_options+="--prune "
