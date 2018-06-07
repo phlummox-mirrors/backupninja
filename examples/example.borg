@@ -163,10 +163,10 @@ exclude = /var/lib/mysql
 
 ## encryption mode to use for repository creation
 ##
-## can be "none", "repokey" or "repofile"
+## common options are "none", "repokey" or "keyfile"
 ## - "none" = no encryption
 ## - "repokey" = encryption with key stored inside the repository
-## - "repofile" = encryption with key stored in ~/.config/borg/keys/
+## - "keyfile" = encryption with key stored in ~/.config/borg/keys/
 ##
 ## for more info see : borg help init
 ##
