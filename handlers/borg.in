@@ -50,7 +50,7 @@ export BORG_PASSPHRASE="$passphrase"
 # destination specific checks
 [ "$directory" != "" ] || fatal "Destination directory not set"
 if [ "$host" != "localhost" ]; then
-  execstr_repository="$user@$host:$directory"
+  execstr_repository="ssh://${user}@${host}${directory}"
 else
   execstr_repository="$directory"
 fi
