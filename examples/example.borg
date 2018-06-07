@@ -168,14 +168,14 @@ exclude = /var/lib/mysql
 ## - "repokey" = encryption with key stored inside the repository
 ## - "keyfile" = encryption with key stored in ~/.config/borg/keys/
 ##
-## for more info see : borg help init
+## for other options and more info, see : borg help init
 ##
 ## Default:
 # encryption = none
 
 ## passphrase of the key used for repository encryptions
 ##
-## must be set if encryption != none
+## must be set if encryption is not "none"
 ## encryption is disabled by default
 ##
 ## Default:
