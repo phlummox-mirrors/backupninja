@@ -87,6 +87,8 @@ password = secret
 
 #os_password =
 
+#os_region_name =
+
 [b2]
 
 #b2_account_id =
