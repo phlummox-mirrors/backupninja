@@ -8,71 +8,213 @@
 # when = everyday at 01
 
 [general]
+
+# Create a new backup of files and/or directories [yes/no]
+#run_backup = yes
+
+# Remove snapshots from the repository [yes/no]
+#run_forget = yes
+
+# Check the repository for errors [yes/no]
+#run_check = no
+
+# Remove unneeded data from the repository [yes/no]
+#run_prune = no
+
+# Build a new index file [yes/no]
+#run_rebuild_index = no
+
+# Repository to backup to or restore from [path]
 repository = /mnt/backup
+
+# Repository password [string]
 password = secret
-# backup = yes
-# forget = no
-# check = no
-# prune = no
-# rebuild_index = no
 
-# [s3]
-# aws_access_key_id =
-# aws_secret_access_key = 
+# File to load root certificates from (default: use system certificates) [path]
+#cacert =
 
-# [swift]
-# os_auth_url =
-# os_tenant_id =
-# os_tenant_name =
-# os_username =
-# os_password =
+# Set the cache directory [path]
+#cache_dir =
 
-# [b2]
-# b2_account_id =
-# b2_account_key =
+# Auto remove old cache directories [yes/no]
+#cleanup_cache =
 
-# [azure]
-# azure_account_name =
-# azure_account_key =
+# Set output mode to JSON for commands that support it [yes/no]
+#json =
 
-# [gs]
-# google_project_id =
-# google_application_credentials =
+# Limits downloads to a maximum rate in KiB/s. (default: unlimited) [integer]
+#limit_download =
 
-# [backup]
-# include = /
-# exclude = /dev
-# exclude = /lost+found
-# exclude = /media
-# exclude = /mnt
-# exclude = /proc
-# exclude = /run
-# exclude = /sys
-# exclude = /tmp
-# exclude = /var/cache
-# exclude = /var/lock
-# exclude = /var/spool
-# exclude = /var/run
-# exclude = /var/tmp
-# flag = --one-file-system
-# tag =
+# Limits uploads to a maximum rate in KiB/s. (default: unlimited) [integer]
+#limit_upload =
 
-# [forget]
-# keep_last = 7
-# keep_hourly = 24
-# keep_daily = 7
-# keep_weekly = 4
-# keep_monthly = 12
-# keep_yearly = 3
-# keep_within =
-# keep_tag =
-# flag = --prune
+# Do not use a local cache [yes/no]
+#no_cache =
 
-# [check]
-# flag =
+# Do not lock the repo, this allows some operations on read-only repos [yes/no]
+#no_lock =
 
-# [prune]
-# flag =
+# Set extended option (can be specified multiple times) [key=value]
+#option =
 
-# [rebuild_index]
-# flag =
+# Read the repository password from a file [path]
+#password_file =
+
+# Do not output comprehensive progress report [yes/no]
+#quiet =
+
+# Path to a file containing PEM encoded TLS client certificate and private key [path]
+#tls_client_cert =
+
+# Be verbose (level n) [integer]
+#verbose =
+
+[s3]
+
+#aws_access_key_id =
+
+#aws_secret_access_key =
+
+[swift]
+
+#os_auth_url =
+
+#os_tenant_id =
+
+#os_tenant_name =
+
+#os_username =
+
+#os_password =
+
+[b2]
+
+#b2_account_id =
+
+#b2_account_key =
+
+[azure]
+
+#azure_account_name =
+
+#azure_account_key =
+
+[gs]
+
+#google_project_id =
+
+#google_application_credentials =
+
+[backup]
+
+# Files adn directories to backup (can be specified multiple times) [path]
+#include = /
+
+# Exclude a pattern (can be specified multiple times) [pattern]
+#exclude = /dev
+#exclude = /lost+found
+#exclude = /media
+#exclude = /mnt
+#exclude = /proc
+#exclude = /run
+#exclude = /sys
+#exclude = /tmp
+#exclude = /var/cache
+#exclude = /var/lock
+#exclude = /var/spool
+#exclude = /var/run
+#exclude = /var/tmp
+
+# Excludes cache directories that are marked with a CACHEDIR.TAG file [yes/no]
+#exclude_caches =
+
+# Read exclude patterns from a file (can be specified multiple times) [path]
+#exclude_file =
+
+# Takes filename[:header], exclude contents of directories containing filename (except filename itself) if header of that file is as provided (can be specified multiple times) [stringArray]
+#exclude_if_present =
+
+# Read the files to backup from file (can be combined with file args) [path]
+#files_from =
+
+# Force re-reading the target files/directories (overrides the "parent" flag) [yes/no]
+#force =
+
+# Set the hostname for the snapshot manually. To prevent an expensive rescan use the "parent" flag [string]
+#hostname =
+
+# Exclude other file systems [yes/no]
+#one_file_system =
+
+# Use this parent snapshot (default: last snapshot in the repo that has the same target files/directories) [string]
+#parent =
+
+# Add a tag for the new snapshot (can be specified multiple times) [string]
+#tag =
+
+# Time of the backup (ex. '2012-11-01 22:08:41') (default: now) [string]
+#time =
+
+# Store the atime for all files and directories [yes/no]
+#with_atime =
+
+[forget]
+
+# Keep the last n snapshots [integer]
+#keep_last = 7
+
+# Keep the last n hourly snapshots [integer]
+#keep_hourly =
+
+# Keep the last n daily snapshots [integer]
+#keep_daily =
+
+# Keep the last n weekly snapshots [integer]
+#keep_weekly =
+
+# Keep the last n monthly snapshots [integer]
+#keep_monthly =
+
+# Keep the last n yearly snapshots [integer]
+#keep_yearly =
+
+# Keep snapshots that were created within duration before the newest (e.g. 1y5m7d) [string]
+#keep_within =
+
+# Keep snapshots with this tag (can be specified multiple times) [string]
+#keep_tag =
+
+# Only consider snapshots with the given host [string]
+#host =
+
+# Only consider snapshots which include this tag (can be specified multiple times) [string]
+#tag =
+
+# Only consider snapshots which include this (absolute) path (can be specified multiple times) [string]
+#path =
+
+# Use compact format [yes/no]
+#compact =
+
+# String for grouping snapshots by host,paths,tags (default "host,paths") [string]
+#group_by =
+
+# Do not delete anything, just print what would be done [yes/no]
+dry_run =
+
+# Automatically run the 'prune' command if snapshots have been removed [yes/no]
+#prune =
+
+[check]
+
+# Find unused blobs [yes/no]
+#check_unused =
+
+# Read all data blobs [yes/no]
+#read_data =
+
+# Read subset of data packs [string]
+#read_data_subset =
+
+# Use the cache [yes/no]
+#with_cache =
