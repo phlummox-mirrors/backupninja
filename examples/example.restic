@@ -10,10 +10,10 @@
 [general]
 
 # Create a new backup of files and/or directories [yes/no]
-#run_backup = yes
+run_backup = yes
 
 # Remove snapshots from the repository [yes/no]
-#run_forget = yes
+#run_forget = no
 
 # Check the repository for errors [yes/no]
 #run_check = no

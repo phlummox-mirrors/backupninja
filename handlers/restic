@@ -16,8 +16,8 @@ function export_debug {
 
 setsection general
 
-getconf run_backup        "yes"
-getconf run_forget        "yes"
+getconf run_backup        "no"
+getconf run_forget        "no"
 getconf run_check         "no"
 getconf run_prune         "no"
 getconf run_rebuild_index "no"
