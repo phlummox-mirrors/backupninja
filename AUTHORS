@@ -7,7 +7,7 @@ micah@riseup.net   -- debian package, vserver support, bug fixes
 stefani@riseup.net -- makecd handler, man pages
 intrigeri@boum.org -- dup handler, pgsql handler, vserver support, bug fixes
 Charles Lepple 	   -- trac handler
-Petr Klíma <petr.klima@madeta-group.cz>	-- autotools, RPM support and sys checks
+Petr Klï¿½ma <petr.klima@madeta-group.cz>	-- autotools, RPM support and sys checks
 paulv@bikkel.org   -- rsnap handler
 Robert Napier 	   -- improved RPM build
 rhatto 		   -- rub handler and patches
@@ -65,3 +65,4 @@ David Gasaway <dave@gasaway.org> -- Fixes for configuration files without suffix
 Hugh Nowlan <nosmo@nosmo.me> -- dup check for archive dir
 Lyz <lyz@riseup.net> -- sys support for LUKS in disk partitions
 Glandos <bugs-0xacab@antipoul.fr> -- sys excludes zram devices
+Nicolas Karolak <nicolas@karolak.fr> -- Add restic support
