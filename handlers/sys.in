@@ -633,7 +633,7 @@ if [ "$partitions" == "yes" ]; then
 fi
 
 if [ "$luksheaders" == "yes" ]; then
-   devices=`LC_ALL=C $SFDISK -l 2>/dev/null | grep '/dev/' | @SED@ -e 's/Disk //' -re 's/:? +.*//g'`
+   devices=`LC_ALL=C $SFDISK -l 2>/dev/null | grep -E '^(Disk )?/dev/' | @SED@ -e 's/Disk //' -re 's/:? +.*//g'`
    [ -n "$devices" ] || warning "No block device found"
    partitions=`LC_ALL=C $SFDISK -l 2>/dev/null |grep "^/dev" | @AWK@ '{print $1}'`
    [ -n "$partitions" ] || warning "No partitions found"
