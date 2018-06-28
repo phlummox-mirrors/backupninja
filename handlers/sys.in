@@ -608,7 +608,7 @@ fi
 
 if [ "$partitions" == "yes" ]; then
    if [ "$dosfdisk" == "yes" ]; then
-      devices=`LC_ALL=C $LSBLK --output NAME,TYPE --list --paths 2>/dev/null | grep "disk$" | @AWK@ '{print $1}'`
+      devices=`LC_ALL=C $LSBLK --output NAME,TYPE --list --paths 2>/dev/null | grep "disk$" | grep -v '^/dev/zram' | @AWK@ '{print $1}'`
       if [ "$devices" == "" ]; then
          warning "No harddisks found"
       fi
