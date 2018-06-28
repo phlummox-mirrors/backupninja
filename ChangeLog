@@ -2,6 +2,9 @@ version 1.0.3 -- UNRELEASED
 
     documentation changes
 	 · Fix typos in README.md and manpages. Thank you, Lintian!
+    handler changes
+	borg:
+	 . Added initial support
 
 version 1.0.2 -- September 05, 2017
     handler changes
