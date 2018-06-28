@@ -1,10 +1,22 @@
 version 1.0.3 -- UNRELEASED
 
+    backupninja changes
+	 · Add validation check for when parameter
+	 · Quote output strings passed to logging functions
+	 · Ignore files in /etc/backup.d that lack suffix
     documentation changes
 	 · Fix typos in README.md and manpages. Thank you, Lintian!
+	 · Improve release process documentation
     handler changes
 	borg:
-	 . Added initial support
+	 . Add initial support
+	dub:
+	 · Fix symmetric encryption
+	 · Bail if archive dir doesn't exist
+	sys:
+	 · Use lsblk instead of sfdisk to get a list of block devices
+	 · Avoid looking for partitions on zram devices
+	 · Support extracting LUKS headers from partitions
 
 version 1.0.2 -- September 05, 2017
     handler changes

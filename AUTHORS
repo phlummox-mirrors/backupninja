@@ -61,3 +61,7 @@ ulrich <ulrich@habmalnefrage.de> -- Added validation check for when
 Romain Dessort <romain@univers-libre.net> -- Fix list of devices when dumping partition tables
 Guillaume Subiron <ben@wainei.net> -- borg handler
 Jerome Charaoui <jerome@riseup.net> -- borg handler
+David Gasaway <dave@gasaway.org> -- Fixes for configuration files without suffix
+Hugh Nowlan <nosmo@nosmo.me> -- dup check for archive dir
+Lyz <lyz@riseup.net> -- sys support for LUKS in disk partitions
+Glandos <bugs-0xacab@antipoul.fr> -- sys excludes zram devices
