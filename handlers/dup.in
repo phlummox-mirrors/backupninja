@@ -225,6 +225,7 @@ fi
 # duplicity now enables the archive_dir by default, let's put it into /var/cache/backupninja/duplicity
 # unless the user has specified it.
 if echo "${options}" | grep -qv -- "--archive-dir" ; then
+   [ -d "/var/cache/backupninja" ] || fatal "/var/cache/backupninja does not exist - create it"
    execstr_options="${execstr_options} --archive-dir /var/cache/backupninja/duplicity"
 fi
 
