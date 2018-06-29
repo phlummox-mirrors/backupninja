@@ -278,6 +278,7 @@ script is run hourly from cron.
 
 The following options are available:
 -h, --help           This usage message
+-v, --version        Show backupninja version number
 -d, --debug          Run in debug mode, where all log messages are
                      output to the current shell.
 -f, --conffile FILE  Use FILE for the main configuration instead
@@ -431,12 +432,14 @@ function process_action() {
 setupcolors
 conffile="@CFGDIR@/backupninja.conf"
 loglevel=3
+version="@PACKAGE_VERSION@"
 
 ## process command line options
 
 while [ $# -ge 1 ]; do
    case $1 in
       -h|--help) usage;;
+      -v|--version) echo "backupninja $version";;
       -d|--debug) debug=1; export BACKUPNINJA_DEBUG=yes;;
       -t|--test) test=1;debug=1;;
       -n|--now) processnow=1;;

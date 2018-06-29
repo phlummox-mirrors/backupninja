@@ -15,7 +15,8 @@ edit = sed \
     -e 's,@datadir\@,$(pkgdatadir),g' \
     -e "s,@libdir\@,$(pkglibdir),g" \
     -e 's,@localstatedir\@,$(localstatedir),g' \
-    -e 's,@prefix\@,$(prefix),g'
+    -e 's,@prefix\@,$(prefix),g' \
+    -e 's,@PACKAGE_VERSION\@,$(PACKAGE_VERSION),g'
 
 #install-exec-hook:
 
