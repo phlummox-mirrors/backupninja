@@ -57,7 +57,6 @@
 #   protocol = ssh or rsync (remote source only)
 #   rsync = rsync program
 #   rsync_options = rsync command options
-#   exclude_vserver = vserver-name (valid only if vservers = yes on backupninja.conf)
 #   numericids = when set to 1, use numeric ids instead of user/group mappings on rsync
 #   compress = if set to 1, compress data on rsync (remote source only)
 #   bandwidthlimit = set a bandwidth limit in KB/s (remote source only)
@@ -97,9 +96,6 @@
 #   touch = touch command
 #   mv = mv command
 #   fsck = fsck command
-#
-# You dont need to manually specify vservers using "include = /vservers".
-# They are automatically backuped if vserver is set to "yes" on you backupninja.conf.
 #
 
 # function definitions
@@ -175,7 +171,6 @@ function eval_config {
   getconf filelistbase
   getconf include
   getconf exclude
-  getconf exclude_vserver
   getconf numericids 0
   getconf compress 0
   
@@ -981,8 +976,6 @@ function set_rsync_options {
     rsync_options=($rsync_options --rsync-path="$remote_rsync")
   fi
 
-  include_vservers
-
 }
 
 function stop_services {
@@ -1052,33 +1045,6 @@ function run_fsck {
         mount $mountpoint
       fi
     fi
-  fi
-
-}
-
-function include_vservers {
-
-  # add vservers to included folders
-
-  if [ "$vservers_are_available" == "yes" ]; then
-
-    # sane permission on backup
-    mkdir -p $backupdir/$VROOTDIR
-    chmod 000 $backupdir/$VROOTDIR
-
-    for candidate in $found_vservers; do
-      candidate="`basename $candidate`"
-      found_excluded_vserver="0"
-      for excluded_vserver in $exclude_vserver; do
-        if [ "$excluded_vserver" == "$candidate" ]; then
-          found_excluded_vserver="1"
-          break
-        fi
-      done
-      if [ "$found_excluded_vserver" == "0" ]; then
-        include="$include $VROOTDIR/$candidate"
-      fi
-    done
   fi
 
 }

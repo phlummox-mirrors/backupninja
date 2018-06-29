@@ -79,7 +79,3 @@
 # note: to backup your BIOS, you need the program 'flashrom' installed, and your
 # mainboard needs to be supported, see http://flashrom.org/Supported_hardware#Supported_mainboards
 # bios = no
-
-# If vservers = yes in /etc/backupninja.conf then the following variables can
-# be used:
-# vsnames = all | <vserver1> <vserver2> ... (default = all)

@@ -126,21 +126,6 @@ getconf mbrfile $parentdir/mbr.__star__.bin
 getconf FLASHROM `which flashrom`
 getconf bios no
 
-getconf vsnames all
-
-# If vservers are configured, check that the ones listed in $vsnames are running.
-usevserver=no
-if [ $vservers_are_available = yes ]; then
-   if [ "$vsnames" = all ]; then
-      vsnames="$found_vservers"
-   fi
-   if ! vservers_running "$vsnames" ; then
-      fatal "At least one of the vservers listed in vsnames ($vsnames) is not running."
-   fi
-   info "Using vservers '$vsnames'"
-   usevserver=yes
-fi
-
 ## SANITY CHECKS #########################
 
 if [ "$luksheaders" == "yes" ]; then
@@ -186,47 +171,6 @@ fi
 #
 
 if [ "$packages" == "yes" ]; then
-
-   if [ $usevserver = yes ]; then
-      info "vserver root directory set to: $VROOTDIR"
-      for vserver in $vsnames; do
-         info "examining vserver: $vserver"
-         # is it running ?
-         vservers_running $vserver
-         if [ $? -ne 0 ]; then
-            warning "The vserver $vserver is not running."
-            continue
-         fi
-         # is $packagemgr available inside $vserver ?
-         if [ ! -x "${VROOTDIR}/${vserver}${packagemgr}" ]; then
-            warning "can't find $packagemgr in vserver $vserver, skipping installed packages report."
-         else
-            # don't expand * since it can be used in $packagemgroptions
-            set -o noglob
-            debug "$VSERVER $vserver exec $packagemgr $packagemgroptions > $VROOTDIR/$vserver$packagesfile"
-            $VSERVER $vserver exec $packagemgr $packagemgroptions > $VROOTDIR/$vserver$packagesfile || fatal "can not save $packagemgr info to $packagesfile"
-            set +o noglob
-         fi
-         # is $debconfgetselections available inside $vserver ?
-         found=no
-         # case #1: it is available on the host, is it available inside $vserver ?
-         if [ -n "$debconfgetselections" ]; then
-            [ -x "${VROOTDIR}/${vserver}${debconfgetselections}" ] && found=yes
-         # case #2: it is not available on the host, is it available inside $vserver ?
-         else
-            [ -n "`$VSERVER $vserver exec which debconf-get-selections`" ] && found=yes
-         fi
-         if [ "$found" != yes ]; then
-            warning "can't find debconf-get-selections in vserver $vserver, skipping package selection states. You may want to install the debconf-utils package."
-         else
-            debug "$VSERVER $vserver exec $debconfgetselections > $VROOTDIR/$vserver$selectionsfile"
-            $VSERVER $vserver exec $debconfgetselections > $VROOTDIR/$vserver$selectionsfile || fatal "can not save debconf-get-selections info to $selectionsfile"
-         fi
-         unset found
-      done
-   fi
-
-   # We want to perform this on the host as well
    if [ -z "$packagemgr" -o ! -x "$packagemgr" ]; then
       warning "can't find ${packagemgr}, skipping installed packages report."
    else
@@ -549,11 +493,6 @@ catifexec "/usr/sbin/sestatus"
 if [ $os = "redhat" ]; then
    catifexec "rpm" "-q -V selinux-policy-targeted"
    catifexec "rpm" "-q -V selinux-policy-strict"
-fi
-
-if [ $usevserver = yes ]; then
-   STATUS="Gathering vserver information"
-   catiffile "/proc/virtual"
 fi
 
 if [ "$partitions" == "yes" ]; then

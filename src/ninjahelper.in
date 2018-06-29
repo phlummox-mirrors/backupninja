@@ -43,8 +43,6 @@ require_packages() {
 ## menu for the wizards
 ##
 donew() {
-   # (re-)initialize vservers support
-   init_vservers
    # menu
    listBegin "new action menu" "select an action to create"
    listItem return "return to main menu"
@@ -202,7 +200,6 @@ fi
 # include shared functions
 . $libdirectory/easydialog
 . $libdirectory/tools
-. $libdirectory/vserver
 
 # am I running as root?
 if [ "$UID" != "0" ]; then

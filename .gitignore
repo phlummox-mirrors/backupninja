@@ -47,7 +47,6 @@ lib/Makefile
 lib/easydialog
 lib/parseini
 lib/tools
-lib/vserver
 man/Makefile
 src/Makefile
 src/backupninja

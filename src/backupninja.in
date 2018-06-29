@@ -507,7 +507,6 @@ fi
 
 # include shared functions
 . $libdirectory/tools
-. $libdirectory/vserver
 
 setfile $conffile
 
@@ -545,10 +544,6 @@ getconf RSYNC /usr/bin/rsync
 getconf DSYNC /usr/bin/dsync
 getconf DOVEADM /usr/bin/doveadm
 getconf admingroup root
-
-# initialize vservers support
-# (get config variables and check real vservers availability)
-init_vservers nodialog
 
 if [ ! -d "$configdirectory" ]; then
    echo "Configuration directory '$configdirectory' not found."

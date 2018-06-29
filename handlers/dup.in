@@ -20,8 +20,6 @@ getconf signkey
 
 setsection source
 getconf include
-getconf vsnames all
-getconf vsinclude
 getconf exclude
 
 setsection dest
@@ -49,7 +47,7 @@ destdir=${destdir%/}
 ### SANITY CHECKS ##############################################################
 
 [ -n "$desturl" -o -n "$destdir" ]  || fatal "The destination directory (destdir) must be set when desturl is not used."
-[ -n "$include" -o -n "$vsinclude" ]  || fatal "No source includes specified"
+[ -n "$include" ]  || fatal "No source includes specified"
 [ -n "$password" ] || fatal "The password option must be set."
 if [ -n "$signkey" -a -n "$encryptkey" -a "$signkey" != "$encryptkey" ]; then
    [ -n "$signpassword" ] || fatal "The signpassword option must be set because signkey is different from encryptkey."
@@ -90,25 +88,6 @@ fi
 nice="nice -n $nicelevel"
 if [ -n "$ionicelevel" ]; then
    nice="ionice -c2 -n $ionicelevel $nice"
-fi
-
-### VServers
-# If vservers are configured, check that the ones listed in $vsnames do exist.
-usevserver=no
-if [ $vservers_are_available = yes ]; then
-   if [ "$vsnames" = all ]; then
-      vsnames="$found_vservers"
-   else
-      if ! vservers_exist "$vsnames" ; then
-            fatal "At least one of the vservers listed in vsnames ($vsnames) does not exist."
-      fi
-   fi
-   if [ -n "$vsinclude" ]; then
-      info "Using vservers '$vsnames'"
-      usevserver=yes
-   fi
-else
-   [ -z "$vsinclude" ] || warning 'vservers support disabled in backupninja.conf, vsincludes configuration lines will be ignored'
 fi
 
 ### See if we can login on $desthost
@@ -270,20 +249,6 @@ for i in $include; do
    execstr_source="${execstr_source} --include '$str'"
 done
 IFS=$SAVEIFS
-
-# vsincludes
-if [ $usevserver = yes ]; then
-   for vserver in $vsnames; do
-      SAVEIFS=$IFS
-      IFS=$(echo -en "\n\b")
-      for vi in $vsinclude; do
-         str="${vi//__star__/*}"
-         str="$VROOTDIR/$vserver$str"
-         execstr_source="${execstr_source} --include '$str'"
-      done
-      IFS=$SAVEIFS
-   done
-fi
 
 set +o noglob
 

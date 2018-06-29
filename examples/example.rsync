@@ -4,8 +4,6 @@
 # Mandatory options are uncommented with sugested values
 # Other options are commented out with their default values
 #
-# Note: You dont need to manually specify vservers using "include = /vservers".
-#       They're automatically backuped if vserver is set to "yes" on you backupninja.conf.
 
 [general]
 
@@ -120,11 +118,6 @@ include = /var
 # exclude folder on backup
 exclude = exclude_folder1
 exclude = exclude_folder2
-
-# exlude some vserver from backup
-# this is used only if vservers = yes on backupninja.conf
-exclude_vserver = excluded_vserver1
-exclude_vserver = excluded_vserver2
 
 # ssh command line (remote only)
 #ssh = ssh

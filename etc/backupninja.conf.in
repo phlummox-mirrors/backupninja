@@ -72,9 +72,6 @@ usecolors = yes
 # default value for 'when'
 when = everyday at 01:00
 
-# if running vservers, set to yes
-vservers = no
-
 # programs paths
 # SLAPCAT=/usr/sbin/slapcat
 # LDAPSEARCH=/usr/bin/ldapsearch
@@ -89,6 +86,3 @@ vservers = no
 # GZIP=/bin/gzip
 # GZIP_OPTS='--rsyncable'
 # RSYNC=/usr/bin/rsync
-# VSERVERINFO=/usr/sbin/vserver-info
-# VSERVER=/usr/sbin/vserver
-# VROOTDIR=/var/lib/vservers

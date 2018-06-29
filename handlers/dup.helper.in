@@ -30,35 +30,6 @@ do_dup_host_includes() {
    set +o noglob
 }
 
-do_dup_vserver() {
-   # choose the vservers to backup (into $selected_vservers)
-   choose_one_or_more_vservers "$dup_title"
-   [ $? = 0 ] || return 1
-
-   set -o noglob
-   # choose the files to backup
-   REPLY=
-   while [ -z "$REPLY" ]; do
-      formBegin "$dup_title - vservers: vsincludes (backup these directories from every selected vserver)"
-         [ -z "$dup_vsincludes" ] && dup_vsincludes="$dup_default_includes"
-         for i in $dup_vsincludes; do
-            formItem include "$i"
-         done
-         formItem include ""
-         formItem include ""
-         formItem include ""
-         formItem include ""
-         formItem include ""
-         formItem include ""
-         formItem include ""
-         formItem include ""
-      formDisplay
-      [ $? = 0 ] || return 1
-      dup_vsincludes="$REPLY"
-   done
-   set +o noglob
-}
-
 do_dup_excludes() {
    set -o noglob
    formBegin "$dup_title: excludes"
@@ -78,35 +49,6 @@ do_dup_excludes() {
    [ $? = 0 ] || return 1
    dup_excludes="$REPLY"
    set +o noglob
-}
-
-do_dup_src() {
-   choose_host_or_vservers_or_both "$dup_title"
-   [ $? = 0 ] || return 1
-   case $host_or_vservers in
-      'host')
-         do_dup_host_includes
-         [ $? = 0 ] || return 1
-         ;;
-      'vservers')
-         do_dup_vserver
-         [ $? = 0 ] || return 1
-         ;;
-      'both')
-         do_dup_host_includes
-         [ $? = 0 ] || return 1
-         do_dup_vserver
-         [ $? = 0 ] || return 1
-         ;;
-      *)
-         return 1
-         ;;
-   esac
-   do_dup_excludes
-   [ $? = 0 ] || return 1
-
-   _src_done="(DONE)"
-   setDefault dest
 }
 
 do_dup_dest() {
@@ -366,7 +308,7 @@ signpassword = $dup_gpg_signpassword
 [source]
 
 # A few notes about includes and excludes:
-# 1. include, exclude and vsinclude statements support globbing with '*'
+# 1. include and exclude statements support globbing with '*'
 # 2. Symlinks are not dereferenced. Moreover, an include line whose path
 #    contains, at any level, a symlink to a directory, will only have the
 #    symlink backed-up, not the target directory's content. Yes, you have to
@@ -384,43 +326,12 @@ signpassword = $dup_gpg_signpassword
 # files to include in the backup
 EOF
 
-   if [ "$host_or_vservers" == host -o "$host_or_vservers" == both ]; then
-      set -o noglob
-      for i in $dup_includes; do
-         echo "include = $i" >> $next_filename
-      done
-      set +o noglob
-   fi
+   set -o noglob
+   for i in $dup_includes; do
+      echo "include = $i" >> $next_filename
+   done
+   set +o noglob
 
-   cat >> $next_filename <<EOF
-
-# If vservers = yes in /etc/backupninja.conf then the following variables can
-# be used:
-# vsnames = all | <vserver1> <vserver2> ... (default = all)
-# vsinclude = <path>
-# vsinclude = <path>
-# ...
-# Any path specified in vsinclude is added to the include list for each vserver
-# listed in vsnames (or all if vsnames = all, which is the default).
-#
-# For example, vsinclude = /home will backup the /home directory in every
-# vserver listed in vsnames. If you have 'vsnames = foo bar baz', this
-# vsinclude will add to the include list /vservers/foo/home, /vservers/bar/home
-# and /vservers/baz/home.
-# Vservers paths are derived from $VROOTDIR.
-
-EOF
-
-   if [ "$host_or_vservers" == vservers -o "$host_or_vservers" == both ]; then
-      set -o noglob
-      echo -e "vsnames = $selected_vservers\n" >> $next_filename
-      for i in $dup_vsincludes; do
-         echo "vsinclude = $i" >> $next_filename
-      done
-      set +o noglob
-   fi
-
-   # excludes
    cat >> $next_filename <<EOF
 
 # files to exclude from the backup
@@ -605,7 +516,6 @@ dup_wizard() {
    _adv_done=
    dup_includes=
    dup_excludes=
-   dup_vsincludes=
    dup_incremental=yes
    dup_increments=30
    dup_keep=60
