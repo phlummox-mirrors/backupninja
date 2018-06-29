@@ -28,12 +28,12 @@ The key features of backupninja are:
 
 The following backup types are supported:
 
- - secure, remote, incremental filesytem backup (via rdiff-backup)
+ - secure, remote, incremental filesystem backup (via rdiff-backup)
    incremental data is compressed. permissions are retained even
    with an unpriviledged backup user
  - backup of mysql databases (via mysqlhotcopy and mysqldump)
  - basic system and hardware info
- - encrypted remote backups (via duplicity)
+ - encrypted remote backups (via duplicity or borgbackup)
  - backup of subversion repositories
 
 Installation
@@ -107,6 +107,7 @@ file in `/etc/backup.d` according to the file's suffix:
  - `.sh`: run this file as a shell script.
  - `.rdiff`: filesystem backup (using rdiff-backup)
  - `.dup`: filesystem backup (using duplicity)
+ - `.borg`: filesystem backup (using borg)
  - `.mysql`: backup mysql databases
  - `.pgsql`: backup PostgreSQL databases
  - `.sys`: general hardware, partition, and system reports.

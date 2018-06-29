@@ -131,10 +131,10 @@ if [ "$databases" == "all" ]; then
       output=`eval $execstr 2>&1`
       code=$?
       if [ "$code" == "0" ]; then
-         debug $output
+         debug "$output"
          info "Successfully finished dump of pgsql cluster"
       else
-         warning $output
+         warning "$output"
          warning "Failed to dump pgsql cluster"
       fi
    fi
@@ -161,10 +161,10 @@ else
          output=`eval $execstr 2>&1`
          code=$?
          if [ "$code" == "0" ]; then
-            debug $output
+            debug "$output"
             info "Successfully finished pgsql globals (roles and tablespaces) dump"
          else
-            warning $output
+            warning "$output"
             warning "Failed to dump pgsql globals (roles and tablespaces)"
          fi
       fi
@@ -198,10 +198,10 @@ else
          output=`eval $execstr 2>&1`
          code=$?
          if [ "$code" == "0" ]; then
-            debug $output
+            debug "$output"
             info "Successfully finished dump of pgsql database ${db}"
          else
-            warning $output
+            warning "$output"
             warning "Failed to dump pgsql database ${db}"
          fi
       fi

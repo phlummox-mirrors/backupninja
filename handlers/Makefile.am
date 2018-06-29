@@ -1,9 +1,9 @@
 
-HANDLERS = dup dup.helper maildir makecd		\
+HANDLERS = borg borg.helper dup dup.helper maildir makecd	\
          makecd.helper mysql mysql.helper pgsql pgsql.helper rdiff	\
          rdiff.helper rsync sh svn sys sys.helper trac tar tar.helper
 
-DIST_HANDLERS = dup.in dup.helper.in maildir.in makecd.in		\
+DIST_HANDLERS = borg.in borg.helper.in dup.in dup.helper.in maildir.in makecd.in	\
          makecd.helper.in mysql.in mysql.helper.in pgsql.in pgsql.helper.in rdiff.in	\
          rdiff.helper.in rsync.in sh.in svn.in sys.in sys.helper.in trac.in tar.in tar.helper.in wget
 
@@ -17,6 +17,14 @@ edit = sed \
     -e "s,@SED\@,$(SED),g" 
 
 pkgdata_DATA = $(HANDLERS)
+
+borg: $(srcdir)/borg.in
+	rm -f borg
+	$(edit) $(srcdir)/borg.in > borg
+
+borg.helper: $(srcdir)/borg.helper.in
+	rm -f borg.helper
+	$(edit) $(srcdir)/borg.helper.in > borg.helper
 
 dup: $(srcdir)/dup.in
 	rm -f dup
