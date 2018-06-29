@@ -52,4 +52,4 @@ man/Makefile
 src/Makefile
 src/backupninja
 src/ninjahelper
-vagrant
+.vagrant
