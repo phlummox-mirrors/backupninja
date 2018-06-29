@@ -51,10 +51,10 @@ debug 0 "echo $execstr "
 output=` $execstr 2>&1 `
 code=$?
 if [ "$code" == "0" ]; then
-   debug $output
+   debug "$output"
    info "Successfully finished creation of iso"
 else
-   warning $output
+   warning "$output"
    warning "Failed to create iso"
 fi
 
@@ -65,10 +65,10 @@ if [ "$isoonly" == "no" ]; then
       $CDRECORD -v gracetime=2 dev=$device speed=8 -dao -data $outputfile
       code=$?
       if [ "$code" == "0" ]; then
-         debug $output
+         debug "$output"
          info "Successfully burned CD"
       else
-         warning $output
+         warning "$output"
          warning "Failed to create CD"
       fi
    fi
@@ -77,10 +77,10 @@ if [ "$isoonly" == "no" ]; then
       $GROWISOFS -speed=2 -Z $device=$outputfile -use-the-force-luke=notray -use-the-force-luke=tty
       code=$?
       if [ "$code" == "0" ]; then
-         debug $output
+         debug "$output"
          info "Successfully burned DVD"
       else
-         warning $output
+         warning "$output"
          warning "Failed to create DVD"
       fi
    fi

@@ -107,6 +107,7 @@ getconf sysreportfile $parentdir/sysreport.txt
 
 getconf SFDISK `which sfdisk`
 getconf HWINFO `which hwinfo`
+getconf LSBLK `which lsblk`
 getconf sfdisk_options ""
 getconf hwinfo_options ""
 
@@ -607,7 +608,7 @@ fi
 
 if [ "$partitions" == "yes" ]; then
    if [ "$dosfdisk" == "yes" ]; then
-      devices=`LC_ALL=C $SFDISK -l 2>/dev/null | grep "^Disk /dev" | @AWK@ '{print $2}' | cut -d: -f1`
+      devices=`LC_ALL=C $LSBLK --output NAME,TYPE --list --paths 2>/dev/null | grep "disk$" | grep -v '^/dev/zram' | @AWK@ '{print $1}'`
       if [ "$devices" == "" ]; then
          warning "No harddisks found"
       fi
@@ -632,7 +633,7 @@ if [ "$partitions" == "yes" ]; then
 fi
 
 if [ "$luksheaders" == "yes" ]; then
-   devices=`LC_ALL=C $SFDISK -l 2>/dev/null | grep "^Disk /dev" | @AWK@ '{print $2}' | cut -d: -f1`
+   devices=`LC_ALL=C $SFDISK -l 2>/dev/null | grep -E '^(Disk )?/dev/' | @SED@ -e 's/Disk //' -re 's/:? +.*//g'`
    [ -n "$devices" ] || warning "No block device found"
    partitions=`LC_ALL=C $SFDISK -l 2>/dev/null |grep "^/dev" | @AWK@ '{print $1}'`
    [ -n "$partitions" ] || warning "No partitions found"
@@ -663,10 +664,10 @@ if [ "$luksheaders" == "yes" ]; then
       output=`$DD if="${dev}" of="${outputfile}" bs=512 count="${headersize}" 2>&1`
       exit_code=$?
       if [ $exit_code -eq 0 ]; then
-         debug $output
+         debug "$output"
          info "The LUKS header of $dev was saved to $outputfile."
       else
-         debug $output
+         debug "$output"
          fatal "The LUKS header of $dev could not be saved."
       fi
    done
@@ -719,7 +720,7 @@ function doLvmBackup () {
       output=`$VGCFGBACKUP --file "${lvmdir}"/'%s' $vg`
    done
    exit_code=$?
-   debug $output
+   debug "$output"
    case $exit_code in
       0)
          info "LVM metadata was saved to $lvmdir for volume groups: $vgs"

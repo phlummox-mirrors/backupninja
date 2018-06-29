@@ -50,7 +50,9 @@ destdir=${destdir%/}
 [ -n "$desturl" -o -n "$destdir" ]  || fatal "The destination directory (destdir) must be set when desturl is not used."
 [ -n "$include" -o -n "$vsinclude" ]  || fatal "No source includes specified"
 [ -n "$password" ] || fatal "The password option must be set."
-[ -n "$signpassword" -a -n "$signkey" -a -n "$encryptkey" -a "$signkey" != "$encryptkey" ] || fatal "The signpassword option must be set because signkey is different from encryptkey."
+if [ -n "$signkey" -a -n "$encryptkey" -a "$signkey" != "$encryptkey" ]; then
+   [ -n "$signpassword" ] || fatal "The signpassword option must be set because signkey is different from encryptkey."
+fi
 if [ "`echo $desturl | @AWK@ -F ':' '{print $1}'`" == "s3+http" ]; then
    [ -n "$awsaccesskeyid" -a -n "$awssecretaccesskey" ]  || fatal "AWS access keys must be set for S3 backups."
 fi
@@ -223,6 +225,7 @@ fi
 # duplicity now enables the archive_dir by default, let's put it into /var/cache/backupninja/duplicity
 # unless the user has specified it.
 if echo "${options}" | grep -qv -- "--archive-dir" ; then
+   [ -d "/var/cache/backupninja" ] || fatal "/var/cache/backupninja does not exist - create it"
    execstr_options="${execstr_options} --archive-dir /var/cache/backupninja/duplicity"
 fi
 
@@ -312,10 +315,10 @@ if [ ! $test ]; then
              "$execstr_precmd duplicity cleanup --force $execstr_options $execstr_serverpart 2>&1"`
    exit_code=$?
    if [ $exit_code -eq 0 ]; then
-      debug $output
+      debug "$output"
       info "Duplicity cleanup finished successfully."
    else
-      debug $output
+      debug "$output"
       warning "Duplicity cleanup failed."
    fi
 fi
@@ -332,10 +335,10 @@ if [ "$keep" != "yes" ]; then
                 "$execstr_precmd duplicity remove-older-than $keep --force $execstr_options $execstr_serverpart 2>&1"`
       exit_code=$?
       if [ $exit_code -eq 0 ]; then
-         debug $output
+         debug "$output"
          info "Duplicity remove-older-than finished successfully."
       else
-         debug $output
+         debug "$output"
          warning "Duplicity remove-older-than failed."
       fi
    fi
@@ -355,10 +358,10 @@ if [ "$keep" != "yes" ]; then
                "$execstr_precmd duplicity remove-all-inc-of-but-n-full $keepincroffulls --force $execstr_options $execstr_serverpart 2>&1"`
             exit_code=$?
             if [ $exit_code -eq 0 ]; then
-               debug $output
+               debug "$output"
                info "Duplicity remove-all-inc-of-but-n-full finished successfully."
             else
-               debug $output
+               debug "$output"
                warning "Duplicity remove-all-inc-of-but-n-full failed."
             fi
          fi
@@ -377,12 +380,12 @@ if [ ! $test ]; then
              su -c \
                 "$execstr_precmd duplicity $execstr_command $execstr_options $execstr_source --exclude '**' / $execstr_serverpart >$outputfile 2>&1"`
    exit_code=$?
-   debug $output
+   debug "$output"
    cat $outputfile | (while read output ; do
                          if [ $exit_code -eq 0 ]; then
-                            info $output
+                            info "$output"
                          else
-                            error $output
+                            error "$output"
                          fi
                       done
    )
