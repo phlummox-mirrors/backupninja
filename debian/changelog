@@ -1,3 +1,12 @@
+backupninja (1.1.0-1) unstable; urgency=medium
+
+  * Import new upstream release
+  * Declare compliance with Standards-Version 4.1.4 (no change needed)
+  * Add myself to Uploaders
+  * Add reference to borgbackup in Suggests and Description
+
+ -- Jerome Charaoui <jerome@riseup.net>  Fri, 29 Jun 2018 12:15:06 -0400
+
 backupninja (1.0.2-1) unstable; urgency=medium
 
   * Import new upstream release (Closes: #683731, #736280, #745818).
