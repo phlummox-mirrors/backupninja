@@ -5,18 +5,18 @@ Upstream
 
         export VERSION=x.y.z
 
-* update `configure.in` and `ChangeLog`
+* update `configure.ac` and `ChangeLog`
 
         perl -pi -E \
            "s{^AC_INIT\(\[backupninja\],\[[0-9.]+\],}{AC_INIT([backupninja],[$VERSION],}" \
-           configure.in && \
+           configure.ac && \
         RELEASE_DATE=$(LC_ALL=C date '+%B %d, %Y') perl -pi -E \
            "s{^version\s+[0-9.]+\s+--\s+UNRELEASED$}{version $VERSION -- $RELEASE_DATE}" \
            ChangeLog
 
 * commit, tag and create the tarball:
 
-        git commit configure.in ChangeLog \
+        git commit configure.ac ChangeLog \
             -m "Releasing backupninja $VERSION" && \
         git clean -fdx && \
         git tag -s "backupninja-$VERSION" \
