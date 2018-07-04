@@ -12,6 +12,16 @@ function export_debug {
   debug "$1=${!1}"
 }
 
+function run_cmd {
+  local retry=3
+  local pass=0
+  while [ $pass -lt $retry ]; do
+    (( pass++ ))
+    debug "Attempt $pass"
+    $1 && break
+  done
+}
+
 ### GETCONF ###################################################################
 
 setsection general
@@ -280,7 +290,7 @@ if [ "$run_backup" == "yes" ]; then
   # execute backup
   info "Taking backup snapshot."
   debug "Running: $cmd"
-  $cmd || \
+  run_cmd "$cmd" || \
     fatal "Restic backup failed."
 
   # set bash orginal globbing behavior
@@ -364,7 +374,7 @@ if [[ "$run_forget" == "yes" ]]; then
   # execute forget
   info "Removing old snapshots based on defined retention policy."
   debug "Running: $cmd"
-  $cmd || \
+  run_cmd "$cmd" || \
     fatal "Restic forget expired snapshots failed."
 
   debug "Unsetting variables"
@@ -402,7 +412,7 @@ if [ "$run_check" == "yes" ]; then
   # execute check
   info "Checking repository integrity and consistency."
   debug "Running: $cmd"
-  $cmd || \
+  run_cmd "$cmd" || \
     fatal "Restic check repository integrity and consistency failed."
 
   debug "Unsetting variables"
@@ -421,7 +431,7 @@ if [ "$run_prune" == "yes" ]; then
   # execute prune
   info "Removing data not referenced and not needed any more."
   debug "Running: $cmd"
-  $cmd || \
+  run_cmd "$cmd" || \
     fatal "Restic prune repository failed."
 
   debug "Unsetting variables"
@@ -439,7 +449,7 @@ if [ "$run_rebuild_index" == "yes" ]; then
   # execute rebuild-index
   info "Rebuilding index based on files in the repository."
   debug "Running: $cmd"
-  $cmd || \
+  run_cmd "$cmd" || \
     fatal "Restic rebuild index repository failed."
 
   debug "Unsetting variables"
