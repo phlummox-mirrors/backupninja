@@ -24,6 +24,9 @@ run_backup = yes
 # Build a new index file [yes/no]
 #run_rebuild_index = no
 
+# Retry to run the command [integer]
+#retry_run = 1
+
 # Repository to backup to or restore from [path]
 repository = /mnt/backup
 

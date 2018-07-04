@@ -5,23 +5,6 @@
 # restic script for backupninja
 #
 
-### HELPERS ###################################################################
-
-function export_debug {
-  export "$1"="$2"
-  debug "$1=${!1}"
-}
-
-function run_cmd {
-  local retry=3
-  local pass=0
-  while [ $pass -lt $retry ]; do
-    (( pass++ ))
-    debug "Attempt $pass"
-    $1 && break
-  done
-}
-
 ### GETCONF ###################################################################
 
 setsection general
@@ -31,6 +14,8 @@ getconf run_forget        "no"
 getconf run_check         "no"
 getconf run_prune         "no"
 getconf run_rebuild_index "no"
+
+get retry_run 1
 
 getconf cacert
 getconf cache_dir
@@ -76,6 +61,22 @@ setsection gs
 
 getconf google_project_id
 getconf google_application_credentials
+
+### HELPERS ###################################################################
+
+function export_debug {
+  export "$1"="$2"
+  debug "$1=${!1}"
+}
+
+function run_cmd {
+  local pass=0
+  while [ $pass -lt $retry_run ]; do
+    (( pass++ ))
+    debug "Attempt $pass"
+    $1 && break
+  done
+}
 
 ### GLOBAL OPTIONS ############################################################
 
