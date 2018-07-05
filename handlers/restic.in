@@ -15,7 +15,7 @@ getconf run_check         "no"
 getconf run_prune         "no"
 getconf run_rebuild_index "no"
 
-get retry_run 1
+getconf retry_run 1
 
 getconf cacert
 getconf cache_dir
