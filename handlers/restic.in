@@ -31,7 +31,6 @@ getconf password_file
 getconf quiet
 getconf repository
 getconf tls_client_cert
-getconf verbose
 
 setsection s3
 
@@ -127,9 +126,6 @@ function run_cmd {
 
 [ -n "$tls_client_cert" ] && \
   cmd_global_options+="--tls-client-cert $tls_client_cert "
-
-[ -n "$verbose" ] && \
-  cmd_global_options+="--verbose $verbose "
 
 ### REPOSITORY ################################################################
 

@@ -69,9 +69,6 @@ password = secret
 # Path to a file containing PEM encoded TLS client certificate and private key [path]
 #tls_client_cert =
 
-# Be verbose (level n) [integer]
-#verbose =
-
 [s3]
 
 #aws_access_key_id =
