@@ -71,12 +71,17 @@ function export_debug {
 
 function run_cmd {
   local pass=0
+  local cmd=$1
   while [ $pass -lt $retry_run ]; do
     (( pass++ ))
     debug "Attempt $pass"
-    $1 && break
+    # return when cmd succeeded, pass when failed
+    $cmd && return 0 || :
     sleep $retry_wait
   done
+
+  # if we reach here, we have failed
+  return 1
 }
 
 ### GLOBAL OPTIONS ############################################################
