@@ -27,6 +27,9 @@ run_backup = yes
 # Retry to run the command [integer]
 #retry_run = 1
 
+# Seconds to wait between each retry attempts [integer]
+#retry_run = 5
+
 # Repository to backup to or restore from [path]
 repository = /mnt/backup
 

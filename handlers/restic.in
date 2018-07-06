@@ -16,6 +16,7 @@ getconf run_prune         "no"
 getconf run_rebuild_index "no"
 
 getconf retry_run 1
+getconf retry_wait 5
 
 getconf cacert
 getconf cache_dir
@@ -74,6 +75,7 @@ function run_cmd {
     (( pass++ ))
     debug "Attempt $pass"
     $1 && break
+    sleep $retry_wait
   done
 }
 
