@@ -30,6 +30,11 @@ apt-get -qq install bats mailutils faketime
 TMPDIR=$(mktemp -t -d bntest.XXXXXX)
 export TMPDIR
 
+# Mount temporary directories in tmpfs
+# this should speed up the tests a little bit
+mount -t tmpfs tmpfs "$TMPDIR"
+mount -t tmpfs tmpfs /var/backups
+
 # Run actual tests
 for t in "$(dirname "$0")"/*.bats; do
     echo "# $(basename -s .bats "$t")"
@@ -38,6 +43,8 @@ for t in "$(dirname "$0")"/*.bats; do
 done
 
 # Clean up
-rm -rf "${TMPDIR}"
+umount "$TMPDIR"
+umount /var/backups
+rmdir "$TMPDIR"
 
 exit 0
