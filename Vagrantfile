@@ -8,8 +8,11 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
     locale-gen
     apt-get update
-    apt-get install -y git automake make
-    git clone https://0xacab.org/liberate/backupninja.git
-    chown vagrant: backupninja -R
+    apt-get install -y automake make dialog
+    cd /vagrant
+    ./autogen.sh
+    ./configure --prefix=/usr --mandir=/usr/share/man --sysconfdir=/etc --localstatedir=/var --libdir=/usr/lib --libexecdir=/usr/lib
+    make
+    make install
   SHELL
 end
