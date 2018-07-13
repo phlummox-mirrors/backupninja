@@ -2,7 +2,7 @@ apt-get -qq install debconf-utils hwinfo lvm2
 
 load common
 
-sysconfig() {
+test_sys() {
     cat << EOF > "${BATS_TMPDIR}/backup.d/test.sys"
 when = manual
 packages = no
@@ -41,8 +41,8 @@ teardown_luks() {
     modprobe -r brd
 }
 
-@test "sys: sysreport" {
-    sysconfig
+@test "system report is created" {
+    test_sys
     run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.sys"
     [ "$status" -eq 0 ]
     [ -s /var/backups/sysreport.txt ]
@@ -50,8 +50,8 @@ teardown_luks() {
     grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
 }
 
-@test "sys: packages" {
-    sysconfig
+@test "packages backup is made" {
+    test_sys
     setconfig 'backup.d/test.sys' packages yes
     run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.sys"
     [ "$status" -eq 0 ]
@@ -60,8 +60,8 @@ teardown_luks() {
     [ -s /var/backups/debconfsel.txt ]
 }
 
-@test "sys: partitions" {
-    sysconfig
+@test "partitions backup is made" {
+    test_sys
     setconfig 'backup.d/test.sys' partitions yes
     run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.sys"
     [ "$status" -eq 0 ]
@@ -69,8 +69,8 @@ teardown_luks() {
     grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
 }
 
-@test "sys: hardware" {
-    sysconfig
+@test "hardware info is made" {
+    test_sys
     setconfig 'backup.d/test.sys' hardware yes
     run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.sys"
     [ "$status" -eq 0 ]
@@ -78,8 +78,8 @@ teardown_luks() {
     grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
 }
 
-@test "sys: lvm" {
-    sysconfig
+@test "lvm backup is made" {
+    test_sys
     setconfig 'backup.d/test.sys' lvm yes
     setup_lvm
     run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.sys"
@@ -91,8 +91,8 @@ teardown_luks() {
     teardown_lvm
 }
 
-@test "sys: luksheaders" {
-    sysconfig
+@test "luksheaders backup is made" {
+    test_sys
     setconfig 'backup.d/test.sys' luksheaders yes
     setup_luks
     run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.sys"
