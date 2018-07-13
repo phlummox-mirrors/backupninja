@@ -130,7 +130,7 @@ testaction() {
 @test "scheduling: runs when = 'Tuesday at 04' and time matches" {
     testaction info test_info
     setconfig backupninja.conf when 'Tuesday at 04'
-    run faketime -f '@2018-06-10 04:00:00' backupninja -f "${BATS_TMPDIR}/backupninja.conf"
+    run faketime -f '@2018-06-12 04:00:00' backupninja -f "${BATS_TMPDIR}/backupninja.conf"
     [ "$status" -eq 0 ]
     grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
 }
