@@ -226,7 +226,7 @@ function isnow() {
        if [ "$whendayofweek" != "$nowdayofweek" ]; then
            whendayofweek=${whendayofweek%s}
            if [ "$whendayofweek" != "$nowdayofweek" ]; then
-               if [ "$whendayofweek" != "mondays" -a "$whendayofweek" != "tuesdays" -a "$whendayofweek" != "wednesdays" -a "$whendayofweek" != "thursdays" -a "$whendayofweek" != "fridays" -a "$whendayofweek" != "saturdays" -a "$whendayofweek" != "sundays" ]; then
+               if [ "$whendayofweek" != "monday" -a "$whendayofweek" != "tuesday" -a "$whendayofweek" != "wednesday" -a "$whendayofweek" != "thursday" -a "$whendayofweek" != "friday" -a "$whendayofweek" != "saturday" -a "$whendayofweek" != "sunday" ]; then
                    warning "The day in the 'when' option in the configuration is malformed. Please read the README for examples."
                fi
                if [ "$at" != "at" ]; then
