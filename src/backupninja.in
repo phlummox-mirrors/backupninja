@@ -186,7 +186,7 @@ function tolower() {
 
 # simple to integer function
 function toint() {
-   echo "$1" | tr -d '[:alpha:]'
+   echo "$1" | @SED@ 's/[^0-9]//g;s/^0\+//'
 }
 
 #
@@ -202,7 +202,7 @@ function toint() {
 # we grab the current time once, since processing
 # all the configs might take more than an hour.
 nowtime=`LC_ALL=C date +%H`
-nowday=`LC_ALL=C date +%d`
+nowday=`LC_ALL=C date +%-d`
 nowdayofweek=`LC_ALL=C date +%A`
 nowdayofweek=`tolower "$nowdayofweek"`
 
