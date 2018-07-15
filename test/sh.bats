@@ -1,6 +1,6 @@
 load common
 
-test_sh() {
+setup_sh() {
     cat << EOF > "${BATS_TMPDIR}/backup.d/test.sh"
 !#/bin/sh
 touch /var/backups/test_sh
@@ -10,7 +10,6 @@ EOF
 }
 
 @test "sh: runs and creates file" {
-    test_sh
     run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.sh"
     [ "$status" -eq 0 ]
     [ -f /var/backups/test_sh ]
