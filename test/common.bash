@@ -1,8 +1,9 @@
 setup() {
-    # Write a basic config file
+
+    # Write a basic backupninja config file
     cat << EOF > "${BATS_TMPDIR}/backupninja.conf"
 when = manual
-loglevel = 4
+loglevel = 5
 reportemail = root
 reportsuccess = yes
 reportinfo = no
@@ -24,6 +25,11 @@ EOF
 }
 
 teardown() {
+
+    # Print the debug log in case the test case fails
+    echo "cat ${BATS_TMPDIR}/log/backupninja.log :"
+    cat "${BATS_TMPDIR}/log/backupninja.log"
+
     # Clean up
     rm -rf "${BATS_TMPDIR}/backupninja.conf" \
         "${BATS_TMPDIR}/log" \
