@@ -121,7 +121,6 @@ testaction() {
 @test "scheduling: skips when = 'everyday at 01' and time is mismatched" {
     testaction info test_info
     setconfig backupninja.conf when 'everyday at 01'
-    setconfig backupninja.conf loglevel 5
     run faketime -f '@2018-06-12 02:00:00' backupninja -f "${BATS_TMPDIR}/backupninja.conf"
     [ "$status" -eq 0 ]
     grep -q "Debug: skipping ${BATS_TMPDIR}/backup.d/test.sh because current time does not match everyday at 01" "${BATS_TMPDIR}/log/backupninja.log"
@@ -138,7 +137,6 @@ testaction() {
 @test "scheduling: skips when = 'Tuesday at 04' and time is mismatched" {
     testaction info test_info
     setconfig backupninja.conf when 'Tuesday at 04'
-    setconfig backupninja.conf loglevel 5
     run faketime -f '@2018-06-13 04:00:00' backupninja -f "${BATS_TMPDIR}/backupninja.conf"
     [ "$status" -eq 0 ]
     grep -q "Debug: skipping ${BATS_TMPDIR}/backup.d/test.sh because current time does not match Tuesday at 04" "${BATS_TMPDIR}/log/backupninja.log"
@@ -155,7 +153,6 @@ testaction() {
 @test "scheduling: skips when = '1st at 10' and time is mismatched" {
     testaction info test_info
     setconfig backupninja.conf when '1st at 10'
-    setconfig backupninja.conf loglevel 5
     run faketime -f '@2018-06-15 10:00:00' backupninja -f "${BATS_TMPDIR}/backupninja.conf"
     [ "$status" -eq 0 ]
     grep -q "Debug: skipping ${BATS_TMPDIR}/backup.d/test.sh because current time does not match 1st at 10" "${BATS_TMPDIR}/log/backupninja.log"
@@ -172,7 +169,6 @@ testaction() {
 @test "scheduling: skips when = '21 at 09:00' and time is mismatched" {
     testaction info test_info
     setconfig backupninja.conf when '21 at 09:00'
-    setconfig backupninja.conf loglevel 5
     run faketime -f '@2018-06-22 09:00:00' backupninja -f "${BATS_TMPDIR}/backupninja.conf"
     [ "$status" -eq 0 ]
     grep -q "Debug: skipping ${BATS_TMPDIR}/backup.d/test.sh because current time does not match 21 at 09:00" "${BATS_TMPDIR}/log/backupninja.log"
