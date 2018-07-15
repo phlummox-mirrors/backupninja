@@ -20,8 +20,25 @@ libdirectory = /usr/lib/backupninja
 usecolors = no
 EOF
 
+    # Create backupninja directories
     mkdir "${BATS_TMPDIR}/log" "${BATS_TMPDIR}/backup.d"
     chmod 0750 "${BATS_TMPDIR}/backup.d"
+
+    # Get name of component being tested
+    COMP=$(basename -s .bats "${BATS_TEST_FILENAME}")
+
+    # Invoke component-specific general test setup
+    # (runs only before the first test case)
+    if [[ "$BATS_TEST_NUMBER" -eq 1 ]]; then
+        if type "begin_${COMP}" 2>&1 | grep -q "function"; then
+            begin_${COMP}
+        fi
+    fi
+
+    # Invoke component-specific test setup
+    if type "setup_${COMP}" 2>&1 | grep -q "function"; then
+        setup_${COMP}
+    fi
 }
 
 teardown() {
@@ -34,8 +51,20 @@ teardown() {
     rm -rf "${BATS_TMPDIR}/backupninja.conf" \
         "${BATS_TMPDIR}/log" \
         "${BATS_TMPDIR}/backup.d" \
-        /var/mail/vagrant \
-        /var/backups/*
+        /var/mail/vagrant
+
+    # Invoke component-specific test teardown
+    if type "teardown_${COMP}" 2>&1 | grep -q "function"; then
+        teardown_${COMP}
+    fi
+
+    # Invoke component-specific general test setup
+    # (runs only before the first test case)
+    if [[ "${#BATS_TEST_NAMES[@]}" -eq "$BATS_TEST_NUMBER" ]]; then
+        if type "finish_${COMP}" 2>&1 | grep -q "function"; then
+            finish_${COMP}
+        fi
+    fi
 }
 
 setconfig() {
