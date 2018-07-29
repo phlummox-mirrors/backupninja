@@ -66,3 +66,4 @@ Hugh Nowlan <nosmo@nosmo.me> -- dup check for archive dir
 Lyz <lyz@riseup.net> -- sys support for LUKS in disk partitions
 Glandos <bugs-0xacab@antipoul.fr> -- sys excludes zram devices
 Nicolas Karolak <nicolas@karolak.fr> -- Add restic support
+Derek Laventure -- Add restic helper
