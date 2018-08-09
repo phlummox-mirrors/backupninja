@@ -37,6 +37,7 @@ setsection s3
 
 getconf aws_access_key_id
 getconf aws_secret_access_key
+getconf aws_session_token
 
 setsection swift
 
@@ -167,6 +168,8 @@ if [ "$(echo "$repository" | /usr/bin/awk -F ':' '{print $1}')" == "s3" ]; then
 
   export_debug AWS_ACCESS_KEY_ID "$aws_access_key_id"
   export_debug AWS_SECRET_ACCESS_KEY "$aws_secret_access_key"
+  [ -n "$aws_session_token" ] && \
+    export_debug AWS_SESSION_TOKEN "$aws_session_token"
 
 fi
 

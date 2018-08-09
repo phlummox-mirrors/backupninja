@@ -78,6 +78,8 @@ password = secret
 
 #aws_secret_access_key =
 
+#aws_session_token =
+
 [swift]
 
 #os_auth_url =
