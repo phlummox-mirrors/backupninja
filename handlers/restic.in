@@ -256,7 +256,7 @@ if [ "$run_backup" == "yes" ]; then
   [ -n "$files_from" ] && \
     cmd_options+="$(for i in $files_from; do echo "--files-from $i "; done)"
 
-  [ -d "$repostory" ] && \
+  [ -d "$repository" ] && \
     cmd_options+="--exclude $repository "
 
   [ -n "$exclude" ] && \
