@@ -75,8 +75,9 @@ function run_cmd {
   while [ $pass -lt $retry_run ]; do
     (( pass++ ))
     debug "Attempt $pass"
+    info "Running command in a subshell. This may take a while..."
     # return when cmd succeeded, pass when failed
-    $cmd && return 0 || :
+    eval $cmd && return 0 || :
     sleep $retry_wait
   done
 
@@ -126,7 +127,7 @@ function run_cmd {
   cmd_global_options+="--no-lock "
 
 [ -n "$option" ] && \
-  cmd_global_options+="$(for i in $option; do echo "--option $i "; done)"
+  cmd_global_options+="$(for i in "${option[@]}"; do echo "--option $i "; done)"
 
 [ -n "$quiet" ] && \
   cmd_global_options+="--quiet "
