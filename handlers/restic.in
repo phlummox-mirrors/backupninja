@@ -471,6 +471,7 @@ debug "Unsetting environment variables"
 unset RESTIC_PASSWORD
 unset AWS_ACCESS_KEY_ID
 unset AWS_SECRET_ACCESS_KEY
+unset AWS_SESSION_TOKEN
 unset OS_AUTH_URL
 unset OS_TENANT_ID
 unset OS_TENANT_NAME
