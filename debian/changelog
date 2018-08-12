@@ -1,6 +1,6 @@
 backupninja (1.1.0-2) unstable; urgency=medium
 
-  * Fix FTBFS, closes #903168
+  * Fix FTBFS (Closes: #903168)
 
  -- Jerome Charaoui <jerome@riseup.net>  Sat, 11 Aug 2018 21:45:35 -0400
 
