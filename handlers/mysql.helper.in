@@ -75,9 +75,9 @@ do_mysql_final() {
    compress="compress = no"
    for opt in $result; do
       case $opt in
-         '"sqldump"') sqldump="sqldump = yes";;
-         '"hotcopy"') hotcopy="hotcopy = yes";;
-         '"compress"') compress="compress = yes";;
+         'sqldump') sqldump="sqldump = yes";;
+         'hotcopy') hotcopy="hotcopy = yes";;
+         'compress') compress="compress = yes";;
       esac
    done
    get_next_filename $configdirectory/20.mysql
