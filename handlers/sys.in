@@ -594,7 +594,7 @@ if [ "$hardware" == "yes" ]; then
       echo -e "\n\n====================== summary ======================\n" >>  $hardwarefile
       debug "$HWINFO --short --cpu --network --disk --pci  >> $hardwarefile"
       $HWINFO --short --cpu --network --disk --pci  >> $hardwarefile
-      for flag in cpu network bios pci; do
+      for flag in cpu network disk bios pci; do
          echo -e "\n\n====================== $flag ======================\n" >>  $hardwarefile
          $HWINFO --$flag >> $hardwarefile
       done
