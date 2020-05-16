@@ -8,6 +8,7 @@
 getconf options
 getconf testconnect yes
 getconf nicelevel 0
+getconf ionicelevel
 getconf tmpdir
 
 setsection gpg
@@ -78,6 +79,17 @@ if [ "`echo $desturl | @AWK@ -F ':' '{print $1}'`" == "file" ]; then
    elif [ ! -d "`echo $desturl | @AWK@ -F '://' '{print $2}'`" ]; then
       fatal "The destination ($desturl) is not a directory."
    fi
+fi
+
+# Check that the ionicelevel is valid
+if [ -n "$ionicelevel" ] && echo "$ionicelevel" | grep -vq "^[0-7]$"; then
+   fatal "The value of ionicelevel is expected to be either empty or an integer from 0 to 7. Got: $ionicelevel"
+fi
+
+# Only use ionice if ionicelevel is not empty
+nice="nice -n $nicelevel"
+if [ -n "$ionicelevel" ]; then
+   nice="ionice -c2 -n $ionicelevel $nice"
 fi
 
 ### VServers
@@ -305,13 +317,12 @@ fi
 ### Cleanup commands (duplicity >= 0.4.4)
 
 # cleanup
-debug "$execstr_precmd duplicity cleanup --force $execstr_options $execstr_serverpart"
+debug "$nice $execstr_precmd duplicity cleanup --force $execstr_options $execstr_serverpart"
 if [ ! $test ]; then
    export PASSPHRASE=$password
    export SIGN_PASSPHRASE=$signpassword
    export FTP_PASSWORD=$ftp_password
-   output=`nice -n $nicelevel \
-             su -c \
+   output=`$nice su -c \
              "$execstr_precmd duplicity cleanup --force $execstr_options $execstr_serverpart 2>&1"`
    exit_code=$?
    if [ $exit_code -eq 0 ]; then
@@ -325,13 +336,12 @@ fi
 
 # remove-older-than
 if [ "$keep" != "yes" ]; then
-   debug "$execstr_precmd duplicity remove-older-than $keep --force $execstr_options $execstr_serverpart"
+   debug "$nice $execstr_precmd duplicity remove-older-than $keep --force $execstr_options $execstr_serverpart"
    if [ ! $test ]; then
       export PASSPHRASE=$password
       export SIGN_PASSPHRASE=$signpassword
       export FTP_PASSWORD=$ftp_password
-      output=`nice -n $nicelevel \
-                su -c \
+      output=`$nice su -c \
                 "$execstr_precmd duplicity remove-older-than $keep --force $execstr_options $execstr_serverpart 2>&1"`
       exit_code=$?
       if [ $exit_code -eq 0 ]; then
@@ -348,13 +358,12 @@ fi
 if [ "$keep" != "yes" ]; then
    if [ "$keepincroffulls" != "all" ]; then
       if version_ge "$duplicity_version" '0.6.10'; then
-         debug "$execstr_precmd duplicity remove-all-inc-of-but-n-full $keepincroffulls --force $execstr_options $execstr_serverpart"
+         debug "$nice $execstr_precmd duplicity remove-all-inc-of-but-n-full $keepincroffulls --force $execstr_options $execstr_serverpart"
          if [ ! $test ]; then
             export PASSPHRASE=$password
             export SIGN_PASSPHRASE=$signpassword
             export FTP_PASSWORD=$ftp_password
-            output=`nice -n $nicelevel \
-               su -c \
+            output=`$nice su -c \
                "$execstr_precmd duplicity remove-all-inc-of-but-n-full $keepincroffulls --force $execstr_options $execstr_serverpart 2>&1"`
             exit_code=$?
             if [ $exit_code -eq 0 ]; then
@@ -370,14 +379,13 @@ if [ "$keep" != "yes" ]; then
 fi
 
 ### Backup command
-debug "$execstr_precmd duplicity $execstr_command $execstr_options $execstr_source --exclude '**' / $execstr_serverpart"
+debug "$nice $execstr_precmd duplicity $execstr_command $execstr_options $execstr_source --exclude '**' / $execstr_serverpart"
 if [ ! $test ]; then
    outputfile=`maketemp backupout`
    export PASSPHRASE=$password
    export SIGN_PASSPHRASE=$signpassword
    export FTP_PASSWORD=$ftp_password
-   output=`nice -n $nicelevel \
-             su -c \
+   output=`$nice su -c \
                 "$execstr_precmd duplicity $execstr_command $execstr_options $execstr_source --exclude '**' / $execstr_serverpart >$outputfile 2>&1"`
    exit_code=$?
    debug "$output"

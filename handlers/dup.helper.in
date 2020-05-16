@@ -259,6 +259,7 @@ do_dup_misc_options() {
 
    formBegin "$dup_title - misc. options"
      formItem "nicelevel" "$dup_nicelevel"
+     formItem "ionicelevel" "$dup_ionicelevel"
      formItem "testconnect" "$dup_testconnect"
      formItem "options" "$dup_options"
    formDisplay
@@ -271,8 +272,9 @@ do_dup_misc_options() {
    IFS=$' \t\n'
 
    dup_nicelevel=${thereply[0]}
-   dup_testconnect=${thereply[1]}
-   dup_options=${thereply[2]}
+   dup_ionicelevel=${thereply[1]}
+   dup_testconnect=${thereply[2]}
+   dup_options=${thereply[3]}
 
    set +o noglob
 }
@@ -294,6 +296,8 @@ options = $dup_options
 
 # default is 0, but set to 19 if you want to lower the priority.
 nicelevel = $dup_nicelevel
+# by default (when value is empty), ionice will not be used.
+ionicelevel = $dup_ionicelevel
 
 # default is yes. set to no to skip the test if the remote host is alive.
 # if 'desturl' is set below, 'testconnect' must be set to 'no' for now.
@@ -619,6 +623,7 @@ dup_wizard() {
    dup_gpg_password=""
    dup_gpg_signpassword=""
    dup_nicelevel=19
+   dup_ionicelevel=
    dup_testconnect=yes
    dup_options=
 
