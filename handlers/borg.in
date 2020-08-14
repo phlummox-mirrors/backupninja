@@ -35,6 +35,7 @@ getconf prune_options
 setsection dest
 getconf user
 getconf host
+getconf port 22
 getconf directory
 # strip trailing /
 directory=${directory%/}
@@ -50,7 +51,7 @@ export BORG_PASSPHRASE="$passphrase"
 # destination specific checks
 [ "$directory" != "" ] || fatal "Destination directory not set"
 if [ "$host" != "localhost" ]; then
-  execstr_repository="ssh://${user}@${host}${directory}"
+  execstr_repository="ssh://${user}@${host}:${port}${directory}"
 else
   execstr_repository="$directory"
 fi
@@ -59,8 +60,8 @@ execstr_archive="$archive"
 # check the connection at the source and destination
 [ -n "$test" ] || test=0
 if [ "$host" != "localhost" ] && ([ "$testconnect" = "yes" ] || [ "${test}" -eq 1 ]); then
-   debug "ssh -o PasswordAuthentication=no $host -l $user 'echo -n 1'"
-   local ret=`ssh -o PasswordAuthentication=no $host -l $user 'echo -n 1'`
+   debug "ssh -o PasswordAuthentication=no $host -p $port -l $user 'echo -n 1'"
+   local ret=`ssh -o PasswordAuthentication=no $host -p $port -l $user 'echo -n 1'`
    if [ "$ret" = 1 ]; then
       debug "Connected to $host as $user successfully"
    else
