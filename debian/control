@@ -19,8 +19,9 @@ Depends:
  gawk | mawk,
  dialog,
  bash (>=2.05b-26),
- bsd-mailx | mailx | mailutils,
  ${misc:Depends}
+Recommends:
+ bsd-mailx | mailx | mailutils
 Suggests:
  bzip2,
  debconf-utils,
