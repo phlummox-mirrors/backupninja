@@ -16,16 +16,19 @@ EOF
 
     chmod 0640 "${BATS_TMPDIR}/backup.d/test.sys"
 
-    # Create 2 ramdisks
-    modprobe brd rd_nr=2 rd_size=20480 max_part=0
+    # Create 3 ramdisks
+    modprobe brd rd_nr=3 rd_size=20480 max_part=0
 
     # Setup LVM
     pvcreate /dev/ram0
     vgcreate vgtest /dev/ram0
     lvcreate -L 12M -n lvtest vgtest /dev/ram0
 
-    # Setup LUKS encrypted device
-    cryptsetup -q luksFormat /dev/ram1 <<< 123test
+    # Setup LUKS v1 encrypted device
+    cryptsetup -q --type luks1 luksFormat /dev/ram1 <<< 123test
+
+    # Setup LUKS v2 encrypted device
+    cryptsetup -q --type luks2 luksFormat /dev/ram2 <<< 123test
 
     # Do backup
     run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.sys"
@@ -70,6 +73,10 @@ finish_sys() {
     grep -q 'contents = "Text Format Volume Group"' "/var/backups/lvm/vgtest"
 }
 
-@test "luksheaders backup is made" {
+@test "luksheaders v1 backup is made" {
     file /var/backups/luksheader.ram1.bin | grep -q "LUKS encrypted file"
+}
+
+@test "luksheaders v2 backup is made" {
+    file /var/backups/luksheader.ram2.bin | grep -q "LUKS encrypted file"
 }
