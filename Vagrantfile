@@ -15,4 +15,7 @@ Vagrant.configure("2") do |config|
     make
     make install
   SHELL
+  config.vm.synced_folder ".", "/vagrant", type: "rsync",
+    rsync__exclude: ".git/",
+    rsync__args: ["--delete"]
 end
