@@ -656,20 +656,9 @@ if [ "$luksheaders" == "yes" ]; then
       label=${dev#/dev/}
       label=${label//\//-}
       outputfile=${luksheadersfile//__star__/$label}
-      # the following sizes are expressed in terms of 512-byte sectors
-      debug "Let us find out the LUKS header size for $dev"
-      debug "$CRYPTSETUP luksDump \"$dev\" | grep '^Payload offset:' | @AWK@ '{print $3}'"
-      headersize=`$CRYPTSETUP luksDump "$dev" | grep '^Payload offset:' | @AWK@ '{print $3}'`
-      if [ $? -ne 0 ]; then
-         warning "Could not compute the size of LUKS header, skipping $dev"
-         continue
-      elif [ -z "$headersize" -o -n "`echo \"$headersize\" | @SED@ 's/[0-9]*//g'`" ]; then
-         warning "The computed size of LUKS header is not an integer, skipping $dev"
-         continue
-      fi
       debug "Let us backup the LUKS header of $dev"
-      debug "$DD if=\"${dev}\" of=\"${outputfile}\" bs=512 count=\"${headersize}\""
-      output=`$DD if="${dev}" of="${outputfile}" bs=512 count="${headersize}" 2>&1`
+      debug "$CRYPTSETUP luksHeaderBackup \"${dev}\" --header-backup-file \"${outputfile}\""
+      output=`$CRYPTSETUP luksHeaderBackup "${dev}" --header-backup-file "${outputfile}" 2>&1`
       exit_code=$?
       if [ $exit_code -eq 0 ]; then
          debug "$output"
