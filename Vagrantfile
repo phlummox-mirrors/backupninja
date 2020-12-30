@@ -4,7 +4,8 @@
 ENV["LC_ALL"] = "en_US.UTF-8"
 empty_disk = '.vagrant/tmp/empty.vdi'
 lvm_disk = '.vagrant/tmp/lvm.vdi'
-luks_disk = '.vagrant/tmp/luks.vdi'
+lukspart_disk = '.vagrant/tmp/lukspart.vdi'
+luksdev_disk = '.vagrant/tmp/luksdev.vdi'
 
 Vagrant.configure("2") do |config|
   config.vm.box = "debian/buster64"
@@ -30,12 +31,16 @@ Vagrant.configure("2") do |config|
     unless File.exist?(empty_disk)
       vb.customize ['createhd', '--filename', lvm_disk, '--size', 100 ]
     end
-    unless File.exist?(luks_disk)
-      vb.customize ['createhd', '--filename', luks_disk, '--size', 100 ]
+    unless File.exist?(lukspart_disk)
+      vb.customize ['createhd', '--filename', lukspart_disk, '--size', 100 ]
+    end
+    unless File.exist?(luksdev_disk)
+      vb.customize ['createhd', '--filename', luksdev_disk, '--size', 100 ]
     end
     vb.customize ['storageattach', :id, '--storagectl', 'SATA Controller', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', empty_disk]
     vb.customize ['storageattach', :id, '--storagectl', 'SATA Controller', '--port', 2, '--device', 0, '--type', 'hdd', '--medium', lvm_disk]
-    vb.customize ['storageattach', :id, '--storagectl', 'SATA Controller', '--port', 3, '--device', 0, '--type', 'hdd', '--medium', luks_disk]
+    vb.customize ['storageattach', :id, '--storagectl', 'SATA Controller', '--port', 3, '--device', 0, '--type', 'hdd', '--medium', lukspart_disk]
+    vb.customize ['storageattach', :id, '--storagectl', 'SATA Controller', '--port', 4, '--device', 0, '--type', 'hdd', '--medium', luksdev_disk]
   end
 
 end

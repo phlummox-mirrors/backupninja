@@ -25,6 +25,7 @@ EOF
     parted -s /dev/sdd mklabel msdos mkpart p 1MiB 50% mkpart p 50% 100%
     cryptsetup -q --type luks1 luksFormat /dev/sdd1 <<< 123test
     cryptsetup -q --type luks2 luksFormat /dev/sdd2 <<< 123test
+    cryptsetup -q --type luks2 luksFormat /dev/sde <<< 123test
 
     # Do backup
     run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.sys"
@@ -36,6 +37,7 @@ finish_sys() {
     pvremove /dev/sdc
     dd if=/dev/zero of=/dev/sdc bs=512 count=1 conv=notrunc
     dd if=/dev/zero of=/dev/sdd bs=512 count=1 conv=notrunc
+    dd if=/dev/zero of=/dev/sde bs=512 count=1 conv=notrunc
 }
 
 @test "action runs without errors" {
@@ -71,10 +73,14 @@ finish_sys() {
     grep -q 'contents = "Text Format Volume Group"' "/var/backups/lvm/vgtest"
 }
 
-@test "luksheaders v1 backup is made" {
+@test "luksheaders v1 partition backup is made" {
     file /var/backups/luksheader.sdd1.bin | grep -q "LUKS encrypted file"
 }
 
-@test "luksheaders v2 backup is made" {
+@test "luksheaders v2 partition backup is made" {
     file /var/backups/luksheader.sdd2.bin | grep -q "LUKS encrypted file"
+}
+
+@test "luksheaders v2 device backup is made" {
+    file /var/backups/luksheader.sde.bin | grep -q "LUKS encrypted file"
 }
