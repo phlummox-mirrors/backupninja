@@ -17,6 +17,6 @@ Vagrant.configure("2") do |config|
   SHELL
   config.vm.synced_folder ".", "/vagrant", type: "rsync",
     rsync__exclude: ".git/",
-    rsync__args: ["--delete"]
+    rsync__args: ["--recursive", "--delete"]
   config.vm.hostname = "bntest0"
 end
