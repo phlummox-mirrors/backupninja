@@ -1,7 +1,7 @@
 load common
 
 begin_sys() {
-    apt-get -qq install debconf-utils hwinfo lvm2 cryptsetup-bin
+    apt-get -qq install debconf-utils hwinfo lvm2 cryptsetup-bin parted
 
     cat << EOF > "${BATS_TMPDIR}/backup.d/test.sys"
 when = manual
@@ -16,19 +16,15 @@ EOF
 
     chmod 0640 "${BATS_TMPDIR}/backup.d/test.sys"
 
-    # Create 3 ramdisks
-    modprobe brd rd_nr=3 rd_size=20480 max_part=0
-
     # Setup LVM
-    pvcreate /dev/ram0
-    vgcreate vgtest /dev/ram0
-    lvcreate -L 12M -n lvtest vgtest /dev/ram0
+    pvcreate /dev/sdc
+    vgcreate vgtest /dev/sdc
+    lvcreate -L 12M -n lvtest vgtest /dev/sdc
 
-    # Setup LUKS v1 encrypted device
-    cryptsetup -q --type luks1 luksFormat /dev/ram1 <<< 123test
-
-    # Setup LUKS v2 encrypted device
-    cryptsetup -q --type luks2 luksFormat /dev/ram2 <<< 123test
+    # Setup LUKS
+    parted -s /dev/sdd mklabel msdos mkpart p 1MiB 50% mkpart p 50% 100%
+    cryptsetup -q --type luks1 luksFormat /dev/sdd1 <<< 123test
+    cryptsetup -q --type luks2 luksFormat /dev/sdd2 <<< 123test
 
     # Do backup
     run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.sys"
@@ -37,8 +33,9 @@ EOF
 finish_sys() {
     lvremove -f vgtest/lvtest
     vgremove vgtest
-    pvremove /dev/ram0
-    modprobe -r brd
+    pvremove /dev/sdc
+    dd if=/dev/zero of=/dev/sdc bs=512 count=1 conv=notrunc
+    dd if=/dev/zero of=/dev/sdd bs=512 count=1 conv=notrunc
 }
 
 @test "action runs without errors" {
@@ -56,6 +53,7 @@ finish_sys() {
 
 @test "partitions backup is made" {
     [ -s /var/backups/partitions.sda.txt ]
+    [ -s /var/backups/partitions.sdd.txt ]
 }
 
 @test "mbr backup is made" {
@@ -74,9 +72,9 @@ finish_sys() {
 }
 
 @test "luksheaders v1 backup is made" {
-    file /var/backups/luksheader.ram1.bin | grep -q "LUKS encrypted file"
+    file /var/backups/luksheader.sdd1.bin | grep -q "LUKS encrypted file"
 }
 
 @test "luksheaders v2 backup is made" {
-    file /var/backups/luksheader.ram2.bin | grep -q "LUKS encrypted file"
+    file /var/backups/luksheader.sdd2.bin | grep -q "LUKS encrypted file"
 }
