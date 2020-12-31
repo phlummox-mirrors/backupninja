@@ -58,8 +58,8 @@ teardown() {
         teardown_${COMP}
     fi
 
-    # Invoke component-specific general test setup
-    # (runs only before the first test case)
+    # Invoke component-specific general test teardown
+    # (runs only after the last test case)
     if [[ "${#BATS_TEST_NAMES[@]}" -eq "$BATS_TEST_NUMBER" ]]; then
         if type "finish_${COMP}" 2>&1 | grep -q "function"; then
             finish_${COMP}
