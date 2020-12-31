@@ -47,7 +47,23 @@ finish_rdiff() {
     grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
 }
 
-@test "remote destination backup action runs without errors" {
+@test "local source/dest backup exists" {
+    skip "not implemented"
+}
+
+@test "local source/dest rdiff-backup options as expected" {
+    skip "not implemented"
+}
+
+@test "local source/dest backup ingests update" {
+    skip "not implemented"
+}
+
+@test "local source/dest backup appears valid" {
+    skip "not implemented"
+}
+
+@test "remote dest backup action runs without errors" {
     setconfig backup.d/test.rdiff testconnect yes
     setconfig backup.d/test.rdiff bwlimit 1250000
     setconfig backup.d/test.rdiff dest type remote
@@ -58,13 +74,18 @@ finish_rdiff() {
     grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
 }
 
-@test "remote destination backup action with '--remove-older-than' runs without errors" {
-    setconfig backup.d/test.rdiff source keep 1
-    setconfig backup.d/test.rdiff dest type remote
-    setconfig backup.d/test.rdiff dest host bntest1
-    setconfig backup.d/test.rdiff dest user vagrant
-    run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.rdiff"
-    [ "$status" -eq 0 ]
-    grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
-    grep -q "Removing backups older than 1D days succeeded." "${BATS_TMPDIR}/log/backupninja.log" 
+@test "remote dest backup exists" {
+    skip "not implemented"
+}
+
+@test "remote dest rdiff-backup options as expected" {
+    skip "not implemented"
+}
+
+@test "remote dest backup ingests update" {
+    skip "not implemented"
+}
+
+@test "remote dest backup appears valid" {
+    skip "not implemented"
 }
