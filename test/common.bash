@@ -44,8 +44,14 @@ EOF
 teardown() {
 
     # Print the debug log in case the test case fails
-    echo "cat ${BATS_TMPDIR}/log/backupninja.log :"
-    cat "${BATS_TMPDIR}/log/backupninja.log"
+    if [ -f "${BATS_TMPDIR}/log/backupninja.log" ]; then
+        echo "cat ${BATS_TMPDIR}/log/backupninja.log :"
+        cat "${BATS_TMPDIR}/log/backupninja.log"
+        # Copy logfile so it can be examined in subsequent tests
+        cp "${BATS_TMPDIR}/log/backupninja.log" "${BATS_TMPDIR}/_backupninja.log"
+    else
+        echo "backupninja.log not found"
+    fi
 
     # Clean up
     rm -rf "${BATS_TMPDIR}/backupninja.conf" \
