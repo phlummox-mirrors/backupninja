@@ -80,3 +80,17 @@ setconfig() {
         crudini --set "${BATS_TMPDIR}/$1" $2 $3 "$4"
     fi
 }
+
+remote_command() {
+    ssh vagrant@bntest1 "$1"
+}
+
+cleanup_backups() {
+    umount /var/backups
+    mount -t tmpfs tmpfs /var/backups
+}
+
+cleanup_remote_backups() {
+    remote_command "sudo umount /var/backups"
+    remote_command "sudo mount -t tmpfs tmpfs /var/backups"
+}

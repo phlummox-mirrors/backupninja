@@ -5,10 +5,6 @@ begin_rdiff() {
     if [ ! -d /var/cache/bntest ]; then
         debootstrap --variant=minbase testing /var/cache/bntest
     fi
-    if [ ! -d /tmp/backups ]; then
-        mkdir /tmp/backups
-        mount -t tmpfs tmpfs /tmp/backups
-    fi
 }
 
 setup_rdiff() {
@@ -31,7 +27,7 @@ exclude = /var/cache/bntest/var
 
 [dest]
 type = local
-directory = /tmp/backups
+directory = /var/backups
 host =
 user =
 sshoptions = -4
@@ -41,8 +37,8 @@ EOF
 }
 
 finish_rdiff() {
-    rm -rf /tmp/backups/rdifftest
-    ssh vagrant@bntest1 "rm -rf /tmp/backups/rdifftest"
+    rm -rf /var/backups/rdifftest
+    ssh vagrant@bntest1 "rm -rf /var/backups/rdifftest"
 }
 
 @test "local source/dest backup action runs without errors" {

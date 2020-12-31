@@ -23,10 +23,8 @@ Vagrant.configure("2") do |config|
       apt-get install -y borgbackup duplicity rdiff-backup restic rsync
       sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
       systemctl reload sshd
-      mkdir /tmp/backups
-      mount -t tmpfs tmpfs /tmp/backups
-      chown vagrant: /tmp/backups
       echo -e "vagrant\nvagrant" | passwd vagrant
+      chown vagrant: /var/backups
     SHELL
   end
 
@@ -45,9 +43,6 @@ Vagrant.configure("2") do |config|
       ./configure --prefix=/usr --mandir=/usr/share/man --sysconfdir=/etc --localstatedir=/var --libdir=/usr/lib --libexecdir=/usr/lib
       make
       make install
-      mkdir /tmp/backups
-      mount -t tmpfs tmpfs /tmp/backups
-      chown vagrant: /tmp/backups
       mkdir -p /root/.ssh
       yes y | ssh-keygen -t ed25519 -f /root/.ssh/id_ed25519 -N ''
       echo "StrictHostKeyChecking accept-new" >> /root/.ssh/config
