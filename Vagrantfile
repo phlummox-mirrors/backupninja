@@ -20,7 +20,7 @@ Vagrant.configure("2") do |config|
       echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
       locale-gen
       apt-get update
-      apt-get install -y rdiff-backup borgbackup restic
+      apt-get install -y borgbackup duplicity rdiff-backup restic rsync
       sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
       systemctl reload sshd
       mkdir /tmp/backups
