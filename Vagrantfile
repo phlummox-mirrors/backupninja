@@ -2,6 +2,9 @@
 # vi: set ft=ruby :
 
 ENV["LC_ALL"] = "en_US.UTF-8"
+
+base_box = "debian/testing64"
+
 empty_disk = '.vagrant/tmp/empty.vdi'
 lvm_disk = '.vagrant/tmp/lvm.vdi'
 lukspart_disk = '.vagrant/tmp/lukspart.vdi'
@@ -10,7 +13,7 @@ luksdev_disk = '.vagrant/tmp/luksdev.vdi'
 Vagrant.configure("2") do |config|
 
   config.vm.define "remote" do |remote|
-    remote.vm.box = "debian/buster64"
+    remote.vm.box = base_box
     remote.vm.hostname = "bntest1"
     remote.vm.network "private_network", ip: "192.168.181.5"
     remote.vm.provision "shell", inline: <<-SHELL
@@ -26,7 +29,7 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.define "local", primary: true do |local|
-    local.vm.box = "debian/buster64"
+    local.vm.box = base_box
     local.vm.hostname = "bntest0"
     local.vm.network "private_network", ip: "192.168.181.4"
     local.vm.provision "shell", inline: <<-SHELL
