@@ -33,12 +33,18 @@ EOF
 }
 
 finish_sys() {
+    # remove test artifacts
+    rm -rf /var/backups/*
+    # cleanup lvm
     lvremove -f vgtest/lvtest
     vgremove vgtest
     pvremove /dev/sdc
+    # cleanup luks data and partition tables
     dd if=/dev/zero of=/dev/sdc bs=512 count=1 conv=notrunc
+    dd if=/dev/zero of=/dev/sdd1 bs=512 count=2048 conv=notrunc
+    dd if=/dev/zero of=/dev/sdd2 bs=512 count=2048 conv=notrunc
     dd if=/dev/zero of=/dev/sdd bs=512 count=1 conv=notrunc
-    dd if=/dev/zero of=/dev/sde bs=512 count=1 conv=notrunc
+    dd if=/dev/zero of=/dev/sde bs=512 count=2048 conv=notrunc
 }
 
 @test "action runs without errors" {
