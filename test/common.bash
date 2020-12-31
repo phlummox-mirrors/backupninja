@@ -75,8 +75,8 @@ teardown() {
 
 setconfig() {
     if [ -z $4 ]; then
-        crudini --set "${BATS_TMPDIR}/$1" '' $2 $3
+        crudini --set "${BATS_TMPDIR}/$1" '' $2 "$3"
     else
-        crudini --set "${BATS_TMPDIR}/$1" $2 $3 $4
+        crudini --set "${BATS_TMPDIR}/$1" $2 $3 "$4"
     fi
 }
