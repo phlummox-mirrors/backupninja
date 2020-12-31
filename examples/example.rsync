@@ -77,6 +77,16 @@ days = 7
 # rsync command nice level
 #nicelevel = 0
 
+## ionicelevel is optional. If it is left undefined or empty, ionice will not
+## be used at all. If it is set to to an integer value from 0 to 7, then ionice
+## will be used with the best effort class (-c2) and with the ionicelevel as
+## the class data (-n).
+##
+## See the ionice(1) man page for more details about available levels.
+##
+## Default:
+# ionicelevel =
+
 # set to "yes" if your system isnt handling timestamps correctly
 #enable_mv_timestamp_bug = no
 

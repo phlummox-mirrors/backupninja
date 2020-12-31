@@ -40,6 +40,7 @@
 #   keepweekly = for long storage format, specify the number of weekly backup increments
 #   keepmonthly = for long storage format, specify the number of monthly backup increments
 #   nicelevel = rsync command nice level
+#   ionicelevel = best-effort nice level applied to rsync and other commands
 #   enable_mv_timestamp_bug = set to "yes" if your system isnt handling timestamps correctly
 #   tmp = temp folder
 #   multiconnection = set to "yes" if you want to use multiconnection ssh support
@@ -129,6 +130,7 @@ function eval_config {
   getconf keepweekly 3
   getconf keepmonthly 1
   getconf nicelevel 0
+  getconf ionicelevel
   getconf enable_mv_timestamp_bug no
   getconf tmp /tmp
   getconf multiconnection no
@@ -256,6 +258,10 @@ function eval_config {
     nice="nice -n $nicelevel"
   else 
     nice=""
+  fi
+
+  if [ -n "$ionicelevel" ]; then
+    nice="ionice -c2 -n $ionicelevel $nice"
   fi
 
   ssh_cmd_base="ssh -T -o PasswordAuthentication=no -p $port -i $id_file"
