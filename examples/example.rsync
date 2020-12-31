@@ -137,7 +137,7 @@ exclude_vserver = excluded_vserver2
 #rsync = $RSYNC
 
 # rsync command options
-#rsync_options = "-av --delete --recursive"
+#rsync_options = -av --delete --recursive
 
 # when set to 1, use numeric ids instead of user/group mappings on rsync
 #numericids =
