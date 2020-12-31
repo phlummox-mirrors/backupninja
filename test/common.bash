@@ -68,9 +68,9 @@ teardown() {
 }
 
 setconfig() {
-    if grep -qe "$2\s\+=" "${BATS_TMPDIR}/$1"; then
-        sed -i "s|^$2\s\+=.*|$2 = $3|" "${BATS_TMPDIR}/$1"
+    if [ -z $4 ]; then
+        crudini --set "${BATS_TMPDIR}/$1" '' $2 $3
     else
-        echo "$2 = $3" >> "${BATS_TMPDIR}/$1"
+        crudini --set "${BATS_TMPDIR}/$1" $2 $3 $4
     fi
 }
