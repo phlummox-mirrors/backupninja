@@ -35,6 +35,7 @@ teardown_pgsql() {
     setconfig backup.d/test.pgsql compress yes
     setconfig backup.d/test.pgsql format plain
     run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.pgsql"
+    [ "$status" -eq 0 ]
     gzip -tq /var/backups/postgres/bntest0-all.sql.gz
 }
 
@@ -43,6 +44,7 @@ teardown_pgsql() {
     setconfig backup.d/test.pgsql compress no
     setconfig backup.d/test.pgsql format plain
     run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.pgsql"
+    [ "$status" -eq 0 ]
     [ -s /var/backups/postgres/bntest0-all.sql ]
 }
 
@@ -51,6 +53,7 @@ teardown_pgsql() {
     setconfig backup.d/test.pgsql compress yes
     setconfig backup.d/test.pgsql format plain
     run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.pgsql"
+    [ "$status" -eq 0 ]
     gzip -tq /var/backups/postgres/bntest_v11vJj.sql.gz
     [ "$(zgrep -c -e '^COPY' /var/backups/postgres/bntest_v11vJj.sql.gz)" -eq 68 ]
     [ ! -e /var/backups/postgres/bntest_p8Cz8k.sql.gz ]
@@ -61,6 +64,7 @@ teardown_pgsql() {
     setconfig backup.d/test.pgsql compress no
     setconfig backup.d/test.pgsql format plain
     run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.pgsql"
+    [ "$status" -eq 0 ]
     [ -s /var/backups/postgres/bntest_v11vJj.sql ]
     [ "$(grep -c -e '^COPY' /var/backups/postgres/bntest_v11vJj.sql)" -eq 68 ]
     [ ! -e /var/backups/postgres/bntest_p8Cz8k.sql ]
@@ -71,6 +75,7 @@ teardown_pgsql() {
     setconfig backup.d/test.pgsql compress yes
     setconfig backup.d/test.pgsql format tar
     run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.pgsql"
+    [ "$status" -eq 0 ]
     gzip -tq /var/backups/postgres/bntest_p8Cz8k.pg_dump.gz
     gzip -tq /var/backups/postgres/bntest_v11vJj.pg_dump.gz
     gzip -tq /var/backups/postgres/globals.sql.gz
@@ -81,6 +86,7 @@ teardown_pgsql() {
     setconfig backup.d/test.pgsql compress no
     setconfig backup.d/test.pgsql format tar
     run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.pgsql"
+    [ "$status" -eq 0 ]
     [ -s /var/backups/postgres/bntest_p8Cz8k.pg_dump ]
     [ -s /var/backups/postgres/bntest_v11vJj.pg_dump ]
     file /var/backups/postgres/bntest_p8Cz8k.pg_dump | grep "POSIX tar archive"
@@ -93,6 +99,7 @@ teardown_pgsql() {
     setconfig backup.d/test.pgsql compress yes
     setconfig backup.d/test.pgsql format tar
     run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.pgsql"
+    [ "$status" -eq 0 ]
     gzip -tq /var/backups/postgres/bntest_v11vJj.pg_dump.gz
     [ ! -e /var/backups/postgres/bntest_p8Cz8k.pg_dump.gz ]
     [ ! -e /var/backups/postgres/globals.sql.gz ]
@@ -103,6 +110,7 @@ teardown_pgsql() {
     setconfig backup.d/test.pgsql compress no
     setconfig backup.d/test.pgsql format tar
     run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.pgsql"
+    [ "$status" -eq 0 ]
     [ -s /var/backups/postgres/bntest_v11vJj.pg_dump ]
     file /var/backups/postgres/bntest_v11vJj.pg_dump | grep -q "POSIX tar archive"
     [ ! -e /var/backups/postgres/bntest_p8Cz8k.pg_dump ]
@@ -114,6 +122,7 @@ teardown_pgsql() {
     setconfig backup.d/test.pgsql compress yes
     setconfig backup.d/test.pgsql format custom
     run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.pgsql"
+    [ "$status" -eq 0 ]
     gzip -tq /var/backups/postgres/bntest_p8Cz8k.pg_dump.gz
     gzip -tq /var/backups/postgres/bntest_v11vJj.pg_dump.gz
     gzip -tq /var/backups/postgres/globals.sql.gz
@@ -124,6 +133,7 @@ teardown_pgsql() {
     setconfig backup.d/test.pgsql compress no
     setconfig backup.d/test.pgsql format custom
     run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.pgsql"
+    [ "$status" -eq 0 ]
     [ -s /var/backups/postgres/bntest_p8Cz8k.pg_dump ]
     [ -s /var/backups/postgres/bntest_v11vJj.pg_dump ]
     file /var/backups/postgres/bntest_p8Cz8k.pg_dump | grep -q "PostgreSQL custom database dump"
@@ -136,6 +146,7 @@ teardown_pgsql() {
     setconfig backup.d/test.pgsql compress yes
     setconfig backup.d/test.pgsql format custom
     run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.pgsql"
+    [ "$status" -eq 0 ]
     gzip -tq /var/backups/postgres/bntest_v11vJj.pg_dump.gz
     [ ! -e /var/backups/postgres/bntest_p8Cz8k.pg_dump.gz ]
     [ ! -e /var/backups/postgres/globals.sql.gz ]
@@ -146,6 +157,7 @@ teardown_pgsql() {
     setconfig backup.d/test.pgsql compress no
     setconfig backup.d/test.pgsql format custom
     run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.pgsql"
+    [ "$status" -eq 0 ]
     [ -s /var/backups/postgres/bntest_v11vJj.pg_dump ]
     file /var/backups/postgres/bntest_v11vJj.pg_dump | grep -q "PostgreSQL custom database dump"
     [ ! -e /var/backups/postgres/bntest_p8Cz8k.pg_dump ]
