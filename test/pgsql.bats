@@ -83,8 +83,8 @@ teardown_pgsql() {
     run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.pgsql"
     [ -s /var/backups/postgres/bntest_p8Cz8k.pg_dump ]
     [ -s /var/backups/postgres/bntest_v11vJj.pg_dump ]
-    file /tmp/bntest_p8Cz8k.pg_dump | grep "POSIX tar archive"
-    file /tmp/bntest_v11vJj.pg_dump | grep "POSIX tar archive"
+    file /var/backups/postgres/bntest_p8Cz8k.pg_dump | grep "POSIX tar archive"
+    file /var/backups/postgres/bntest_v11vJj.pg_dump | grep "POSIX tar archive"
     [ -s /var/backups/postgres/globals.sql ]
 }
 
@@ -104,7 +104,7 @@ teardown_pgsql() {
     setconfig backup.d/test.pgsql format tar
     run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.pgsql"
     [ -s /var/backups/postgres/bntest_v11vJj.pg_dump ]
-    file /tmp/bntest_v11vJj.pg_dump | grep -q "POSIX tar archive"
+    file /var/backups/postgres/bntest_v11vJj.pg_dump | grep -q "POSIX tar archive"
     [ ! -e /var/backups/postgres/bntest_p8Cz8k.pg_dump ]
     [ ! -e /var/backups/postgres/globals.sql ]
 }
