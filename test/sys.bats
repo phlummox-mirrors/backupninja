@@ -23,6 +23,7 @@ EOF
 
     # Setup LUKS
     parted -s /dev/sdd mklabel msdos mkpart p 1MiB 50% mkpart p 50% 100%
+    partprobe
     cryptsetup -q --type luks1 luksFormat /dev/sdd1 <<< 123test
     cryptsetup -q --type luks2 luksFormat /dev/sdd2 <<< 123test
     cryptsetup -q --type luks2 luksFormat /dev/sde <<< 123test
