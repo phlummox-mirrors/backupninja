@@ -17,6 +17,7 @@ Vagrant.configure("2") do |config|
     remote.vm.hostname = "bntest1"
     remote.vm.network "private_network", ip: "192.168.181.5"
     remote.vm.provision "shell", inline: <<-SHELL
+      echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
       locale-gen
       apt-get update
       apt-get install -y rdiff-backup borgbackup restic
@@ -25,6 +26,7 @@ Vagrant.configure("2") do |config|
       mkdir /tmp/backups
       mount -t tmpfs tmpfs /tmp/backups
       chown vagrant: /tmp/backups
+      echo -e "vagrant\nvagrant" | passwd vagrant
     SHELL
   end
 
@@ -33,6 +35,7 @@ Vagrant.configure("2") do |config|
     local.vm.hostname = "bntest0"
     local.vm.network "private_network", ip: "192.168.181.4"
     local.vm.provision "shell", inline: <<-SHELL
+      echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
       locale-gen
       apt-get update
       apt-get install -y automake make dialog sshpass
