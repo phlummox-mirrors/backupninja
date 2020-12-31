@@ -5,6 +5,10 @@ begin_rdiff() {
     if [ ! -d /var/cache/bntest ]; then
         debootstrap --variant=minbase testing /var/cache/bntest
     fi
+    if [ ! -d /tmp/backups ]; then
+        mkdir /tmp/backups
+        mount -t tmpfs tmpfs /tmp/backups
+    fi
 }
 
 setup_rdiff() {
