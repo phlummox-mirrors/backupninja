@@ -56,8 +56,8 @@ case $compress in
       compress_option=""
       ;;
    *)
-      warning "Unknown compress filter ($tar_compress)"
-      compress_option=""
+      warning "Unknown compress filter ($compress), defaulting to gzip"
+      compress_option="-z"
       EXTENSION="tgz"
       ;;
 esac
