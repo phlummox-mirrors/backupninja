@@ -37,8 +37,7 @@ EOF
 }
 
 finish_rdiff() {
-    rm -rf /var/backups/rdifftest
-    ssh vagrant@bntest1 "rm -rf /var/backups/rdifftest"
+    cleanup_backups local remote
 }
 
 @test "local source/dest backup action runs without errors" {

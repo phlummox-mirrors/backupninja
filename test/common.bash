@@ -86,11 +86,16 @@ remote_command() {
 }
 
 cleanup_backups() {
-    umount /var/backups
-    mount -t tmpfs tmpfs /var/backups
-}
-
-cleanup_remote_backups() {
-    remote_command "sudo umount /var/backups"
-    remote_command "sudo mount -t tmpfs tmpfs /var/backups"
+    for c in "$@"; do
+        case "$c" in
+            "local")
+                umount /var/backups
+                mount -t tmpfs tmpfs /var/backups
+                ;;
+            "remote")
+                remote_command "sudo umount /var/backups"
+                remote_command "sudo mount -t tmpfs tmpfs /var/backups"
+                ;;
+        esac
+    done
 }

@@ -33,12 +33,11 @@ EOF
 }
 
 finish_rsync() {
-    cleanup_backups
-    #ssh vagrant@bntest1 "rm -rf /var/backups/rsynctest.*"
+    cleanup_backups local remote
 }
 
 @test "short: local source/dest backup action runs without errors" {
-    cleanup_backups
+    cleanup_backups local
     setconfig backup.d/test.rsync general format short
     setconfig backup.d/test.rsync general backupdir rsynctest.short
     mkdir -p /var/backups/rsynctest.short/var/cache/bntest/bntest.0
@@ -68,7 +67,7 @@ finish_rsync() {
 }
 
 @test "long: local source/dest backup action runs without errors" {
-    cleanup_backups
+    cleanup_backups local
     setconfig backup.d/test.rsync general format long
     setconfig backup.d/test.rsync general backupdir rsynctest.long
     mkdir -p /var/backups/rsynctest.long/var/cache/bntest/bntest/daily.1
@@ -98,7 +97,7 @@ finish_rsync() {
 }
 
 @test "mirror: local source/dest backup action runs without errors" {
-    cleanup_backups
+    cleanup_backups local
     setconfig backup.d/test.rsync general format mirror
     setconfig backup.d/test.rsync general backupdir rsynctest.mirror
     mkdir -p /var/backups/rsynctest.mirror/var/cache/bntest
@@ -124,13 +123,12 @@ finish_rsync() {
 }
 
 @test "short: remote dest backup action runs without errors" {
-    cleanup_remote_backups
+    cleanup_backups remote
     setconfig backup.d/test.rsync general format short
     setconfig backup.d/test.rsync general backupdir rsynctest.short
     setconfig backup.d/test.rsync dest dest remote
     setconfig backup.d/test.rsync dest host bntest1
     setconfig backup.d/test.rsync dest user vagrant
-    cleanup_remote_backups
     remote_command "mkdir -p /var/backups/rsynctest.short/var/cache/bntest/bntest.0"
     run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.rsync"
     [ "$status" -eq 0 ]
@@ -158,7 +156,7 @@ finish_rsync() {
 }
 
 @test "long: remote dest backup action runs without errors" {
-    cleanup_remote_backups
+    cleanup_backups remote
     setconfig backup.d/test.rsync general format long
     setconfig backup.d/test.rsync general backupdir rsynctest.long
     setconfig backup.d/test.rsync dest dest remote
@@ -191,7 +189,7 @@ finish_rsync() {
 }
 
 @test "mirror: remote dest backup action runs without errors" {
-    cleanup_remote_backups
+    cleanup_backups remote
     setconfig backup.d/test.rsync general format mirror
     setconfig backup.d/test.rsync general backupdir rsynctest.mirror
     setconfig backup.d/test.rsync dest dest remote
