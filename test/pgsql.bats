@@ -2,6 +2,7 @@ load common
 
 begin_pgsql() {
     apt-get -qq install postgresql
+    systemctl is-active postgresql || systemctl start postgresql
     sudo -u postgres createuser --superuser root
     createdb bntest_p8Cz8k
     createdb bntest_v11vJj
@@ -24,6 +25,7 @@ finish_pgsql() {
     dropdb bntest_p8Cz8k
     dropdb bntest_v11vJj
     sudo -u postgres dropuser root
+    systemctl stop postgresql
 }
 
 teardown_pgsql() {
