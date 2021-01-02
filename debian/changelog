@@ -1,6 +1,7 @@
 backupninja (UNRELEASED) unstable; urgency=medium
 
   * Update debian/copyright
+  * Change Riseup Labs to Liberate in debian/control
 
  -- Micah Anderson <micah@riseup.net>  Sat, 02 Jan 2021 15:49:50 -0400
 
