@@ -145,7 +145,7 @@ exclude = exclude_folder2
 #remote_rsync = rsync
 
 # ssh key file (remote source only)
-#id_file = /root/.ssh/id_dsa
+#id_file = /root/.ssh/id_rsa
 
 # set to "yes" to rsync use a batch file as source
 #batch = no
@@ -189,7 +189,7 @@ exclude = exclude_folder2
 #user =
 
 # ssh key file (remote destination only)
-#id_file = /root/.ssh/id_dsa
+#id_file = /root/.ssh/id_rsa
 
 # set a bandwidth limit in KB/s (remote destination only)
 #bandwidthlimit =

@@ -155,7 +155,7 @@ function eval_config {
     getconf user
     getconf bandwidthlimit
     getconf remote_rsync rsync
-    getconf id_file /root/.ssh/id_dsa
+    getconf id_file /root/.ssh/id_rsa
   fi
   
   getconf batch no
@@ -197,7 +197,7 @@ function eval_config {
     getconf user
     getconf bandwidthlimit
     getconf remote_rsync rsync
-    getconf id_file /root/.ssh/id_dsa
+    getconf id_file /root/.ssh/id_rsa
   fi
   
   getconf batch no
