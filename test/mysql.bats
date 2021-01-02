@@ -26,7 +26,7 @@ finish_mysql() {
 }
 
 teardown_mysql() {
-    rm -rf /var/backups/mysql
+    cleanup_backups local
 }
 
 @test "sqldump: exports all databases, with compression" {
@@ -117,4 +117,8 @@ teardown_mysql() {
     [ "$(grep -c 'INSERT INTO `cache_data`' /var/backups/mysql/sqldump/bntest_v11vJj.sql)" -eq 0 ]
     [ "$(grep -c 'INSERT INTO `cache_entity`' /var/backups/mysql/sqldump/bntest_v11vJj.sql)" -eq 0 ]
     [ "$(grep -c 'CREATE TABLE' /var/backups/mysql/sqldump/bntest_v11vJj.sql)" -eq 68 ]
+}
+
+@test "hotcopy: exports all databases" {
+    skip "not implemented, method is deprecated upstream"
 }
