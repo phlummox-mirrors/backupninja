@@ -9,7 +9,7 @@ Vagrant.configure("2") do |config|
     locale-gen
     apt-get update
     apt-get install -y git automake make
-    git clone https://0xacab.org/riseuplabs/backupninja.git
+    git clone https://0xacab.org/liberate/backupninja.git
     chown vagrant: backupninja -R
   SHELL
 end
