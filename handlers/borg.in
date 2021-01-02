@@ -164,10 +164,10 @@ if [ $test = 0 ]; then
    output=`$nice su -c "$execstr" 2>&1`
    if [ $? = 0 ]; then
       debug $output
-      info "Successfully finished backing up source $label"
+      info "Successfully finished backing up source."
    else
       error $output
-      fatal "Failed backuping up source $label"
+      fatal "Failed backing up source."
    fi
 fi
 
