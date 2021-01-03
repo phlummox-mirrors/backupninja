@@ -1,5 +1,11 @@
 setup() {
 
+    # declare some constants
+    readonly BN_REMOTEUSER="vagrant"
+    readonly BN_REMOTEHOST="bntest1"
+    readonly BN_BACKUPDIR="/var/backups"
+    readonly BN_SRCDIR="/var/cache/bntest"
+
     # Write a basic backupninja config file
     cat << EOF > "${BATS_TMPDIR}/backupninja.conf"
 when = manual

@@ -2,8 +2,8 @@ load common
 
 begin_borg() {
     apt-get -qq install debootstrap borgbackup
-    if [ ! -d /var/cache/bntest ]; then
-        debootstrap --variant=minbase testing /var/cache/bntest
+    if [ ! -d "$BN_SRCDIR" ]; then
+        debootstrap --variant=minbase testing "$BN_SRCDIR"
     fi
 }
 
@@ -17,8 +17,8 @@ bwlimit =
 
 [source]
 init = yes
-include = /var/cache/bntest
-exclude = /var/cache/bntest/var
+include = ${BN_SRCDIR}
+exclude = ${BN_SRCDIR}/var
 create_options =
 prune = yes
 keep = 30d
@@ -27,9 +27,9 @@ cache_directory =
 
 [dest]
 user =
-host =
+host = localhost
 port = 22
-directory = /var/backups/testborg
+directory = ${BN_BACKUPDIR}/testborg
 archive =
 compression = lz4
 encryption = none
