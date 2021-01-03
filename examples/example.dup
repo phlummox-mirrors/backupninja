@@ -111,7 +111,7 @@
 [source]
 
 ## A few notes about includes and excludes:
-## 1. include, exclude and vsinclude statements support globbing with '*'
+## 1. include and exclude statements support globbing with '*'
 ## 2. Symlinks are not dereferenced. Moreover, an include line whose path
 ##    contains, at any level, a symlink to a directory, will only have the
 ##    symlink backed-up, not the target directory's content. Yes, you have to

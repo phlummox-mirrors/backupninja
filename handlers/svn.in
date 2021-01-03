@@ -8,7 +8,6 @@ getconf src /var/lib/svn
 getconf dest /var/backups/svn
 getconf tmp /var/backups/svn.tmp
 getconf HOTBACKUP "/usr/bin/svnadmin hotcopy"
-getconf vsname
 
 error=0
 

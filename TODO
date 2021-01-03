@@ -13,8 +13,6 @@ you are working on it!
   want local-to-local, or remote-to-local, or pull backups). This has been
   reported for the duplicity handler as Debian bug #346040.
 
-. Allow vsnames "all" in the msyql handler.
-
 . Factorize the rdiff.helper's connection-related functions into a lib, so
   that they can be used by dup.helper too. (NB: don't forget that the dup
   handler has a sshoptions configuration setting, that is often used to

@@ -96,8 +96,6 @@ check_consistency "source" "$type" "$user" "$host"
 getconf label
 getconf keep 60
 getconf include
-getconf vsnames all
-getconf vsinclude
 getconf exclude
 
 setsection dest
@@ -240,7 +238,7 @@ IFS=$SAVEIFS
 set +o noglob
 
 # exclude everything else
-[ "$include" != "" -o "$vsinclude" != "" ] && execstr="${execstr}--exclude '/*' "
+[ "$include" != "" ] && execstr="${execstr}--exclude '/*' "
 
 # include client-part and server-part
 execstr="${execstr}$execstr_sourcepart $execstr_destpart"
