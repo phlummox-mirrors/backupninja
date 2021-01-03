@@ -58,8 +58,10 @@ export BORG_PASSPHRASE="$passphrase"
 [ -n "$include" ] || fatal "No source includes specified"
 
 # destination specific checks
-[ "$directory" != "" ] || fatal "Destination directory not set"
+[ -n "$directory" ] || fatal "Destination directory not set"
 if [ "$host" != "localhost" ]; then
+   [ -n "$user" ] || fatal "Destination user not set"
+   [ -n "$host" ] || fatal "Destination host not set"
   execstr_repository="ssh://${user}@${host}:${port}${directory}"
 else
   execstr_repository="$directory"
