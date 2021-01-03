@@ -50,6 +50,9 @@ export BORG_PASSPHRASE="$passphrase"
 
 ### CHECK CONFIG ###
 
+# source includes at least one path
+[ -n "$include" ] || fatal "No source includes specified"
+
 # destination specific checks
 [ "$directory" != "" ] || fatal "Destination directory not set"
 if [ "$host" != "localhost" ]; then
