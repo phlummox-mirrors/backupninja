@@ -79,29 +79,100 @@ teardown() {
     fi
 }
 
+# set parameter/value in action config file
 setconfig() {
     if [ -z $4 ]; then
+        # default section
         crudini --set "${BATS_TMPDIR}/$1" '' $2 "$3"
     else
+        # named section
         crudini --set "${BATS_TMPDIR}/$1" $2 $3 "$4"
     fi
 }
 
-remote_command() {
-    ssh vagrant@bntest1 "$1"
+# special-case for repeating config parameters
+# crudini doesn't support those
+# (used for include and exclude parameters)
+setconfig_repeat() {
+    conffile="${BATS_TMPDIR}/$1"
+    param="$2"
+    shift; shift;
+    for p in "$@"; do
+        conf="${conf}${param} = ${p}\n"
+    done
+    sed -i "s#^${param} =.*#${conf}#" "${conffile}"
 }
 
+# delete config parameter
+delconfig() {
+    if [ -z $3 ]; then
+        # default section
+        crudini --del "${BATS_TMPDIR}/$1" '' $2
+    else
+        # named section
+        crudini --del "${BATS_TMPDIR}/$1" $2 $3
+    fi
+}
+
+# execute command on remote vagrant host
+remote_command() {
+    ssh "${BN_REMOTEUSER}@${BN_REMOTEHOST}" "$1"
+}
+
+# remove backup test artifacts
 cleanup_backups() {
     for c in "$@"; do
         case "$c" in
             "local")
-                umount /var/backups
-                mount -t tmpfs tmpfs /var/backups
+                umount "$BN_BACKUPDIR"
+                mount -t tmpfs tmpfs "$BN_BACKUPDIR"
                 ;;
             "remote")
-                remote_command "sudo umount /var/backups"
-                remote_command "sudo mount -t tmpfs tmpfs /var/backups"
+                remote_command "sudo umount \"$BN_BACKUPDIR\""
+                remote_command "sudo mount -t tmpfs tmpfs $BN_BACKUPDIR\""
                 ;;
         esac
     done
+}
+
+# run backupninja action, removing previous log file if exists
+runaction() {
+    if [ -f "${BATS_TMPDIR}/backup.d/${1}" ]; then
+        [ -f "${BATS_TMPDIR}/log/backupninja.log" ] && rm -f "${BATS_TMPDIR}/log/backupninja.log"
+        run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/${1}"
+    else
+        echo "action file not found: ${BATS_TMPDIR}/backup.d/${1}"
+        false
+    fi
+}
+
+# run backupninja action in test mode, removing previous log file if exist
+testaction() {
+    if [ -f "${BATS_TMPDIR}/backup.d/${1}" ]; then
+        [ -f "${BATS_TMPDIR}/log/backupninja.log" ] && rm -f "${BATS_TMPDIR}/log/backupninja.log"
+        run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --test --run "${BATS_TMPDIR}/backup.d/${1}"
+    else
+        echo "action file not found: ${BATS_TMPDIR}/backup.d/${1}"
+        false
+    fi
+}
+
+# grep the backupninja log
+greplog() {
+    if [ -z "$2" ]; then
+        grep -q "$1" "${BATS_TMPDIR}/log/backupninja.log"
+    else
+        # grep line following previous match
+        grep -A1 "$1" "${BATS_TMPDIR}/log/backupninja.log" | tail -n1 | grep -q -- "$2"
+    fi
+}
+
+
+not_greplog() {
+    if [ -z "$2" ]; then
+        ! grep -q "$1" "${BATS_TMPDIR}/log/backupninja.log"
+    else
+        # grep line following previous match
+        ! (grep -A1 "$1" "${BATS_TMPDIR}/log/backupninja.log" | tail -n1 | grep -q -- "$2")
+    fi
 }
