@@ -37,6 +37,7 @@ passphrase =
 EOF
 
     chmod 0640 "${BATS_TMPDIR}/backup.d/test.borg"
+    rm -rf /root/.cache/borg
 }
 
 finish_borg() {
