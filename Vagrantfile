@@ -22,6 +22,8 @@ Vagrant.configure("2") do |config|
       apt-get update
       apt-get install -y borgbackup duplicity rdiff-backup restic rsync
       sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
+      echo "Port 22" >> /etc/ssh/sshd_config
+      echo "Port 7722" >> /etc/ssh/sshd_config
       systemctl reload sshd
       echo -e "vagrant\nvagrant" | passwd vagrant
       chown vagrant: /var/backups
