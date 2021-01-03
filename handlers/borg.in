@@ -14,7 +14,10 @@
 #
 #
 
+debug "export BORG_RELOCATED_REPO_ACCESS_IS_OK=yes"
 export BORG_RELOCATED_REPO_ACCESS_IS_OK=yes
+
+debug "export BORG_UNKNOWN_UNENCRYPTED_REPO_ACCESS_IS_OK=yes"
 export BORG_UNKNOWN_UNENCRYPTED_REPO_ACCESS_IS_OK=yes
 
 ### GET CONFIG ###
@@ -46,6 +49,7 @@ getconf compression lz4
 getconf encryption none
 getconf passphrase
 
+debug "export BORG_PASSPHRASE=\"<redacted>\""
 export BORG_PASSPHRASE="$passphrase"
 
 ### CHECK CONFIG ###
@@ -65,14 +69,15 @@ execstr_archive="$archive"
 if [ -n "$cache_directory" ]; then
    cache_parent_dir=$(dirname "$(readlink -f "$cache_directory")")
    [ -d "$cache_parent_dir" ] || fatal "Cache directory parent dir '$cache_parent_dir' is absent or is not a directory."
-   BORG_CACHE_DIR=$cache_directory
-   export BORG_CACHE_DIR
+   debug "export BORG_CACHE_DIR=\"${cache_directory}\""
+   export BORG_CACHE_DIR="$cache_directory"
 else
    # Cache dir not set, let's clear out the environment variable to avoid
    # having this directory be pointed to a random destination.
    # Also apparently if we set the variable to an empty string, borg uses the
    # empty string as though it was some path we specified and backup runs
    # error out, so we need to unset the variable completely.
+   debug "unset BORG_CACHE_DIR"
    unset BORG_CACHE_DIR
 fi
 
@@ -195,6 +200,7 @@ if [ "$prune" == "yes" ]; then
    fi
 fi
 
+debug "unset BORG_PASSPHRASE"
 unset BORG_PASSPHRASE
 
 return 0
