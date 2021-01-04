@@ -129,7 +129,7 @@ cleanup_backups() {
                 ;;
             "remote")
                 remote_command "sudo umount \"$BN_BACKUPDIR\""
-                remote_command "sudo mount -t tmpfs tmpfs $BN_BACKUPDIR\""
+                remote_command "sudo mount -t tmpfs tmpfs \"$BN_BACKUPDIR\""
                 ;;
         esac
     done
