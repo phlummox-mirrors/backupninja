@@ -346,37 +346,52 @@ finish_borg() {
     greplog 'Debug: executing borg create$' "\s--compression auto,zstd,13\b"
 }
 
-@test "[dest] passphrase config parameter and validate repository" {
-    # run actual local backup action for this test
-    # and verify passphrase validity with borg check
-
-    # absent parameter, no passphrase
+@test "create local backup without encryption, test extraction" {
+    # no encryption, no passphrase
     setconfig backup.d/test.borg dest archive testarchive
+    setconfig backup.d/test.borg dest encryption none
     delconfig backup.d/test.borg dest passphrase
     cleanup_backups local
     runaction test.borg
     [ "$status" -eq 0 ]
+    greplog 'Debug: executing borg init$' 'Debug: borg init --encryption=none'
     greplog "Warning: Repository has been initialized"
     unset BORG_PASSPHRASE
-    borg check --repository-only "${BN_BACKUPDIR}/testborg::testarchive"
+    borg extract --dry-run "${BN_BACKUPDIR}/testborg::testarchive"
+    [ "$status" -eq 0 ]
+}
 
-    # defined parameter
+@test "create local backup with encryption, test extraction" {
+    # encryption enabled, wrong passphrase
     setconfig backup.d/test.borg dest archive testarchive
+    setconfig backup.d/test.borg dest encryption repokey
     setconfig backup.d/test.borg dest passphrase 123test
     cleanup_backups local
     runaction test.borg
     [ "$status" -eq 0 ]
+    greplog 'Debug: executing borg init$' 'Debug: borg init --encryption=repokey'
     greplog "Warning: Repository has been initialized"
+    export BORG_PASSPHRASE="123foo"
+    run borg extract --dry-run "${BN_BACKUPDIR}/testborg::testarchive"
+    [ "$status" -eq 2 ]
     export BORG_PASSPHRASE="123test"
-    borg check --repository-only "${BN_BACKUPDIR}/testborg::testarchive"
+    borg extract --dry-run "${BN_BACKUPDIR}/testborg::testarchive"
 }
 
-@test "remote backup action runs and validate repository" {
+@test "create remote backup with encryption, test extraction" {
     setconfig backup.d/test.borg dest archive testarchive
+    setconfig backup.d/test.borg dest encryption repokey
+    setconfig backup.d/test.borg dest passphrase 123test
     setconfig backup.d/test.borg dest host "${BN_REMOTEHOST}"
     setconfig backup.d/test.borg dest user "${BN_REMOTEUSER}"
+    cleanup_backups remote
     runaction test.borg
     [ "$status" -eq 0 ]
+    greplog 'Debug: executing borg init$' 'Debug: borg init --encryption=repokey'
     greplog "Warning: Repository has been initialized"
-    borg check --repository-only "ssh://${BN_REMOTEUSER}@${BN_REMOTEHOST}:22${BN_BACKUPDIR}/testborg::testarchive"
+    export BORG_PASSPHRASE="123foo"
+    run borg extract --dry-run "ssh://${BN_REMOTEUSER}@${BN_REMOTEHOST}:22${BN_BACKUPDIR}/testborg::testarchive"
+    [ "$status" -eq 2 ]
+    export BORG_PASSPHRASE="123test"
+    borg extract --dry-run "ssh://${BN_REMOTEUSER}@${BN_REMOTEHOST}:22${BN_BACKUPDIR}/testborg::testarchive"
 }
