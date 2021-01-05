@@ -149,8 +149,11 @@ if version_ge "$duplicity_version" '0.6.17'; then
    fi
    execstr_options="${execstr_options} --ssh-options '$sshoptions'"
    if [ "$bandwidthlimit" != 0 ]; then
-      [ -z "$desturl" ] || warning 'The bandwidthlimit option is not used when desturl is set.'
-      execstr_precmd="trickle -s -d $bandwidthlimit -u $bandwidthlimit"
+      if [ "`echo $desturl | @AWK@ -F ':' '{print $1}'`" == "file" ]; then
+         warning 'The bandwidthlimit option is not used with a local file path destination.'
+      else
+         execstr_precmd="trickle -s -d $bandwidthlimit -u $bandwidthlimit"
+      fi
    fi
 ## duplicity < 0.6.17 : scp/sftp backend
 else
