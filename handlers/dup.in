@@ -46,18 +46,34 @@ destdir=${destdir%/}
 
 ### SANITY CHECKS ##############################################################
 
-[ -n "$desturl" -o -n "$destdir" ]  || fatal "The destination directory (destdir) must be set when desturl is not used."
-[ -n "$include" ]  || fatal "No source includes specified"
+if [ -z "$desturl" ]; then
+   # desturl undefined, ensure desthost, destuser and destdir are set
+   [ -n "$desthost" ] || fatal "The destination host (desthost) must be set when desturl is not used."
+   [ -n "$destuser" ] || fatal "The destination user (destuser) must be set when desturl is not used."
+   [ -n "$destdir" ] || fatal "The destination directory (destdir) must be set when desturl is not used."
+else
+   # desturl overrides other destination specifiers, warn if they are used
+   [ -z "$destuser" ] || warning 'the configured destuser is ignored since desturl is set'
+   [ -z "$desthost" ] || warning 'the configured desthost is ignored since desturl is set'
+   [ -z "$destdir" ] || warning 'the configured destdir is ignored since desturl is set'
+fi
+
+[ -n "$include" ]  || fatal "No source includes specified."
+
 [ -n "$password" ] || fatal "The password option must be set."
+
 if [ -n "$signkey" -a -n "$encryptkey" -a "$signkey" != "$encryptkey" ]; then
    [ -n "$signpassword" ] || fatal "The signpassword option must be set because signkey is different from encryptkey."
 fi
+
 if [ "`echo $desturl | @AWK@ -F ':' '{print $1}'`" == "s3+http" ]; then
    [ -n "$awsaccesskeyid" -a -n "$awssecretaccesskey" ]  || fatal "AWS access keys must be set for S3 backups."
 fi
+
 if [ "`echo $desturl | @AWK@ -F ':' '{print $1}'`" == "cf+http" ]; then
    [ -n "$cfusername" -a -n "$cfapikey" ]  || fatal "Cloudfiles access keys must be set for S3 backups."
 fi
+
 if [ "`echo $desturl | @AWK@ -F ':' '{print $1}'`" == "dpbx" ]; then
    [ -n "$dropboxappkey" -a -n "$dropboxappsecret" ]  || fatal "Dropbox app ID and secret must be set for Dropbox backups."
 
@@ -68,15 +84,9 @@ if [ "`echo $desturl | @AWK@ -F ':' '{print $1}'`" == "dpbx" ]; then
    fi
 fi
 
+# Ensure ftp_password is defined if needed
 if [ "`echo $desturl | @AWK@ -F ':' '{print $1}'`" == "ftp" ]; then
    [ -n "$ftp_password" ]  || fatal "ftp_password must be set for FTP backups."
-fi
-if [ "`echo $desturl | @AWK@ -F ':' '{print $1}'`" == "file" ]; then
-   if [ ! -e "`echo $desturl | @AWK@ -F '://' '{print $2}'`" ]; then
-      fatal "The destination directory ($desturl) does not exist."
-   elif [ ! -d "`echo $desturl | @AWK@ -F '://' '{print $2}'`" ]; then
-      fatal "The destination ($desturl) is not a directory."
-   fi
 fi
 
 # Check that the ionicelevel is valid
@@ -115,9 +125,6 @@ execstr_command=
 execstr_options="$options --no-print-statistics"
 execstr_source=
 if [ -n "$desturl" ]; then
-   [ -z "$destuser" ] || warning 'the configured destuser is ignored since desturl is set'
-   [ -z "$desthost" ] || warning 'the configured desthost is ignored since desturl is set'
-   [ -z "$destdir" ] || warning 'the configured destdir is ignored since desturl is set'
    execstr_serverpart="$desturl"
 else
    execstr_serverpart="scp://$destuser@$desthost/$destdir"
