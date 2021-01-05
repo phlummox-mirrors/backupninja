@@ -45,7 +45,7 @@ finish_borg() {
     rm -rf /root/.cache/borg
 }
 
-@test "ssh connection test" {
+@test "check ssh connection test" {
     setconfig backup.d/test.borg testconnect yes
     setconfig backup.d/test.borg dest user $BN_REMOTEUSER
     setconfig backup.d/test.borg dest host $BN_REMOTEHOST
@@ -54,7 +54,7 @@ finish_borg() {
     greplog "Debug: Connected to ${BN_REMOTEHOST} as ${BN_REMOTEUSER} successfully$"
 }
 
-@test "nicelevel config parameter" {
+@test "check config parameter nicelevel" {
     # nicelevel is 0 by default
     delconfig backup.d/test.borg nicelevel
     testaction test.borg
@@ -68,7 +68,7 @@ finish_borg() {
     greplog 'Debug: executing borg create$' '\bnice -n -19\b'
 }
 
-@test "ionicelevel config parameter" {
+@test "check config parameter ionicelevel" {
     # no ionice by default
     delconfig backup.d/test.borg ionicelevel
     testaction test.borg
@@ -88,7 +88,7 @@ finish_borg() {
     greplog 'Fatal: The value of ionicelevel is expected to be either empty or an integer from 0 to 7. Got: 10$'
 }
 
-@test "bwlimit config parameter" {
+@test "check config parameter bwlimit" {
     # no limit by default
     delconfig backup.d/test.borg bwlimit
     testaction test.borg
@@ -103,7 +103,7 @@ finish_borg() {
 
 }
 
-@test "[source] init config parameter" {
+@test "check config parameter source/init" {
     # do repository init by default
     delconfig backup.d/test.borg source init
     testaction test.borg
@@ -123,7 +123,7 @@ finish_borg() {
     not_greplog 'Debug: executing borg init$'
 }
 
-@test "[source] include config parameter" {
+@test "check config parameter source/include" {
     # missing path
     delconfig backup.d/test.borg source include
     testaction test.borg
@@ -143,7 +143,7 @@ finish_borg() {
     greplog 'Debug: executing borg create$' "'${BN_SRCDIR}' '/foo' '/bar'$"
 }
 
-@test "[source] exclude config parameter" {
+@test "check config parameter source/exclude" {
     # absent path
     delconfig backup.d/test.borg source exclude
     testaction test.borg
@@ -163,7 +163,7 @@ finish_borg() {
     greplog 'Debug: executing borg create$' "\s--exclude '${BN_SRCDIR}/var' --exclude '${BN_SRCDIR}/foo' --exclude '${BN_SRCDIR}/bar'\s"
 }
 
-@test "[source] create_options config parameter" {
+@test "check config parameter source/create_options" {
     # absent parameter
     delconfig backup.d/test.borg source create_options
     testaction test.borg
@@ -177,7 +177,7 @@ finish_borg() {
     greplog 'Debug: executing borg create$' "\s--exclude-caches\b"
 }
 
-@test "[source] prune config parameter" {
+@test "check config parameter source/prune" {
     # absent parameter, defaults enabled
     delconfig backup.d/test.borg source prune
     testaction test.borg
@@ -198,7 +198,7 @@ finish_borg() {
     not_greplog 'Debug: executing borg prune$'
 }
 
-@test "[source] keep config parameter" {
+@test "check config parameter source/keep" {
     # absent parameter, defaults to '30d'
     setconfig backup.d/test.borg source prune yes
     delconfig backup.d/test.borg source keep
@@ -222,7 +222,7 @@ finish_borg() {
     not_greplog 'Debug: executing borg prune$' '\s--keep-within='
 }
 
-@test "[source] prune_options config parameter" {
+@test "check config parameter source/prune_options" {
     # absent parameter
     delconfig backup.d/test.borg source prune_options
     testaction test.borg
@@ -236,7 +236,7 @@ finish_borg() {
     greplog 'Debug: executing borg prune$' '\s--save-space\b'
 }
 
-@test "[source] cache_directory config parameter" {
+@test "check config parameter source/cache_directory" {
     # absent parameter
     delconfig backup.d/test.borg source cache_directory
     testaction test.borg
@@ -250,7 +250,7 @@ finish_borg() {
     greplog 'Debug: export BORG_CACHE_DIR="/var/cache/borg"$'
 }
 
-@test "[dest] user config parameter" {
+@test "check config parameter dest/user" {
     # absent parameter
     delconfig backup.d/test.borg dest user
     setconfig backup.d/test.borg dest host "$BN_REMOTEHOST"
@@ -267,7 +267,7 @@ finish_borg() {
     greplog 'Debug: executing borg create$' "\bssh://${BN_REMOTEUSER}@${BN_REMOTEHOST}:22${BN_BACKUPDIR}/testborg::"
 }
 
-@test "[dest] host config parameter" {
+@test "check config parameter dest/host" {
     # absent parameter
     delconfig backup.d/test.borg dest host
     setconfig backup.d/test.borg dest user "$BN_REMOTEUSER"
@@ -284,7 +284,7 @@ finish_borg() {
     greplog 'Debug: executing borg create$' "\bssh://${BN_REMOTEUSER}@${BN_REMOTEHOST}:22${BN_BACKUPDIR}/testborg::"
 }
 
-@test "[dest] port config parameter" {
+@test "check config parameter dest/port" {
     # absent parameter, defaults to 22
     setconfig backup.d/test.borg dest user "$BN_REMOTEUSER"
     setconfig backup.d/test.borg dest host "$BN_REMOTEHOST"
@@ -304,7 +304,7 @@ finish_borg() {
     greplog 'Debug: executing borg create$' "\bssh://${BN_REMOTEUSER}@${BN_REMOTEHOST}:7722${BN_BACKUPDIR}/testborg::"
 }
 
-@test "[dest] directory config parameter" {
+@test "check config parameter dest/directory" {
     # absent parameter
     delconfig backup.d/test.borg dest directory
     testaction test.borg
@@ -318,7 +318,7 @@ finish_borg() {
     greplog 'Debug: executing borg create$' "\s${BN_BACKUPDIR}/testborg::"
 }
 
-@test "[dest] archive config parameter" {
+@test "check config parameter dest/archive" {
     # absent parameter, defaults to {now:%Y-%m-%dT%H:%M:%S}
     delconfig backup.d/test.borg dest archive
     testaction test.borg
@@ -332,7 +332,7 @@ finish_borg() {
     greplog 'Debug: executing borg create$' "\s${BN_BACKUPDIR}/testborg::foo"
 }
 
-@test "[dest] compression config parameter" {
+@test "check config parameter dest/compression" {
     # absent parameter, defaults to lz4
     delconfig backup.d/test.borg dest compression
     testaction test.borg
@@ -346,7 +346,7 @@ finish_borg() {
     greplog 'Debug: executing borg create$' "\s--compression auto,zstd,13\b"
 }
 
-@test "create local backup without encryption, test extraction" {
+@test "create local backup without encryption" {
     # no encryption, no passphrase
     setconfig backup.d/test.borg dest archive testarchive
     setconfig backup.d/test.borg dest encryption none
@@ -356,12 +356,15 @@ finish_borg() {
     [ "$status" -eq 0 ]
     greplog 'Debug: executing borg init$' 'Debug: borg init --encryption=none'
     greplog "Warning: Repository has been initialized"
+}
+
+@test "verify local backup without encryption" {
     unset BORG_PASSPHRASE
     borg extract --dry-run "${BN_BACKUPDIR}/testborg::testarchive"
     [ "$status" -eq 0 ]
 }
 
-@test "create local backup with encryption, test extraction" {
+@test "create local backup with encryption" {
     # encryption enabled, wrong passphrase
     setconfig backup.d/test.borg dest archive testarchive
     setconfig backup.d/test.borg dest encryption repokey
@@ -378,7 +381,7 @@ finish_borg() {
     borg extract --dry-run "${BN_BACKUPDIR}/testborg::testarchive"
 }
 
-@test "create remote backup with encryption, test extraction" {
+@test "create remote backup with encryption" {
     setconfig backup.d/test.borg dest archive testarchive
     setconfig backup.d/test.borg dest encryption repokey
     setconfig backup.d/test.borg dest passphrase 123test
