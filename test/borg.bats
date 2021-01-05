@@ -374,6 +374,9 @@ finish_borg() {
     [ "$status" -eq 0 ]
     greplog 'Debug: executing borg init$' 'Debug: borg init --encryption=repokey'
     greplog "Warning: Repository has been initialized"
+}
+
+@test "verify local backup with encryption" {
     export BORG_PASSPHRASE="123foo"
     run borg extract --dry-run "${BN_BACKUPDIR}/testborg::testarchive"
     [ "$status" -eq 2 ]
@@ -392,6 +395,9 @@ finish_borg() {
     [ "$status" -eq 0 ]
     greplog 'Debug: executing borg init$' 'Debug: borg init --encryption=repokey'
     greplog "Warning: Repository has been initialized"
+}
+
+@test "verify remote backup with encryption" {
     export BORG_PASSPHRASE="123foo"
     run borg extract --dry-run "ssh://${BN_REMOTEUSER}@${BN_REMOTEHOST}:22${BN_BACKUPDIR}/testborg::testarchive"
     [ "$status" -eq 2 ]
