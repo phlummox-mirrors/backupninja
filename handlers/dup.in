@@ -166,24 +166,29 @@ else
    execstr_options="${execstr_options} --scp-command 'scp $scpoptions' --sftp-command 'sftp $sftpoptions'"
 fi
 
-### Symmetric or asymmetric (public/private key pair) encryption
+### Encryption and signing
 if [ -n "$encryptkey" ]; then
-   execstr_options="${execstr_options} --encrypt-key $encryptkey"
-   debug "Data will be encrypted with the GnuPG key $encryptkey."
+   if [ "$sign" = yes ]; then
+      if [ -n "$signkey" -a "$encryptkey" != "$signkey" ]; then
+         # encryptkey and signkey are different
+         debug "Data will be encrypted with the GnuPG key $encryptkey."
+         debug "Data will be signed with the GnuPG key $signkey."
+         execstr_options="${execstr_options} --encrypt-key $encryptkey --sign-key $signkey"
+      else
+         # encryptkey and signkey identical
+         debug "Data will be encrypted ang signed with the GnuPG key $encryptkey."
+         execstr_options="${execstr_options} --encrypt-sign-key $encryptkey"
+      fi
+   else
+      execstr_options="${execstr_options} --encrypt-key $encryptkey"
+      debug "Data will be encrypted with the GnuPG key $encryptkey."
+      debug "Data won't be signed."
+   fi
+elif [ "$sign" == yes ]; then
+   # duplicity is not able to sign data when using symmetric encryption
+   fatal "The encryptkey option must be set when signing."
 else
    debug "Data will be encrypted using symmetric encryption."
-fi
-
-### Data signing (or not)
-if [ "$sign" == yes ]; then
-   # duplicity is not able to sign data when using symmetric encryption
-   [ -n "$encryptkey" ] || fatal "The encryptkey option must be set when signing."
-   # if needed, initialize signkey to a value that is not empty (checked above)
-   [ -n "$signkey" ] || signkey="$encryptkey"
-   execstr_options="${execstr_options} --sign-key $signkey"
-   debug "Data will be signed will the GnuPG key $signkey."
-else
-   debug "Data won't be signed."
 fi
 
 ### Incremental or full backup mode
