@@ -101,18 +101,17 @@ if [ -n "$ionicelevel" ]; then
 fi
 
 ### See if we can login on $desthost
-if [ "$testconnect" == "yes" ]; then
+[ -n "$test" ] || test=0
+if [ "$testconnect" == "yes" ] || [ "${test}" -eq 1 ]; then
    if [ -n "$desturl" ]; then
       warning 'testconnect can not be used when desturl is set'
    else
       debug "ssh $sshoptions -o PasswordAuthentication=no $desthost -l $destuser 'echo -n 1'"
-      if [ ! $test ]; then
-         result=`ssh $sshoptions -o PasswordAuthentication=no $desthost -l $destuser 'echo -n 1'`
-         if [ "$result" != "1" ]; then
-            fatal "Can't connect to $desthost as $destuser."
-         else
-            debug "Connected to $desthost as $destuser successfully"
-         fi
+      result=`ssh $sshoptions -o PasswordAuthentication=no $desthost -l $destuser 'echo -n 1'`
+      if [ "$result" != "1" ]; then
+         fatal "Can't connect to $desthost as $destuser."
+      else
+         debug "Connected to $desthost as $destuser successfully"
       fi
    fi
 fi
@@ -290,7 +289,7 @@ fi
 
 # cleanup
 debug "$nice $execstr_precmd duplicity cleanup --force $execstr_options $execstr_serverpart"
-if [ ! $test ]; then
+if [ $test = 0 ]; then
    export PASSPHRASE=$password
    export SIGN_PASSPHRASE=$signpassword
    export FTP_PASSWORD=$ftp_password
@@ -331,7 +330,7 @@ if [ "$keep" != "yes" ]; then
    if [ "$keepincroffulls" != "all" ]; then
       if version_ge "$duplicity_version" '0.6.10'; then
          debug "$nice $execstr_precmd duplicity remove-all-inc-of-but-n-full $keepincroffulls --force $execstr_options $execstr_serverpart"
-         if [ ! $test ]; then
+         if [ $test = 0 ]; then
             export PASSPHRASE=$password
             export SIGN_PASSPHRASE=$signpassword
             export FTP_PASSWORD=$ftp_password
@@ -352,7 +351,7 @@ fi
 
 ### Backup command
 debug "$nice $execstr_precmd duplicity $execstr_command $execstr_options $execstr_source --exclude '**' / $execstr_serverpart"
-if [ ! $test ]; then
+if [ $test = 0 ]; then
    outputfile=`maketemp backupout`
    export PASSPHRASE=$password
    export SIGN_PASSPHRASE=$signpassword
