@@ -296,6 +296,7 @@ fi
 ### Cleanup commands (duplicity >= 0.4.4)
 
 # cleanup
+debug "executing duplicity cleanup"
 debug "$nice $execstr_precmd duplicity cleanup --force $execstr_options $execstr_serverpart"
 if [ $test = 0 ]; then
    export PASSPHRASE=$password
@@ -315,6 +316,7 @@ fi
 
 # remove-older-than
 if [ "$keep" != "yes" ]; then
+   debug "executing duplicity remove-older-than"
    debug "$nice $execstr_precmd duplicity remove-older-than $keep --force $execstr_options $execstr_serverpart"
    if [ ! $test ]; then
       export PASSPHRASE=$password
@@ -337,6 +339,7 @@ fi
 if [ "$keep" != "yes" ]; then
    if [ "$keepincroffulls" != "all" ]; then
       if version_ge "$duplicity_version" '0.6.10'; then
+         debug "executing duplicity remove-all-inc-of-but-n-full"
          debug "$nice $execstr_precmd duplicity remove-all-inc-of-but-n-full $keepincroffulls --force $execstr_options $execstr_serverpart"
          if [ $test = 0 ]; then
             export PASSPHRASE=$password
@@ -358,6 +361,7 @@ if [ "$keep" != "yes" ]; then
 fi
 
 ### Backup command
+debug "executing duplicity"
 debug "$nice $execstr_precmd duplicity $execstr_command $execstr_options $execstr_source --exclude '**' / $execstr_serverpart"
 if [ $test = 0 ]; then
    outputfile=`maketemp backupout`
