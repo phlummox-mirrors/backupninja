@@ -176,3 +176,38 @@ not_greplog() {
         ! (grep -A1 "$1" "${BATS_TMPDIR}/log/backupninja.log" | tail -n1 | grep -q -- "$2")
     fi
 }
+
+makegpgkeys() {
+    # encryption key
+    run gpg --keyid-format long -k encrypt@bntest0 2>/dev/null
+    if [ "$status" -eq 2 ]; then
+        gpg --batch --gen-key <<"        EOF"
+            Key-Type: 1
+            Key-Length: 2048
+            Subkey-Type: 1
+            Subkey-Length: 2048
+            Name-Real: Encrypt key
+            Name-Email: encrypt@bntest0
+            Expire-Date: 0
+            Passphrase: 123encrypt
+        EOF
+    fi
+    BN_ENCRYPTKEY=$(gpg --keyid-format long -k encrypt@bntest0 | sed -n '2p' | grep -o '\S\+')
+    export BN_ENCRYPTKEY
+    # signing key
+    run gpg --keyid-format long -k sign@bntest0 2>/dev/null
+    if [ "$status" -eq 2 ]; then
+        gpg --batch --gen-key <<"        EOF"
+            Key-Type: 1
+            Key-Length: 2048
+            Subkey-Type: 1
+            Subkey-Length: 2048
+            Name-Real: Sign key
+            Name-Email: sign@bntest0
+            Expire-Date: 0
+            Passphrase: 123sign
+        EOF
+    fi
+    BN_SIGNKEY=$(gpg --keyid-format long -k sign@bntest0 | sed -n '2p' | grep -o '\S\+')
+    export BN_SIGNKEY
+}
