@@ -67,163 +67,139 @@ finish_dup() {
     setconfig backup.d/test.dup dest destuser $BN_REMOTEUSER
     setconfig backup.d/test.dup dest desthost $BN_REMOTEHOST
     delconfig backup.d/test.dup dest desturl
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     greplog "Debug: Connected to ${BN_REMOTEHOST} as ${BN_REMOTEUSER} successfully$"
 }
 
 @test "check config parameter nicelevel" {
     # nicelevel is 0 by default
     delconfig backup.d/test.dup nicelevel
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     greplog 'Debug: executing duplicity$' '\bnice -n 0\b'
 
     # nicelevel is defined
     setconfig backup.d/test.dup nicelevel -19
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     greplog 'Debug: executing duplicity$' '\bnice -n -19\b'
 }
 
 @test "check config parameter ionicelevel" {
     # no ionice by default
     delconfig backup.d/test.dup ionicelevel
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     not_greplog 'Debug: executing duplicity$' '\bionice -c2\b'
 
     # acceptable value
     setconfig backup.d/test.dup ionicelevel 7
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     greplog 'Debug: executing duplicity$' '\bionice -c2 -n 7\b'
 
     # unacceptable value
     setconfig backup.d/test.dup ionicelevel 10
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     greplog 'Fatal: The value of ionicelevel is expected to be either empty or an integer from 0 to 7. Got: 10$'
 }
 
 @test "check config parameter options" {
     setconfig backup.d/test.dup options "--verbosity 8"
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     greplog 'Debug: executing duplicity$' '\s--verbosity 8\b'
 }
 
 @test "check config parameter tmpdir" {
     # tmpdir undefined
     delconfig backup.d/test.dup tmpdir
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     not_greplog 'Debug: executing duplicity$' '\s--tmpdir\b'
 
     # tmpdir defined
     setconfig backup.d/test.dup tmpdir /tmp
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     not_greplog 'Debug: executing duplicity$' '\s--tmpdir /tmp\b'
 }
 
 @test "check config parameter source/include" {
     # missing path
     delconfig backup.d/test.dup source include
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     greplog 'Fatal: No source includes specified.$'
 
     # single path
     setconfig backup.d/test.dup source include "$BN_SRCDIR"
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     greplog 'Debug: executing duplicity$' "\s--include '${BN_SRCDIR}'"
 
     # multiple paths
     setconfig_repeat backup.d/test.dup source include "$BN_SRCDIR" /foo /bar
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     greplog 'Debug: executing duplicity$' "\s--include '${BN_SRCDIR}' --include '/foo' --include '/bar'\s"
 }
 
 @test "check config parameter source/exclude" {
     # absent path
     delconfig backup.d/test.dup source exclude
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     greplog 'Debug: executing duplicity$' "\s--include '${BN_SRCDIR}' --exclude '\*\*' /\s"
 
     # single path
     setconfig backup.d/test.dup source exclude "${BN_SRCDIR}/var"
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     greplog 'Debug: executing duplicity$' "\s--exclude '${BN_SRCDIR}/var'\s"
 
     # multiple paths
     setconfig_repeat backup.d/test.dup source exclude "$BN_SRCDIR/var" "$BN_SRCDIR/foo" "$BN_SRCDIR/bar"
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     greplog 'Debug: executing duplicity$' "\s--exclude '${BN_SRCDIR}/var' --exclude '${BN_SRCDIR}/foo' --exclude '${BN_SRCDIR}/bar'\s"
 }
 
 @test "check config parameter dest/incremental" {
     # absent parameter, defaults to yes
     delconfig backup.d/test.dup dest incremental
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     greplog 'Debug: executing duplicity$' 'Debug: nice -n 0 LC_ALL=C duplicity   --no-print-statistics'
 
     # defined, set to yes
     setconfig backup.d/test.dup dest incremental yes
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     greplog 'Debug: executing duplicity$' 'Debug: nice -n 0 LC_ALL=C duplicity   --no-print-statistics'
 
     # defined, set to no
     setconfig backup.d/test.dup dest incremental no
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     greplog 'Debug: executing duplicity$' 'Debug: nice -n 0 LC_ALL=C duplicity full  --no-print-statistics'
 }
 
 @test "check config parameter dest/increments" {
     # absent parameter, defaults to 30
     delconfig backup.d/test.dup dest increments
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     greplog 'Debug: executing duplicity$' '\s--full-if-older-than 30D\b'
 
     # defined, set to 60
     setconfig backup.d/test.dup dest increments 60
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     greplog 'Debug: executing duplicity$' '\s--full-if-older-than 60D\b'
 
     # defined, set to keep
     setconfig backup.d/test.dup dest increments keep
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     not_greplog 'Debug: executing duplicity$' '\s--full-if-older-than\s'
 }
 
 @test "check config parameter dest/keep" {
     # absent parameter, defaults to 60
     delconfig backup.d/test.dup dest keep
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     greplog 'Debug: executing duplicity remove-older-than$' '\sduplicity remove-older-than 60D\b'
 
     # defined, set to 180
     setconfig backup.d/test.dup dest keep 180
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     greplog 'Debug: executing duplicity remove-older-than$' '\sduplicity remove-older-than 180D\b'
 
     # defined, set to yes
     setconfig backup.d/test.dup dest keep yes
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     not_greplog 'Debug: executing duplicity remove-older-than$'
 }
 
@@ -231,22 +207,19 @@ finish_dup() {
     # absent parameter, defaults to all
     setconfig backup.d/test.dup dest keep 30
     delconfig backup.d/test.dup dest keepincroffulls
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     not_greplog 'Debug: executing duplicity remove-all-inc-of-but-n-full$'
 
     # defined, set to 1
     setconfig backup.d/test.dup dest keep 30
     setconfig backup.d/test.dup dest keepincroffulls 1
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     greplog 'Debug: executing duplicity remove-all-inc-of-but-n-full$' '\sduplicity remove-all-inc-of-but-n-full 1\b'
 
     # defined, set to all
     setconfig backup.d/test.dup dest keep 30
     setconfig backup.d/test.dup dest keepincroffulls all
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     not_greplog 'Debug: executing duplicity remove-all-inc-of-but-n-full$'
 }
 
@@ -289,37 +262,32 @@ finish_dup() {
 @test "check config parameter dest/sshoptions" {
     # undefined
     delconfig backup.d/test.dup dest sshoptions
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     greplog 'Debug: executing duplicity$' "\s--ssh-options ''\s"
 
     # defined
     setconfig backup.d/test.dup dest sshoptions "-oIdentityFile=/root/.ssh/id_rsa"
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     greplog 'Debug: executing duplicity$' "\s--ssh-options '-oIdentityFile=/root/.ssh/id_rsa'\s"
 }
 
 @test "check config parameter dest/bandwidthlimit" {
     # undefined, disabled by default
     delconfig backup.d/test.dup dest bandwidthlimit
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     not_greplog "\btrickle -s\b"
 
     # defined, set to 250, local file path
     setconfig backup.d/test.dup dest bandwidthlimit 250 
     setconfig backup.d/test.dup dest desturl "file://${BN_BACKUPDIR}/testdup"
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     greplog 'Warning: The bandwidthlimit option is not used with a local file path destination.'
     not_greplog 'Debug: executing duplicity$' "\strickle -s -d 250 -u 250 duplicity\s"
 
     # defined, set to 250, remote path
     setconfig backup.d/test.dup dest bandwidthlimit 250 
     setconfig backup.d/test.dup dest desturl "sftp://${BN_REMOTEUSER}@${BN_REMOTEHOST}:22${BN_BACKUPDIR}/testdup"
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     greplog 'Debug: executing duplicity$' "\strickle -s -d 250 -u 250 duplicity\s"
 }
 
@@ -327,20 +295,17 @@ finish_dup() {
      # undefined desturl
     delconfig backup.d/test.dup dest desturl
     delconfig backup.d/test.dup dest desthost
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     greplog 'Fatal: The destination host (desthost) must be set when desturl is not used.$'
 
     # desturl, file protocol
     setconfig backup.d/test.dup dest desturl "file://${BN_BACKUPDIR}/testdup"
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     greplog 'Debug: executing duplicity$' "\sfile://${BN_BACKUPDIR}/testdup$"
 
     # desturl, sftp protocol
     setconfig backup.d/test.dup dest desturl "sftp://${BN_REMOTEUSER}@${BN_REMOTEHOST}:22${BN_BACKUPDIR}/testdup"
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     greplog 'Debug: executing duplicity$' "\ssftp://${BN_REMOTEUSER}@${BN_REMOTEHOST}:22${BN_BACKUPDIR}/testdup$"
 }
 
@@ -349,8 +314,7 @@ finish_dup() {
     setconfig backup.d/test.dup dest desthost "$BN_REMOTEHOST"
     setconfig backup.d/test.dup dest destuser "$BN_REMOTEUSER"
     setconfig backup.d/test.dup dest destdir "$BN_BACKUPDIR/testdup"
-    testaction test.dup
-    [ "$status" -eq 0 ]
+    testaction
     greplog 'Debug: executing duplicity$' "\sscp://${BN_REMOTEUSER}@${BN_REMOTEHOST}/${BN_BACKUPDIR}/testdup$"
 }
 
@@ -360,8 +324,7 @@ finish_dup() {
     setconfig backup.d/test.dup gpg password 123test
     setconfig backup.d/test.dup dest desturl "file://${BN_BACKUPDIR}/testdup"
     delconfig backup.d/test.dup dest destdir
-    runaction test.dup
-    [ "$status" -eq 0 ]
+    runaction
     greplog "Debug: Data will be encrypted using symmetric encryption."
     greplog "Info: Duplicity finished successfully."
 }
@@ -382,8 +345,7 @@ finish_dup() {
     setconfig backup.d/test.dup gpg password 123test
     setconfig backup.d/test.dup dest desturl "file://${BN_BACKUPDIR}/testdup"
     delconfig backup.d/test.dup dest destdir
-    runaction test.dup
-    [ "$status" -eq 0 ]
+    runaction
     greplog "Debug: Data will be encrypted with the GnuPG key $BN_ENCRYPTKEY.$"
     greplog "Debug: Data won't be signed."
     greplog "Info: Duplicity finished successfully."
@@ -407,8 +369,7 @@ finish_dup() {
     setconfig backup.d/test.dup gpg sign yes
     setconfig backup.d/test.dup dest desturl "file://${BN_BACKUPDIR}/testdup"
     delconfig backup.d/test.dup dest destdir
-    runaction test.dup
-    [ "$status" -eq 0 ]
+    runaction
     greplog "Debug: Data will be encrypted ang signed with the GnuPG key ${BN_ENCRYPTKEY}.$"
     greplog "Info: Duplicity finished successfully."
 }
@@ -433,8 +394,7 @@ finish_dup() {
     setconfig backup.d/test.dup gpg signpassword 123sign
     setconfig backup.d/test.dup dest desturl "file://${BN_BACKUPDIR}/testdup"
     delconfig backup.d/test.dup dest destdir
-    runaction test.dup
-    [ "$status" -eq 0 ]
+    runaction
     greplog "Debug: Data will be encrypted with the GnuPG key ${BN_ENCRYPTKEY}.$"
     greplog "Debug: Data will be signed with the GnuPG key ${BN_SIGNKEY}.$"
     greplog "Info: Duplicity finished successfully."
@@ -456,8 +416,7 @@ finish_dup() {
     setconfig backup.d/test.dup dest desthost "$BN_REMOTEHOST"
     setconfig backup.d/test.dup dest destdir "${BN_BACKUPDIR}/testdup"
     cleanup_backups remote
-    runaction test.dup
-    [ "$status" -eq 0 ]
+    runaction
     greplog "Debug: Data will be encrypted using symmetric encryption."
     greplog "Info: Duplicity finished successfully."
 }
@@ -480,8 +439,7 @@ finish_dup() {
     setconfig backup.d/test.dup dest desthost "$BN_REMOTEHOST"
     setconfig backup.d/test.dup dest destdir "${BN_BACKUPDIR}/testdup"
     cleanup_backups remote
-    runaction test.dup
-    [ "$status" -eq 0 ]
+    runaction
     greplog "Debug: Data will be encrypted ang signed with the GnuPG key ${BN_ENCRYPTKEY}.$"
     greplog "Info: Duplicity finished successfully."
 }

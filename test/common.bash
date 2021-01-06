@@ -139,24 +139,33 @@ cleanup_backups() {
 
 # run backupninja action, removing previous log file if exists
 runaction() {
-    if [ -f "${BATS_TMPDIR}/backup.d/${1}" ]; then
-        [ -f "${BATS_TMPDIR}/log/backupninja.log" ] && rm -f "${BATS_TMPDIR}/log/backupninja.log"
-        run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/${1}"
+    # enable test mode?
+    if [ "$1" == "test" ]; then
+        local TEST="--test"
+        shift
     else
-        echo "action file not found: ${BATS_TMPDIR}/backup.d/${1}"
+        local TEST=""
+    fi
+    # get component
+    if [ -n "$1" ]; then
+        local ACTIONFILE="$1"
+    else
+        local ACTIONFILE="test.$(basename -s .bats "${BATS_TEST_FILENAME}")"
+    fi
+    # run action
+    if [ -f "${BATS_TMPDIR}/backup.d/${ACTIONFILE}" ]; then
+        [ -f "${BATS_TMPDIR}/log/backupninja.log" ] && rm -f "${BATS_TMPDIR}/log/backupninja.log"
+        run backupninja -f "${BATS_TMPDIR}/backupninja.conf" $TEST --debug --now --run "${BATS_TMPDIR}/backup.d/${ACTIONFILE}"
+        [ "$status" -eq 0 ]
+    else
+        echo "action file not found: ${BATS_TMPDIR}/backup.d/${ACTIONFILE}"
         false
     fi
 }
 
 # run backupninja action in test mode, removing previous log file if exist
 testaction() {
-    if [ -f "${BATS_TMPDIR}/backup.d/${1}" ]; then
-        [ -f "${BATS_TMPDIR}/log/backupninja.log" ] && rm -f "${BATS_TMPDIR}/log/backupninja.log"
-        run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --test --run "${BATS_TMPDIR}/backup.d/${1}"
-    else
-        echo "action file not found: ${BATS_TMPDIR}/backup.d/${1}"
-        false
-    fi
+    runaction test "$1"
 }
 
 # grep the backupninja log
