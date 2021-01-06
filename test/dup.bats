@@ -141,7 +141,7 @@ finish_dup() {
     greplog 'Debug: executing duplicity$' "\s--include '${BN_SRCDIR}'"
 
     # multiple paths
-    setconfig_repeat backup.d/test.dup include "$BN_SRCDIR" /foo /bar
+    setconfig_repeat backup.d/test.dup source include "$BN_SRCDIR" /foo /bar
     testaction test.dup
     [ "$status" -eq 0 ]
     greplog 'Debug: executing duplicity$' "\s--include '${BN_SRCDIR}' --include '/foo' --include '/bar'\s"
@@ -161,7 +161,7 @@ finish_dup() {
     greplog 'Debug: executing duplicity$' "\s--exclude '${BN_SRCDIR}/var'\s"
 
     # multiple paths
-    setconfig_repeat backup.d/test.dup exclude "$BN_SRCDIR/var" "$BN_SRCDIR/foo" "$BN_SRCDIR/bar"
+    setconfig_repeat backup.d/test.dup source exclude "$BN_SRCDIR/var" "$BN_SRCDIR/foo" "$BN_SRCDIR/bar"
     testaction test.dup
     [ "$status" -eq 0 ]
     greplog 'Debug: executing duplicity$' "\s--exclude '${BN_SRCDIR}/var' --exclude '${BN_SRCDIR}/foo' --exclude '${BN_SRCDIR}/bar'\s"

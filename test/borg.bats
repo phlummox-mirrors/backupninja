@@ -137,7 +137,7 @@ finish_borg() {
     greplog 'Debug: executing borg create$' "'${BN_SRCDIR}'$"
 
     # multiple paths
-    setconfig_repeat backup.d/test.borg include "$BN_SRCDIR" /foo /bar
+    setconfig_repeat backup.d/test.borg source include "$BN_SRCDIR" /foo /bar
     testaction test.borg
     [ "$status" -eq 0 ]
     greplog 'Debug: executing borg create$' "'${BN_SRCDIR}' '/foo' '/bar'$"
@@ -157,7 +157,7 @@ finish_borg() {
     greplog 'Debug: executing borg create$' "\s--exclude '${BN_SRCDIR}/var'\s"
 
     # multiple paths
-    setconfig_repeat backup.d/test.borg exclude "$BN_SRCDIR/var" "$BN_SRCDIR/foo" "$BN_SRCDIR/bar"
+    setconfig_repeat backup.d/test.borg source exclude "$BN_SRCDIR/var" "$BN_SRCDIR/foo" "$BN_SRCDIR/bar"
     testaction test.borg
     [ "$status" -eq 0 ]
     greplog 'Debug: executing borg create$' "\s--exclude '${BN_SRCDIR}/var' --exclude '${BN_SRCDIR}/foo' --exclude '${BN_SRCDIR}/bar'\s"

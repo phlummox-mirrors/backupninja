@@ -95,12 +95,14 @@ setconfig() {
 # (used for include and exclude parameters)
 setconfig_repeat() {
     conffile="${BATS_TMPDIR}/$1"
-    param="$2"
-    shift; shift;
-    for p in "$@"; do
-        conf="${conf}${param} = ${p}\n"
+    section="$2"
+    param="$3"
+    shift 3
+    crudini --del "$conffile" "$section" "$param"
+    for v; do
+        crudini --set --list --list-sep=$'\nREPEAT = ' "$conffile" "$section" "$param" "$v"
     done
-    sed -i "s#^${param} =.*#${conf}#" "${conffile}"
+    sed -i "s#^\s\+REPEAT =#${param} =#" "${conffile}"
 }
 
 # delete config parameter
