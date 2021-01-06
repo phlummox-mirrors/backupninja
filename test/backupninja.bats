@@ -1,6 +1,6 @@
 load common
 
-testaction() {
+create_test_action() {
     echo '#!/bin/sh' > "${BATS_TMPDIR}/backup.d/test.sh"
     echo "$1 $2" >> "${BATS_TMPDIR}/backup.d/test.sh"
     chmod 0750 "${BATS_TMPDIR}/backup.d/test.sh"
@@ -39,7 +39,7 @@ testaction() {
 }
 
 @test "permissions: error thrown when backup action is owned by non-root user" {
-    testaction
+    create_test_action
     chown vagrant: "${BATS_TMPDIR}/backup.d/test.sh"
     run backupninja -f "${BATS_TMPDIR}/backupninja.conf"
     [ "$status" -eq 2 ]
@@ -47,7 +47,7 @@ testaction() {
 }
 
 @test "permissions: error thrown when backup action is world readable" {
-    testaction
+    create_test_action
     chmod 0755 "${BATS_TMPDIR}/backup.d/test.sh"
     run backupninja -f "${BATS_TMPDIR}/backupninja.conf"
     [ "$status" -eq 2 ]
@@ -55,7 +55,7 @@ testaction() {
 }
 
 @test "permissions: error thrown when backup action group ownership is bad" {
-    testaction
+    create_test_action
     chgrp staff "${BATS_TMPDIR}/backup.d/test.sh"
     run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf"
     [ "$status" -eq 2 ]
@@ -63,7 +63,7 @@ testaction() {
 }
 
 @test "reports: error report is mailed" {
-    testaction fatal test_error
+    create_test_action fatal test_error
     run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
     [ "$status" -eq 0 ]
     sleep 0.1
@@ -71,7 +71,7 @@ testaction() {
 }
 
 @test "reports: warning report is mailed" {
-    testaction warning test_warning
+    create_test_action warning test_warning
     setconfig backupninja.conf reportsuccess no
     setconfig backupninja.conf reportwarning yes
     run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
@@ -81,7 +81,7 @@ testaction() {
 }
 
 @test "reports: success report is mailed" {
-    testaction
+    create_test_action
     setconfig backupninja.conf reportsuccess yes
     run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
     [ "$status" -eq 0 ]
@@ -90,7 +90,7 @@ testaction() {
 }
 
 @test "reports: success report contains informational messages" {
-    testaction info test_info
+    create_test_action info test_info
     setconfig backupninja.conf reportsuccess yes
     setconfig backupninja.conf reportinfo yes
     run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
@@ -100,7 +100,7 @@ testaction() {
 }
 
 @test "reports: success report contains disk space info" {
-    testaction
+    create_test_action
     echo "directory = /" >> "${BATS_TMPDIR}/backup.d/test.sh"
     setconfig backupninja.conf reportsuccess yes
     setconfig backupninja.conf reportspace yes
@@ -111,7 +111,7 @@ testaction() {
 }
 
 @test "scheduling: runs when = 'everyday at 01' and time matches" {
-    testaction info test_info
+    create_test_action info test_info
     setconfig backupninja.conf when 'everyday at 01'
     run faketime -f '@2018-06-12 01:00:00' backupninja -f "${BATS_TMPDIR}/backupninja.conf"
     [ "$status" -eq 0 ]
@@ -119,7 +119,7 @@ testaction() {
 }
 
 @test "scheduling: skips when = 'everyday at 01' and time is mismatched" {
-    testaction info test_info
+    create_test_action info test_info
     setconfig backupninja.conf when 'everyday at 01'
     run faketime -f '@2018-06-12 02:00:00' backupninja -f "${BATS_TMPDIR}/backupninja.conf"
     [ "$status" -eq 0 ]
@@ -127,7 +127,7 @@ testaction() {
 }
 
 @test "scheduling: runs when = 'Tuesday at 04' and time matches" {
-    testaction info test_info
+    create_test_action info test_info
     setconfig backupninja.conf when 'Tuesday at 04'
     run faketime -f '@2018-06-12 04:00:00' backupninja -f "${BATS_TMPDIR}/backupninja.conf"
     [ "$status" -eq 0 ]
@@ -135,7 +135,7 @@ testaction() {
 }
 
 @test "scheduling: skips when = 'Tuesday at 04' and time is mismatched" {
-    testaction info test_info
+    create_test_action info test_info
     setconfig backupninja.conf when 'Tuesday at 04'
     run faketime -f '@2018-06-13 04:00:00' backupninja -f "${BATS_TMPDIR}/backupninja.conf"
     [ "$status" -eq 0 ]
@@ -143,7 +143,7 @@ testaction() {
 }
 
 @test "scheduling: runs when = '1st at 10' and time matches" {
-    testaction info test_info
+    create_test_action info test_info
     setconfig backupninja.conf when '1st at 10'
     run faketime -f '@2018-06-01 10:00:00' backupninja -f "${BATS_TMPDIR}/backupninja.conf"
     [ "$status" -eq 0 ]
@@ -151,7 +151,7 @@ testaction() {
 }
 
 @test "scheduling: skips when = '1st at 10' and time is mismatched" {
-    testaction info test_info
+    create_test_action info test_info
     setconfig backupninja.conf when '1st at 10'
     run faketime -f '@2018-06-15 10:00:00' backupninja -f "${BATS_TMPDIR}/backupninja.conf"
     [ "$status" -eq 0 ]
@@ -159,7 +159,7 @@ testaction() {
 }
 
 @test "scheduling: runs when = '21 at 09:00' and time matches" {
-    testaction info test_info
+    create_test_action info test_info
     setconfig backupninja.conf when '21 at 09:00'
     run faketime -f '@2018-06-21 09:00:00' backupninja -f "${BATS_TMPDIR}/backupninja.conf"
     [ "$status" -eq 0 ]
@@ -167,7 +167,7 @@ testaction() {
 }
 
 @test "scheduling: skips when = '21 at 09:00' and time is mismatched" {
-    testaction info test_info
+    create_test_action info test_info
     setconfig backupninja.conf when '21 at 09:00'
     run faketime -f '@2018-06-22 09:00:00' backupninja -f "${BATS_TMPDIR}/backupninja.conf"
     [ "$status" -eq 0 ]
