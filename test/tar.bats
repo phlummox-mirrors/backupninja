@@ -34,7 +34,7 @@ teardown_tar() {
 }
 
 @test "compress compression" {
-    setconfig backup.d/test.tar compress compress
+    setconfig compress compress
     runaction
     grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
     archive=$(find /var/backups/tartest -maxdepth 1 -name bntest-\*.tar.compress)
@@ -43,7 +43,7 @@ teardown_tar() {
 }
 
 @test "gzip compression" {
-    setconfig backup.d/test.tar compress gzip
+    setconfig compress gzip
     runaction
     grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
     archive=$(find /var/backups/tartest -maxdepth 1 -name bntest-\*.tgz)
@@ -52,7 +52,7 @@ teardown_tar() {
 }
 
 @test "bzip2 compression" {
-    setconfig backup.d/test.tar compress bzip
+    setconfig compress bzip
     runaction
     grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
     archive=$(find /var/backups/tartest -maxdepth 1 -name bntest-\*.tar.bz2)
@@ -61,7 +61,7 @@ teardown_tar() {
 }
 
 @test "xz compression" {
-    setconfig backup.d/test.tar compress xz
+    setconfig compress xz
     runaction
     grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
     archive=$(find /var/backups/tartest -maxdepth 1 -name bntest-\*.tar.xz)
@@ -70,7 +70,7 @@ teardown_tar() {
 }
 
 @test "zstd compression" {
-    setconfig backup.d/test.tar compress zstd
+    setconfig compress zstd
     runaction
     grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
     archive=$(find /var/backups/tartest -maxdepth 1 -name bntest-\*.tar.zst)
@@ -79,7 +79,7 @@ teardown_tar() {
 }
 
 @test "unknown compression, defaults to gzip" {
-    setconfig backup.d/test.tar compress foo
+    setconfig compress foo
     runaction
     grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 1 warning." "${BATS_TMPDIR}/log/backupninja.log"
     archive=$(find /var/backups/tartest -maxdepth 1 -name bntest-\*.tgz)

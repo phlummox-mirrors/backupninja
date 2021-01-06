@@ -30,8 +30,8 @@ teardown_mysql() {
 }
 
 @test "sqldump: exports all databases, with compression" {
-    setconfig backup.d/test.mysql databases all
-    setconfig backup.d/test.mysql compress yes
+    setconfig databases all
+    setconfig compress yes
     runaction
     [ -s "${BN_BACKUPDIR}/mysql/sqldump/bntest_p8Cz8k.sql.gz" ]
     [ -s "${BN_BACKUPDIR}/mysql/sqldump/bntest_v11vJj.sql.gz" ]
@@ -40,8 +40,8 @@ teardown_mysql() {
 }
 
 @test "sqldump: exports all databases, without compression" {
-    setconfig backup.d/test.mysql databases all
-    setconfig backup.d/test.mysql compress no
+    setconfig databases all
+    setconfig compress no
     runaction
     [ -s "${BN_BACKUPDIR}/mysql/sqldump/bntest_p8Cz8k.sql" ]
     [ -s "${BN_BACKUPDIR}/mysql/sqldump/bntest_v11vJj.sql" ]
@@ -50,7 +50,7 @@ teardown_mysql() {
 }
 
 @test "sqldump: exports specific database" {
-    setconfig backup.d/test.mysql databases bntest_v11vJj
+    setconfig databases bntest_v11vJj
     runaction
     [ ! -f ${BN_BACKUPDIR}/mysql/sqldump/bntest_p8Cz8k.sql.gz ]
     [ -s "${BN_BACKUPDIR}/mysql/sqldump/bntest_v11vJj.sql.gz" ]
@@ -58,8 +58,8 @@ teardown_mysql() {
 }
 
 @test "ignores: exports all databases while excluding two tables entirely" {
-    setconfig backup.d/test.mysql databases all
-    setconfig backup.d/test.mysql ignores "bntest_v11vJj.cache_data bntest_v11vJj.cache_entity"
+    setconfig databases all
+    setconfig ignores "bntest_v11vJj.cache_data bntest_v11vJj.cache_entity"
     runaction
     [ -s "${BN_BACKUPDIR}/mysql/sqldump/bntest_p8Cz8k.sql.gz" ]
     [ "$(zgrep -c 'INSERT INTO' ${BN_BACKUPDIR}/mysql/sqldump/bntest_p8Cz8k.sql.gz)" -eq 9 ]
@@ -70,9 +70,9 @@ teardown_mysql() {
 }
 
 @test "nodata: exports all databases while excluding data from one table, with compression" {
-    setconfig backup.d/test.mysql databases all
-    setconfig backup.d/test.mysql compress yes
-    setconfig backup.d/test.mysql nodata bntest_v11vJj.cache_data
+    setconfig databases all
+    setconfig compress yes
+    setconfig nodata bntest_v11vJj.cache_data
     runaction
     [ -s "${BN_BACKUPDIR}/mysql/sqldump/bntest_p8Cz8k.sql.gz" ]
     [ "$(zgrep -c 'INSERT INTO' ${BN_BACKUPDIR}/mysql/sqldump/bntest_p8Cz8k.sql.gz)" -eq 9 ]
@@ -82,9 +82,9 @@ teardown_mysql() {
 }
 
 @test "nodata: exports all databases while excluding data from one table, without compression" {
-    setconfig backup.d/test.mysql databases all
-    setconfig backup.d/test.mysql compress no
-    setconfig backup.d/test.mysql nodata bntest_v11vJj.cache_data
+    setconfig databases all
+    setconfig compress no
+    setconfig nodata bntest_v11vJj.cache_data
     runaction
     [ -s "${BN_BACKUPDIR}/mysql/sqldump/bntest_p8Cz8k.sql" ]
     [ "$(grep -c 'INSERT INTO' ${BN_BACKUPDIR}/mysql/sqldump/bntest_p8Cz8k.sql)" -eq 9 ]
@@ -94,9 +94,9 @@ teardown_mysql() {
 }
 
 @test "nodata: exports all databases while excluding data from two tables, with compression" {
-    setconfig backup.d/test.mysql databases all
-    setconfig backup.d/test.mysql compress yes
-    setconfig backup.d/test.mysql nodata "bntest_v11vJj.cache_data bntest_v11vJj.cache_entity"
+    setconfig databases all
+    setconfig compress yes
+    setconfig nodata "bntest_v11vJj.cache_data bntest_v11vJj.cache_entity"
     runaction
     [ -s "${BN_BACKUPDIR}/mysql/sqldump/bntest_p8Cz8k.sql.gz" ]
     [ "$(zgrep -c 'INSERT INTO' ${BN_BACKUPDIR}/mysql/sqldump/bntest_p8Cz8k.sql.gz)" -eq 9 ]
@@ -107,9 +107,9 @@ teardown_mysql() {
 }
 
 @test "nodata: exports all databases while excluding data from two tables, without compression" {
-    setconfig backup.d/test.mysql databases all
-    setconfig backup.d/test.mysql compress no
-    setconfig backup.d/test.mysql nodata "bntest_v11vJj.cache_data bntest_v11vJj.cache_entity"
+    setconfig databases all
+    setconfig compress no
+    setconfig nodata "bntest_v11vJj.cache_data bntest_v11vJj.cache_entity"
     runaction
     [ -s "${BN_BACKUPDIR}/mysql/sqldump/bntest_p8Cz8k.sql" ]
     [ "$(grep -c 'INSERT INTO' ${BN_BACKUPDIR}/mysql/sqldump/bntest_p8Cz8k.sql)" -eq 9 ]

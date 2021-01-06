@@ -81,12 +81,19 @@ teardown() {
 
 # set parameter/value in action config file
 setconfig() {
-    if [ -z $4 ]; then
-        # default section
-        crudini --set "${BATS_TMPDIR}/$1" '' $2 "$3"
+    if [ -f "${BATS_TMPDIR}/$1" ]; then
+        local CONFIGFILE="${BATS_TMPDIR}/$1"
+        shift
     else
+        local COMP=$(basename -s .bats "${BATS_TEST_FILENAME}")
+        local CONFIGFILE="${BATS_TMPDIR}/backup.d/test.${COMP}"
+    fi
+    if [ -n "$3" ]; then
         # named section
-        crudini --set "${BATS_TMPDIR}/$1" $2 $3 "$4"
+        crudini --set "$CONFIGFILE" "$1" "$2" "$3"
+    else
+        # default section
+        crudini --set "$CONFIGFILE" '' "$1" "$2"
     fi
 }
 
@@ -94,25 +101,38 @@ setconfig() {
 # crudini doesn't support those
 # (used for include and exclude parameters)
 setconfig_repeat() {
-    conffile="${BATS_TMPDIR}/$1"
-    section="$2"
-    param="$3"
-    shift 3
-    crudini --del "$conffile" "$section" "$param"
+    if [ -f "${BATS_TMPDIR}/$1" ]; then
+        local CONFIGFILE="${BATS_TMPDIR}/$1"
+        shift
+    else
+        local COMP=$(basename -s .bats "${BATS_TEST_FILENAME}")
+        local CONFIGFILE="${BATS_TMPDIR}/backup.d/test.${COMP}"
+    fi
+    local SECTION="$1"
+    local PARAM="$2"
+    shift 2
+    crudini --del "$CONFIGFILE" "$SECTION" "$PARAM"
     for v; do
-        crudini --set --list --list-sep=$'\nREPEAT = ' "$conffile" "$section" "$param" "$v"
+        crudini --set --list --list-sep=$'\nREPEAT = ' "$CONFIGFILE" "$SECTION" "$PARAM" "$v"
     done
-    sed -i "s#^\s\+REPEAT =#${param} =#" "${conffile}"
+    sed -i "s#^\s\+REPEAT =#${PARAM} =#" "$CONFIGFILE"
 }
 
 # delete config parameter
 delconfig() {
-    if [ -z $3 ]; then
-        # default section
-        crudini --del "${BATS_TMPDIR}/$1" '' $2
+    if [ -f "${BATS_TMPDIR}/$1" ]; then
+        local CONFIGFILE="${BATS_TMPDIR}/$1"
+        shift
     else
+        local COMP=$(basename -s .bats "${BATS_TEST_FILENAME}")
+        local CONFIGFILE="${BATS_TMPDIR}/backup.d/test.${COMP}"
+    fi
+    if [ -n "$2" ]; then
         # named section
-        crudini --del "${BATS_TMPDIR}/$1" $2 $3
+        crudini --del "$CONFIGFILE" "$1" "$2"
+    else
+        # default section
+        crudini --del "$CONFIGFILE" '' "$1"
     fi
 }
 
