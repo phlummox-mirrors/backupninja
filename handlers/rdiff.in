@@ -159,6 +159,11 @@ case $desttype in
    *      ) fatal "desttype '$desttype' is neither local nor remote" ;;
 esac
 
+# check keep parameter format
+if [ "$keep" != "yes" ] && ! echo "$keep" | grep -qe '^[0-9]\+[smhDWMY]\?$'; then
+   fatal "Keep parameter contains an invalid value ($keep)."
+fi
+
 ### REMOVE OLD BACKUPS ###
 
 if [ "$keep" != yes ]; then
