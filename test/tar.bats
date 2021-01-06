@@ -2,8 +2,8 @@ load common
 
 begin_tar() {
     apt-get -qq install debootstrap ncompress zstd
-    if [ ! -d /var/cache/bntest ]; then
-        debootstrap --variant=minbase testing /var/cache/bntest
+    if [ ! -d "$BN_SRCDIR" ]; then
+        debootstrap --variant=minbase testing "$BN_SRCDIR"
     fi
 }
 
@@ -11,10 +11,10 @@ setup_tar() {
     cat << EOF > "${BATS_TMPDIR}/backup.d/test.tar"
 when = manual
 backupname = bntest
-backupdir = /var/backups/tartest
+backupdir = ${BN_BACKUPDIR}/tartest
 compress = none
-includes = /var/cache/bntest
-excludes = /var/cache/bntest/var
+includes = $BN_SRCDIR
+excludes = ${BN_SRCDIR}/var
 EOF
 
     chmod 0640 "${BATS_TMPDIR}/backup.d/test.tar"
@@ -26,9 +26,8 @@ teardown_tar() {
 
 @test "no compression" {
     runaction
-    grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
-    archive=$(find /var/backups/tartest -maxdepth 1 -name bntest-\*.tar)
-    echo $archive
+    greplog "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning."
+    archive=$(find "${BN_BACKUPDIR}/tartest" -maxdepth 1 -name bntest-\*.tar)
     [ -s "$archive" ]
     tar xOf "$archive" &> /dev/null
 }
@@ -36,8 +35,8 @@ teardown_tar() {
 @test "compress compression" {
     setconfig compress compress
     runaction
-    grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
-    archive=$(find /var/backups/tartest -maxdepth 1 -name bntest-\*.tar.compress)
+    greplog "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning."
+    archive=$(find "${BN_BACKUPDIR}/tartest" -maxdepth 1 -name bntest-\*.tar.compress)
     [ -s "$archive" ]
     tar xZOf "$archive" &> /dev/null
 }
@@ -45,8 +44,8 @@ teardown_tar() {
 @test "gzip compression" {
     setconfig compress gzip
     runaction
-    grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
-    archive=$(find /var/backups/tartest -maxdepth 1 -name bntest-\*.tgz)
+    greplog "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning."
+    archive=$(find "${BN_BACKUPDIR}/tartest" -maxdepth 1 -name bntest-\*.tgz)
     [ -s "$archive" ]
     tar xzOf "$archive" &> /dev/null
 }
@@ -54,8 +53,8 @@ teardown_tar() {
 @test "bzip2 compression" {
     setconfig compress bzip
     runaction
-    grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
-    archive=$(find /var/backups/tartest -maxdepth 1 -name bntest-\*.tar.bz2)
+    greplog "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning."
+    archive=$(find "${BN_BACKUPDIR}/tartest" -maxdepth 1 -name bntest-\*.tar.bz2)
     [ -s "$archive" ]
     tar xjOf "$archive" &> /dev/null
 }
@@ -63,8 +62,8 @@ teardown_tar() {
 @test "xz compression" {
     setconfig compress xz
     runaction
-    grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
-    archive=$(find /var/backups/tartest -maxdepth 1 -name bntest-\*.tar.xz)
+    greplog "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning."
+    archive=$(find "${BN_BACKUPDIR}/tartest" -maxdepth 1 -name bntest-\*.tar.xz)
     [ -s "$archive" ]
     tar xJOf "$archive" &> /dev/null
 }
@@ -72,8 +71,8 @@ teardown_tar() {
 @test "zstd compression" {
     setconfig compress zstd
     runaction
-    grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
-    archive=$(find /var/backups/tartest -maxdepth 1 -name bntest-\*.tar.zst)
+    greplog "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning."
+    archive=$(find "${BN_BACKUPDIR}/tartest" -maxdepth 1 -name bntest-\*.tar.zst)
     [ -s "$archive" ]
     tar --zstd -xOf "$archive" &> /dev/null
 }
@@ -81,8 +80,8 @@ teardown_tar() {
 @test "unknown compression, defaults to gzip" {
     setconfig compress foo
     runaction
-    grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 1 warning." "${BATS_TMPDIR}/log/backupninja.log"
-    archive=$(find /var/backups/tartest -maxdepth 1 -name bntest-\*.tgz)
+    greplog "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 1 warning."
+    archive=$(find "${BN_BACKUPDIR}/tartest" -maxdepth 1 -name bntest-\*.tgz)
     [ -s "$archive" ]
     tar xzOf "$archive" &> /dev/null
 }
