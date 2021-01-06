@@ -319,7 +319,6 @@ finish_borg() {
 @test "verify local backup without encryption" {
     unset BORG_PASSPHRASE
     borg extract --dry-run "${BN_BACKUPDIR}/testborg::testarchive"
-    [ "$status" -eq 0 ]
 }
 
 @test "create local backup with encryption" {
