@@ -36,7 +36,7 @@ teardown_pgsql() {
     setconfig backup.d/test.pgsql databases all
     setconfig backup.d/test.pgsql compress yes
     setconfig backup.d/test.pgsql format plain
-    runaction test.pgsql
+    runaction
     [ "$status" -eq 0 ]
     gzip -tq "${BN_BACKUPDIR}/postgres/bntest0-all.sql.gz"
 }
@@ -45,7 +45,7 @@ teardown_pgsql() {
     setconfig backup.d/test.pgsql databases all
     setconfig backup.d/test.pgsql compress no
     setconfig backup.d/test.pgsql format plain
-    runaction test.pgsql
+    runaction
     [ "$status" -eq 0 ]
     [ -s "${BN_BACKUPDIR}/postgres/bntest0-all.sql" ]
 }
@@ -54,7 +54,7 @@ teardown_pgsql() {
     setconfig backup.d/test.pgsql databases bntest_v11vJj
     setconfig backup.d/test.pgsql compress yes
     setconfig backup.d/test.pgsql format plain
-    runaction test.pgsql
+    runaction
     [ "$status" -eq 0 ]
     gzip -tq "${BN_BACKUPDIR}/postgres/bntest_v11vJj.sql.gz"
     [ "$(zgrep -c -e '^COPY' ${BN_BACKUPDIR}/postgres/bntest_v11vJj.sql.gz)" -eq 68 ]
@@ -65,7 +65,7 @@ teardown_pgsql() {
     setconfig backup.d/test.pgsql databases bntest_v11vJj
     setconfig backup.d/test.pgsql compress no
     setconfig backup.d/test.pgsql format plain
-    runaction test.pgsql
+    runaction
     [ "$status" -eq 0 ]
     [ -s "${BN_BACKUPDIR}/postgres/bntest_v11vJj.sql" ]
     [ "$(grep -c -e '^COPY' ${BN_BACKUPDIR}/postgres/bntest_v11vJj.sql)" -eq 68 ]
@@ -76,7 +76,7 @@ teardown_pgsql() {
     setconfig backup.d/test.pgsql databases all
     setconfig backup.d/test.pgsql compress yes
     setconfig backup.d/test.pgsql format tar
-    runaction test.pgsql
+    runaction
     [ "$status" -eq 0 ]
     gzip -tq "${BN_BACKUPDIR}/postgres/bntest_p8Cz8k.pg_dump.gz"
     gzip -tq "${BN_BACKUPDIR}/postgres/bntest_v11vJj.pg_dump.gz"
@@ -87,7 +87,7 @@ teardown_pgsql() {
     setconfig backup.d/test.pgsql databases all
     setconfig backup.d/test.pgsql compress no
     setconfig backup.d/test.pgsql format tar
-    runaction test.pgsql
+    runaction
     [ "$status" -eq 0 ]
     [ -s "${BN_BACKUPDIR}/postgres/bntest_p8Cz8k.pg_dump" ]
     [ -s "${BN_BACKUPDIR}/postgres/bntest_v11vJj.pg_dump" ]
@@ -100,7 +100,7 @@ teardown_pgsql() {
     setconfig backup.d/test.pgsql databases bntest_v11vJj
     setconfig backup.d/test.pgsql compress yes
     setconfig backup.d/test.pgsql format tar
-    runaction test.pgsql
+    runaction
     [ "$status" -eq 0 ]
     gzip -tq "${BN_BACKUPDIR}/postgres/bntest_v11vJj.pg_dump.gz"
     [ ! -e "${BN_BACKUPDIR}/postgres/bntest_p8Cz8k.pg_dump.gz" ]
@@ -111,7 +111,7 @@ teardown_pgsql() {
     setconfig backup.d/test.pgsql databases bntest_v11vJj
     setconfig backup.d/test.pgsql compress no
     setconfig backup.d/test.pgsql format tar
-    runaction test.pgsql
+    runaction
     [ "$status" -eq 0 ]
     [ -s "${BN_BACKUPDIR}/postgres/bntest_v11vJj.pg_dump" ]
     file ${BN_BACKUPDIR}/postgres/bntest_v11vJj.pg_dump | grep -q "POSIX tar archive"
@@ -123,7 +123,7 @@ teardown_pgsql() {
     setconfig backup.d/test.pgsql databases all
     setconfig backup.d/test.pgsql compress yes
     setconfig backup.d/test.pgsql format custom
-    runaction test.pgsql
+    runaction
     [ "$status" -eq 0 ]
     gzip -tq "${BN_BACKUPDIR}/postgres/bntest_p8Cz8k.pg_dump.gz"
     gzip -tq "${BN_BACKUPDIR}/postgres/bntest_v11vJj.pg_dump.gz"
@@ -134,7 +134,7 @@ teardown_pgsql() {
     setconfig backup.d/test.pgsql databases all
     setconfig backup.d/test.pgsql compress no
     setconfig backup.d/test.pgsql format custom
-    runaction test.pgsql
+    runaction
     [ "$status" -eq 0 ]
     [ -s "${BN_BACKUPDIR}/postgres/bntest_p8Cz8k.pg_dump" ]
     [ -s "${BN_BACKUPDIR}/postgres/bntest_v11vJj.pg_dump" ]
@@ -147,7 +147,7 @@ teardown_pgsql() {
     setconfig backup.d/test.pgsql databases bntest_v11vJj
     setconfig backup.d/test.pgsql compress yes
     setconfig backup.d/test.pgsql format custom
-    runaction test.pgsql
+    runaction
     [ "$status" -eq 0 ]
     gzip -tq "${BN_BACKUPDIR}/postgres/bntest_v11vJj.pg_dump.gz"
     [ ! -e "${BN_BACKUPDIR}/postgres/bntest_p8Cz8k.pg_dump.gz" ]
@@ -158,7 +158,7 @@ teardown_pgsql() {
     setconfig backup.d/test.pgsql databases bntest_v11vJj
     setconfig backup.d/test.pgsql compress no
     setconfig backup.d/test.pgsql format custom
-    runaction test.pgsql
+    runaction
     [ "$status" -eq 0 ]
     [ -s "${BN_BACKUPDIR}/postgres/bntest_v11vJj.pg_dump" ]
     file "${BN_BACKUPDIR}/postgres/bntest_v11vJj.pg_dump" | grep -q "PostgreSQL custom database dump"

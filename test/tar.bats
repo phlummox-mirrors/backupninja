@@ -25,8 +25,7 @@ teardown_tar() {
 }
 
 @test "no compression" {
-    run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.tar"
-    [ "$status" -eq 0 ]
+    runaction
     grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
     archive=$(find /var/backups/tartest -maxdepth 1 -name bntest-\*.tar)
     echo $archive
@@ -36,8 +35,7 @@ teardown_tar() {
 
 @test "compress compression" {
     setconfig backup.d/test.tar compress compress
-    run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.tar"
-    [ "$status" -eq 0 ]
+    runaction
     grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
     archive=$(find /var/backups/tartest -maxdepth 1 -name bntest-\*.tar.compress)
     [ -s "$archive" ]
@@ -46,8 +44,7 @@ teardown_tar() {
 
 @test "gzip compression" {
     setconfig backup.d/test.tar compress gzip
-    run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.tar"
-    [ "$status" -eq 0 ]
+    runaction
     grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
     archive=$(find /var/backups/tartest -maxdepth 1 -name bntest-\*.tgz)
     [ -s "$archive" ]
@@ -56,8 +53,7 @@ teardown_tar() {
 
 @test "bzip2 compression" {
     setconfig backup.d/test.tar compress bzip
-    run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.tar"
-    [ "$status" -eq 0 ]
+    runaction
     grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
     archive=$(find /var/backups/tartest -maxdepth 1 -name bntest-\*.tar.bz2)
     [ -s "$archive" ]
@@ -66,8 +62,7 @@ teardown_tar() {
 
 @test "xz compression" {
     setconfig backup.d/test.tar compress xz
-    run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.tar"
-    [ "$status" -eq 0 ]
+    runaction
     grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
     archive=$(find /var/backups/tartest -maxdepth 1 -name bntest-\*.tar.xz)
     [ -s "$archive" ]
@@ -76,8 +71,7 @@ teardown_tar() {
 
 @test "zstd compression" {
     setconfig backup.d/test.tar compress zstd
-    run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.tar"
-    [ "$status" -eq 0 ]
+    runaction
     grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
     archive=$(find /var/backups/tartest -maxdepth 1 -name bntest-\*.tar.zst)
     [ -s "$archive" ]
@@ -86,8 +80,7 @@ teardown_tar() {
 
 @test "unknown compression, defaults to gzip" {
     setconfig backup.d/test.tar compress foo
-    run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.tar"
-    [ "$status" -eq 0 ]
+    runaction
     grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 1 warning." "${BATS_TMPDIR}/log/backupninja.log"
     archive=$(find /var/backups/tartest -maxdepth 1 -name bntest-\*.tgz)
     [ -s "$archive" ]

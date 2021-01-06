@@ -32,7 +32,7 @@ teardown_mysql() {
 @test "sqldump: exports all databases, with compression" {
     setconfig backup.d/test.mysql databases all
     setconfig backup.d/test.mysql compress yes
-    runaction test.mysql
+    runaction
     [ -s "${BN_BACKUPDIR}/mysql/sqldump/bntest_p8Cz8k.sql.gz" ]
     [ -s "${BN_BACKUPDIR}/mysql/sqldump/bntest_v11vJj.sql.gz" ]
     [ "$(zgrep -c 'INSERT INTO' ${BN_BACKUPDIR}/mysql/sqldump/bntest_p8Cz8k.sql.gz)" -eq 9 ]
@@ -42,7 +42,7 @@ teardown_mysql() {
 @test "sqldump: exports all databases, without compression" {
     setconfig backup.d/test.mysql databases all
     setconfig backup.d/test.mysql compress no
-    runaction test.mysql
+    runaction
     [ -s "${BN_BACKUPDIR}/mysql/sqldump/bntest_p8Cz8k.sql" ]
     [ -s "${BN_BACKUPDIR}/mysql/sqldump/bntest_v11vJj.sql" ]
     [ "$(grep -c 'INSERT INTO' ${BN_BACKUPDIR}/mysql/sqldump/bntest_p8Cz8k.sql)" -eq 9 ]
@@ -51,7 +51,7 @@ teardown_mysql() {
 
 @test "sqldump: exports specific database" {
     setconfig backup.d/test.mysql databases bntest_v11vJj
-    runaction test.mysql
+    runaction
     [ ! -f ${BN_BACKUPDIR}/mysql/sqldump/bntest_p8Cz8k.sql.gz ]
     [ -s "${BN_BACKUPDIR}/mysql/sqldump/bntest_v11vJj.sql.gz" ]
     [ "$(zgrep -c 'INSERT INTO' ${BN_BACKUPDIR}/mysql/sqldump/bntest_v11vJj.sql.gz)" -eq 47 ]
@@ -60,7 +60,7 @@ teardown_mysql() {
 @test "ignores: exports all databases while excluding two tables entirely" {
     setconfig backup.d/test.mysql databases all
     setconfig backup.d/test.mysql ignores "bntest_v11vJj.cache_data bntest_v11vJj.cache_entity"
-    runaction test.mysql
+    runaction
     [ -s "${BN_BACKUPDIR}/mysql/sqldump/bntest_p8Cz8k.sql.gz" ]
     [ "$(zgrep -c 'INSERT INTO' ${BN_BACKUPDIR}/mysql/sqldump/bntest_p8Cz8k.sql.gz)" -eq 9 ]
     [ -s "${BN_BACKUPDIR}/mysql/sqldump/bntest_v11vJj.sql.gz" ]
@@ -73,7 +73,7 @@ teardown_mysql() {
     setconfig backup.d/test.mysql databases all
     setconfig backup.d/test.mysql compress yes
     setconfig backup.d/test.mysql nodata bntest_v11vJj.cache_data
-    runaction test.mysql
+    runaction
     [ -s "${BN_BACKUPDIR}/mysql/sqldump/bntest_p8Cz8k.sql.gz" ]
     [ "$(zgrep -c 'INSERT INTO' ${BN_BACKUPDIR}/mysql/sqldump/bntest_p8Cz8k.sql.gz)" -eq 9 ]
     [ -s "${BN_BACKUPDIR}/mysql/sqldump/bntest_v11vJj.sql.gz" ]
@@ -85,7 +85,7 @@ teardown_mysql() {
     setconfig backup.d/test.mysql databases all
     setconfig backup.d/test.mysql compress no
     setconfig backup.d/test.mysql nodata bntest_v11vJj.cache_data
-    runaction test.mysql
+    runaction
     [ -s "${BN_BACKUPDIR}/mysql/sqldump/bntest_p8Cz8k.sql" ]
     [ "$(grep -c 'INSERT INTO' ${BN_BACKUPDIR}/mysql/sqldump/bntest_p8Cz8k.sql)" -eq 9 ]
     [ -s "${BN_BACKUPDIR}/mysql/sqldump/bntest_v11vJj.sql" ]
@@ -97,7 +97,7 @@ teardown_mysql() {
     setconfig backup.d/test.mysql databases all
     setconfig backup.d/test.mysql compress yes
     setconfig backup.d/test.mysql nodata "bntest_v11vJj.cache_data bntest_v11vJj.cache_entity"
-    runaction test.mysql
+    runaction
     [ -s "${BN_BACKUPDIR}/mysql/sqldump/bntest_p8Cz8k.sql.gz" ]
     [ "$(zgrep -c 'INSERT INTO' ${BN_BACKUPDIR}/mysql/sqldump/bntest_p8Cz8k.sql.gz)" -eq 9 ]
     [ -s "${BN_BACKUPDIR}/mysql/sqldump/bntest_v11vJj.sql.gz" ]
@@ -110,7 +110,7 @@ teardown_mysql() {
     setconfig backup.d/test.mysql databases all
     setconfig backup.d/test.mysql compress no
     setconfig backup.d/test.mysql nodata "bntest_v11vJj.cache_data bntest_v11vJj.cache_entity"
-    runaction test.mysql
+    runaction
     [ -s "${BN_BACKUPDIR}/mysql/sqldump/bntest_p8Cz8k.sql" ]
     [ "$(grep -c 'INSERT INTO' ${BN_BACKUPDIR}/mysql/sqldump/bntest_p8Cz8k.sql)" -eq 9 ]
     [ -s "${BN_BACKUPDIR}/mysql/sqldump/bntest_v11vJj.sql" ]
