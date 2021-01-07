@@ -44,7 +44,7 @@ EOF
 
     # reset duplicity archive-dir
     # default path set by handler is /var/cache/backupninja
-    BN_DUPARCHIVEDIR="/var/cache/backupninja"
+    BN_DUPARCHIVEDIR="/var/cache/backupninja/duplicity"
     export BN_DUPARCHIVEDIR
     [ -d "$BN_DUPARCHIVEDIR" ] && rm -rf "$BN_DUPARCHIVEDIR"
     mkdir -p "$BN_DUPARCHIVEDIR"
