@@ -176,7 +176,7 @@ finish_rdiff() {
     greplog 'Debug: executing rdiff-backup$' "\s/ ${BN_BACKUPDIR}/testrdiff$"
 }
 
-@test "check config parameters and source/user and source/host" {
+@test "check config parameters source/user and source/host" {
     # user undefined, type remote, defaults empty
     setconfig source type remote
     delconfig source user
@@ -315,7 +315,7 @@ finish_rdiff() {
     greplog 'Debug: executing rdiff-backup$' "\s/ ${BN_REMOTEUSER}@${BN_REMOTEHOST}::${BN_BACKUPDIR}/testrdiff$"
 }
 
-@test "check config parameters and dest/user and dest/host" {
+@test "check config parameters dest/user and dest/host" {
     # user undefined, type remote, defaults empty
     setconfig dest type remote
     delconfig dest user
