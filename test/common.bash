@@ -146,11 +146,11 @@ cleanup_backups() {
     for c in "$@"; do
         case "$c" in
             "local")
-                umount "$BN_BACKUPDIR"
+                grep -q "^tmpfs $BN_BACKUPDIR" /proc/mounts && umount "$BN_BACKUPDIR"
                 mount -t tmpfs tmpfs "$BN_BACKUPDIR"
                 ;;
             "remote")
-                remote_command "sudo umount \"$BN_BACKUPDIR\""
+                remote_command "grep -q \"^tmpfs $BN_BACKUPDIR\" /proc/mounts && sudo umount \"$BN_BACKUPDIR\""
                 remote_command "sudo mount -t tmpfs tmpfs \"$BN_BACKUPDIR\""
                 ;;
         esac
