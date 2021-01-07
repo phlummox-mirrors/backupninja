@@ -385,9 +385,9 @@ finish_rdiff() {
     greplog 'Debug: executing rdiff-backup$' "\brdiff-backup\s\+--print-statistics\s"
 
     # defined, set to -4
-    setconfig dest sshoptions "-4"
+    setconfig dest sshoptions "-o IdentityFile=/root/.ssh/id_ed25519"
     testaction
-    greplog 'Debug: executing rdiff-backup$' "\brdiff-backup\s\+--remote-schema 'ssh -C -4 %s rdiff-backup --server'\s"
+    greplog 'Debug: executing rdiff-backup$' "\brdiff-backup\s\+--remote-schema 'ssh -C -o IdentityFile=/root/.ssh/id_ed25519 %s rdiff-backup --server'\s"
 }
 
 @test "create local backup" {

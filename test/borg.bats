@@ -150,12 +150,12 @@ finish_borg() {
     # absent parameter
     delconfig source create_options
     testaction
-    not_greplog 'Debug: executing borg create$' "\s--create-options\s"
+    greplog 'Debug: executing borg create$' "\sborg create --stats --compression lz4\s\+--exclude\s"
 
     # defined parameter
-    setconfig source create_options "--exclude-caches"
+    setconfig source create_options "-x --exclude-caches"
     testaction
-    greplog 'Debug: executing borg create$' "\s--exclude-caches\b"
+    greplog 'Debug: executing borg create$' "\s\+-x --exclude-caches\s\+"
 }
 
 @test "check config parameter source/prune" {
@@ -202,9 +202,9 @@ finish_borg() {
     greplog 'Debug: executing borg prune$' "Debug: borg prune  --keep-within=30d ${BN_BACKUPDIR}/testborg$"
 
     # defined parameter
-    setconfig source prune_options "--save-space"
+    setconfig source prune_options "--keep-daily 9 --save-space"
     testaction
-    greplog 'Debug: executing borg prune$' '\s--save-space\b'
+    greplog 'Debug: executing borg prune$' "\s\+--keep-daily 9 --save-space\s\+"
 }
 
 @test "check config parameter source/cache_directory" {
