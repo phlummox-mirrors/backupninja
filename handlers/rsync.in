@@ -379,6 +379,11 @@ function rotate_short_remote {
       rm -rf $metadata/\$file
     fi
   done
+
+  # Create first directory if needed
+  if [ -d $backupdir ]; then
+    [ -d $folder.0 ] || mkdir -p $folder.0
+  fi
   ##### END REMOTE SCRIPT #######
 EOF
 ) | (while read a; do passthru $a; done)
@@ -750,30 +755,6 @@ function prepare_storage {
 
   section="`basename $SECTION`"
 
-  # create $SECTION directories, but not $backupdir
-  if [ "$dest" == "local" ]; then
-    if [ -d "$backupdir" ]; then
-      mkdir --parents $backupdir/$SECTION
-    else
-       fatal "The destination $backupdir does not exist"
-       exit 1
-    fi
-  else
-(
-    $ssh_cmd <<EOF
-      ##### BEGIN REMOTE SCRIPT #####
-      if [ -d "$backupdir" ]; then
-        mkdir --parents $backupdir/$SECTION
-      else
-        echo "FATAL: The destination $backupdir does not exist"
-        exit 1
-      fi
-      ##### END REMOTE SCRIPT #######
-EOF
-) | (while read a; do passthru $a; done)
-   
-  fi
-
   if [ "$format" == "short" ]; then
 
     suffix="$section.0"
@@ -820,7 +801,34 @@ EOF
     fi
 
   elif [ "$format" == "mirror" ]; then
-    suffix=""
+
+     # create $SECTION directories, but not $backupdir
+     if [ "$dest" == "local" ]; then
+        if [ -d "$backupdir" ]; then
+           mkdir --parents $backupdir/$SECTION
+        else
+           fatal "The destination $backupdir does not exist"
+           exit 1
+        fi
+     else
+        debug "$ssh_cmd"
+        debug "$backupdir/$SECTION"
+(
+        $ssh_cmd <<EOF
+           ##### BEGIN REMOTE SCRIPT #####
+           if [ -d "$backupdir" ]; then
+              mkdir --parents $backupdir/$SECTION
+           else
+              echo "FATAL: The destination $backupdir does not exist"
+           exit 1
+           fi
+           ##### END REMOTE SCRIPT #######
+EOF
+) | (while read a; do passthru $a; done)
+     fi
+
+     suffix=""
+
   else
     fatal "Invalid backup format $format"
   fi
