@@ -14,16 +14,14 @@ teardown_sh() {
     cleanup_backups local
 }
 
-@test "sh: runs and creates file" {
-    runaction test.sh
-    [ "$status" -eq 0 ]
+@test "runs and creates file" {
+    runaction
     [ -f "${BN_BACKUPDIR}/testsh" ]
     greplog "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning."
 }
 
-@test "sh: is not executed in test mode" {
-    testaction test.sh
-    [ "$status" -eq 0 ]
+@test "is not executed in test mode" {
+    testaction
     [ ! -f "${BN_BACKUPDIR}/testsh" ]
     greplog "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning."
 }
