@@ -902,7 +902,7 @@ function test_connect {
   if [ "$result" != "1" ]; then
     fatal "Can't connect to $host as $user."
   else
-    debug "Connected to $host successfully"
+    debug "Connected to $host successfully."
   fi
 
 }
@@ -958,7 +958,7 @@ function set_rsync_options {
 
     if [ "$protocol" == "ssh" ]; then
       if [ ! -e "$id_file" ]; then
-        fatal "SSH Identity file $id_file not found"
+        fatal "SSH identity file $id_file not found."
       else
         debug RSYNC_RSH=\"$ssh_cmd_base\"
         echo RSYNC_RSH=\"$ssh_cmd_base\" >> $log
@@ -1098,6 +1098,7 @@ function check_rsync_exit_status {
 
   case $1 in
     0)
+       debug "Rsync transfer of $SECTION finished successfully."
        return
        ;;
     1|2|3|4|5|6|10|11|12|13|14|21)
@@ -1146,5 +1147,5 @@ run_fsck
 start_services
 end_mux
 
-echo "Finnishing backup at `date`" >> $log
+echo "Finished backup at `date`" >> $log
 
