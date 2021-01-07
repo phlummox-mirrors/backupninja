@@ -1,0 +1,177 @@
+load common
+
+create_test_action() {
+    echo '#!/bin/sh' > "${BATS_TMPDIR}/backup.d/test.sh"
+    echo "$1 $2" >> "${BATS_TMPDIR}/backup.d/test.sh"
+    chmod 0750 "${BATS_TMPDIR}/backup.d/test.sh"
+}
+
+@test "general: usage information is displayed" {
+    run backupninja --help
+    [ "$status" -eq 0 ]
+    [ "${lines[0]}" = "/usr/sbin/backupninja usage:" ]
+}
+
+@test "general: error thrown on bad command-line option" {
+    run backupninja --foo
+    [ "$status" -eq 2 ]
+    [ "${lines[0]}" = "Unknown option --foo" ]
+}
+
+@test "general: logfile is created" {
+    run backupninja -f "${BATS_TMPDIR}/backupninja.conf"
+    [ "$status" -eq 0 ]
+    [ -f "${BATS_TMPDIR}/log/backupninja.log" ]
+}
+
+@test "general: no backup actions configured is logged" {
+    run backupninja --test -f "${BATS_TMPDIR}/backupninja.conf"
+    [ "$status" -eq 0 ]
+    [ "${lines[0]}" = "Info: No backup actions configured in '${BATS_TMPDIR}/backup.d', run ninjahelper!" ]
+}
+
+@test "general: file without suffix in action directory is ignored" {
+    touch "${BATS_TMPDIR}/backup.d/test"
+    chmod 0640 "${BATS_TMPDIR}/backup.d/test"
+    run backupninja -f "${BATS_TMPDIR}/backupninja.conf"
+    [ "$status" -eq 0 ]
+    grep -q "Info: Skipping ${BATS_TMPDIR}/backup.d/test" "${BATS_TMPDIR}/log/backupninja.log"
+}
+
+@test "permissions: error thrown when backup action is owned by non-root user" {
+    create_test_action
+    chown vagrant: "${BATS_TMPDIR}/backup.d/test.sh"
+    run backupninja -f "${BATS_TMPDIR}/backupninja.conf"
+    [ "$status" -eq 2 ]
+    echo "${lines[0]}" | grep -qe '^Configuration files must be owned by root!'
+}
+
+@test "permissions: error thrown when backup action is world readable" {
+    create_test_action
+    chmod 0755 "${BATS_TMPDIR}/backup.d/test.sh"
+    run backupninja -f "${BATS_TMPDIR}/backupninja.conf"
+    [ "$status" -eq 2 ]
+    echo "${lines[0]}" | grep -qe '^Configuration files must not be world writable/readable!'
+}
+
+@test "permissions: error thrown when backup action group ownership is bad" {
+    create_test_action
+    chgrp staff "${BATS_TMPDIR}/backup.d/test.sh"
+    run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf"
+    [ "$status" -eq 2 ]
+    echo "${lines[0]}" | grep -qe '^Configuration files must not be writable/readable by group staff!'
+}
+
+@test "reports: error report is mailed" {
+    create_test_action fatal test_error
+    run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
+    [ "$status" -eq 0 ]
+    sleep 0.1
+    grep -q "\*failed\* -- ${BATS_TMPDIR}/backup.d/test.sh" /var/mail/vagrant
+}
+
+@test "reports: warning report is mailed" {
+    create_test_action warning test_warning
+    setconfig backupninja.conf reportsuccess no
+    setconfig backupninja.conf reportwarning yes
+    run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
+    [ "$status" -eq 0 ]
+    sleep 0.1
+    grep -q "Warning: test_warning" /var/mail/vagrant
+}
+
+@test "reports: success report is mailed" {
+    create_test_action
+    setconfig backupninja.conf reportsuccess yes
+    run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
+    [ "$status" -eq 0 ]
+    sleep 0.1
+    grep -q "success -- ${BATS_TMPDIR}/backup.d/test.sh" /var/mail/vagrant
+}
+
+@test "reports: success report contains informational messages" {
+    create_test_action info test_info
+    setconfig backupninja.conf reportsuccess yes
+    setconfig backupninja.conf reportinfo yes
+    run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
+    [ "$status" -eq 0 ]
+    sleep 0.1
+    grep -q "Info: test_info" /var/mail/vagrant
+}
+
+@test "reports: success report contains disk space info" {
+    create_test_action
+    echo "directory = /" >> "${BATS_TMPDIR}/backup.d/test.sh"
+    setconfig backupninja.conf reportsuccess yes
+    setconfig backupninja.conf reportspace yes
+    run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
+    [ "$status" -eq 0 ]
+    sleep 0.1
+    grep -q "/dev/sda1" /var/mail/vagrant
+}
+
+@test "scheduling: runs when = 'everyday at 01' and time matches" {
+    create_test_action info test_info
+    setconfig backupninja.conf when 'everyday at 01'
+    run faketime -f '@2018-06-12 01:00:00' backupninja -f "${BATS_TMPDIR}/backupninja.conf"
+    [ "$status" -eq 0 ]
+    grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
+}
+
+@test "scheduling: skips when = 'everyday at 01' and time is mismatched" {
+    create_test_action info test_info
+    setconfig backupninja.conf when 'everyday at 01'
+    run faketime -f '@2018-06-12 02:00:00' backupninja -f "${BATS_TMPDIR}/backupninja.conf"
+    [ "$status" -eq 0 ]
+    grep -q "Debug: skipping ${BATS_TMPDIR}/backup.d/test.sh because current time does not match everyday at 01" "${BATS_TMPDIR}/log/backupninja.log"
+}
+
+@test "scheduling: runs when = 'Tuesday at 04' and time matches" {
+    create_test_action info test_info
+    setconfig backupninja.conf when 'Tuesday at 04'
+    run faketime -f '@2018-06-12 04:00:00' backupninja -f "${BATS_TMPDIR}/backupninja.conf"
+    [ "$status" -eq 0 ]
+    grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
+}
+
+@test "scheduling: skips when = 'Tuesday at 04' and time is mismatched" {
+    create_test_action info test_info
+    setconfig backupninja.conf when 'Tuesday at 04'
+    run faketime -f '@2018-06-13 04:00:00' backupninja -f "${BATS_TMPDIR}/backupninja.conf"
+    [ "$status" -eq 0 ]
+    grep -q "Debug: skipping ${BATS_TMPDIR}/backup.d/test.sh because current time does not match Tuesday at 04" "${BATS_TMPDIR}/log/backupninja.log"
+}
+
+@test "scheduling: runs when = '1st at 10' and time matches" {
+    create_test_action info test_info
+    setconfig backupninja.conf when '1st at 10'
+    run faketime -f '@2018-06-01 10:00:00' backupninja -f "${BATS_TMPDIR}/backupninja.conf"
+    [ "$status" -eq 0 ]
+    grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
+}
+
+@test "scheduling: skips when = '1st at 10' and time is mismatched" {
+    create_test_action info test_info
+    setconfig backupninja.conf when '1st at 10'
+    run faketime -f '@2018-06-15 10:00:00' backupninja -f "${BATS_TMPDIR}/backupninja.conf"
+    [ "$status" -eq 0 ]
+    grep -q "Debug: skipping ${BATS_TMPDIR}/backup.d/test.sh because current time does not match 1st at 10" "${BATS_TMPDIR}/log/backupninja.log"
+}
+
+@test "scheduling: runs when = '21 at 09:00' and time matches" {
+    create_test_action info test_info
+    setconfig backupninja.conf when '21 at 09:00'
+    run faketime -f '@2018-06-21 09:00:00' backupninja -f "${BATS_TMPDIR}/backupninja.conf"
+    [ "$status" -eq 0 ]
+    grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
+}
+
+@test "scheduling: skips when = '21 at 09:00' and time is mismatched" {
+    create_test_action info test_info
+    setconfig backupninja.conf when '21 at 09:00'
+    run faketime -f '@2018-06-22 09:00:00' backupninja -f "${BATS_TMPDIR}/backupninja.conf"
+    [ "$status" -eq 0 ]
+    grep -q "Debug: skipping ${BATS_TMPDIR}/backup.d/test.sh because current time does not match 21 at 09:00" "${BATS_TMPDIR}/log/backupninja.log"
+}
+
+

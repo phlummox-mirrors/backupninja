@@ -121,6 +121,7 @@ fi
 
 if [ "$init" == "yes" ]; then
    initstr="borg init --encryption=$encryption $execstr_repository"
+   debug "executing borg init"
    debug "$initstr"
    if [ $test = 0 ]; then
       output="`su -c "$initstr" 2>&1`"
@@ -168,6 +169,8 @@ fi
 
 # include client-part and server-part
 execstr="${execstr} ${excludes} $execstr_repository::$execstr_archive ${includes}"
+
+debug "executing borg create"
 debug "$nice $execstr"
 
 if [ $test = 0 ]; then
@@ -189,6 +192,7 @@ if [ "$prune" == "yes" ]; then
       prune_options="${prune_options} --keep-within=${keep}"
    fi
    prunestr="borg prune $prune_options $execstr_repository"
+   debug "executing borg prune"
    debug "$prunestr"
    if [ $test = 0 ]; then
       output="`su -c "$prunestr" 2>&1`"

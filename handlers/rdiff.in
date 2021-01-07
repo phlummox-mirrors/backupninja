@@ -98,6 +98,7 @@ getconf keep 60
 getconf include
 getconf exclude
 
+
 setsection dest
 getconf directory; destdir=$directory
 # strip trailing /
@@ -179,6 +180,7 @@ if [ "$keep" != yes ]; then
    fi
    removestr="${removestr}${destdir}/${label}";
 
+   debug "executing rdiff-backup --remove-older-than"
    debug "$removestr"
    if [ $test = 0 ]; then
       output="`su -c "$removestr" 2>&1`"
@@ -251,6 +253,7 @@ set +o noglob
 # include client-part and server-part
 execstr="${execstr}$execstr_sourcepart $execstr_destpart"
 
+debug "executing rdiff-backup"
 debug "$nice $execstr"
 if [ $test = 0 ]; then
    output=`$nice su -c "$execstr" 2>&1`
