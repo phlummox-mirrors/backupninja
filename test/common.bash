@@ -150,7 +150,7 @@ cleanup_backups() {
                 mount -t tmpfs tmpfs "$BN_BACKUPDIR"
                 ;;
             "remote")
-                remote_command "grep -q \"^tmpfs $BN_BACKUPDIR\" /proc/mounts && sudo umount \"$BN_BACKUPDIR\""
+                run remote_command "grep -q \"^tmpfs $BN_BACKUPDIR\" /proc/mounts && sudo umount \"$BN_BACKUPDIR\""
                 remote_command "sudo mount -t tmpfs tmpfs \"$BN_BACKUPDIR\""
                 ;;
         esac
