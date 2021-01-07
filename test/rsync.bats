@@ -2,8 +2,8 @@ load common
 
 begin_rsync() {
     apt-get -qq install debootstrap rsync
-    if [ ! -d /var/cache/bntest ]; then
-        debootstrap --variant=minbase testing /var/cache/bntest
+    if [ ! -d "$BN_SRCDIR" ]; then
+        debootstrap --variant=minbase testing "$BN_SRCDIR"
     fi
 }
 
@@ -13,14 +13,14 @@ when = manual
 
 [general]
 log = ${BATS_TMPDIR}/log/rsync.log
-mountpoint = /var/backups
-backupdir = 
+mountpoint = $BN_BACKUPDIR
+backupdir = testrsync
 format = 
 
 [source]
 from = local
-include = /var/cache/bntest
-exclude = /var/cache/bntest/var
+include = $BN_SRCDIR
+exclude = var
 
 [dest]
 dest = local
@@ -36,183 +36,113 @@ finish_rsync() {
     cleanup_backups local remote
 }
 
-@test "short: local source/dest backup action runs without errors" {
+@test "create local backup, short format" {
     cleanup_backups local
-    setconfig backup.d/test.rsync general format short
-    setconfig backup.d/test.rsync general backupdir rsynctest.short
-    mkdir -p /var/backups/rsynctest.short/var/cache/bntest/bntest.0
-    run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.rsync"
+    setconfig general format short
+    mkdir -p "${BN_BACKUPDIR}/testrsync"
+    runaction
+    greplog "Debug: Rsync transfer of $BN_SRCDIR finished successfully.$"
+}
+
+@test "verify local backup, short format" {
+    run rsync -ain --exclude var --delete "${BN_SRCDIR}/" "${BN_BACKUPDIR}/testrsync${BN_SRCDIR}/bntest.0/"
     [ "$status" -eq 0 ]
-    grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
+    [ "$output" == ".d..t...... ./" ]
 }
 
-@test "short: local source/dest backup exists" {
+@test "verify local backup rotation, short format" {
     skip "not implemented"
 }
 
-@test "short: local source/dest rsync options as expected" {
-    skip "not implemented"
-}
-
-@test "short: local source/dest backup ingests update" {
-    skip "not implemented"
-}
-
-@test "short: local source/dest backup rotation" {
-    skip "not implemented"
-}
-
-@test "short: local source/dest backup appears valid" {
-    skip "not implemented"
-}
-
-@test "long: local source/dest backup action runs without errors" {
+@test "create local backup, long format" {
     cleanup_backups local
-    setconfig backup.d/test.rsync general format long
-    setconfig backup.d/test.rsync general backupdir rsynctest.long
-    mkdir -p /var/backups/rsynctest.long/var/cache/bntest/bntest/daily.1
-    run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.rsync"
+    setconfig general format long
+    mkdir -p "${BN_BACKUPDIR}/testrsync"
+    runaction
+    greplog "Debug: Rsync transfer of $BN_SRCDIR finished successfully.$"
+}
+
+@test "verify local backup, long format" {
+    run rsync -ain --exclude var --delete "${BN_SRCDIR}/" "${BN_BACKUPDIR}/testrsync${BN_SRCDIR}/daily.1/"
     [ "$status" -eq 0 ]
-    grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
+    [ "$output" == ".d..t...... ./" ]
 }
 
-@test "long: local source/dest backup exists" {
+@test "verify local backup rotation, long format" {
     skip "not implemented"
 }
 
-@test "long: local source/dest rsync options as expected" {
-    skip "not implemented"
-}
-
-@test "long: local source/dest backup ingests update" {
-    skip "not implemented"
-}
-
-@test "long: local source/dest backup rotation" {
-    skip "not implemented"
-}
-
-@test "long: local source/dest backup appears valid" {
-    skip "not implemented"
-}
-
-@test "mirror: local source/dest backup action runs without errors" {
+@test "create local backup, mirror format" {
     cleanup_backups local
-    setconfig backup.d/test.rsync general format mirror
-    setconfig backup.d/test.rsync general backupdir rsynctest.mirror
-    mkdir -p /var/backups/rsynctest.mirror/var/cache/bntest
-    run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.rsync"
+    setconfig general format mirror
+    mkdir -p "${BN_BACKUPDIR}/testrsync"
+    runaction
+    greplog "Debug: Rsync transfer of $BN_SRCDIR finished successfully.$"
+}
+
+@test "verify local backup, mirror format" {
+    run rsync -ain --exclude var --delete "${BN_SRCDIR}/" "${BN_BACKUPDIR}/testrsync${BN_SRCDIR}/"
     [ "$status" -eq 0 ]
-    grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
+    [ "$output" == ".d..t...... ./" ]
 }
 
-@test "mirror: local source/dest backup exists" {
-    skip "not implemented"
-}
-
-@test "mirror: local source/dest rsync options as expected" {
-    skip "not implemented"
-}
-
-@test "mirror: local source/dest backup ingests update" {
-    skip "not implemented"
-}
-
-@test "mirror: local source/dest backup appears valid" {
-    skip "not implemented"
-}
-
-@test "short: remote dest backup action runs without errors" {
+@test "create remote backup, short format" {
     cleanup_backups remote
-    setconfig backup.d/test.rsync general format short
-    setconfig backup.d/test.rsync general backupdir rsynctest.short
-    setconfig backup.d/test.rsync dest dest remote
-    setconfig backup.d/test.rsync dest host bntest1
-    setconfig backup.d/test.rsync dest user vagrant
-    remote_command "mkdir -p /var/backups/rsynctest.short/var/cache/bntest/bntest.0"
-    run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.rsync"
+    setconfig general format short
+    setconfig dest dest remote
+    setconfig dest host "$BN_REMOTEHOST"
+    setconfig dest user "$BN_REMOTEUSER"
+    remote_command "mkdir -p \"${BN_BACKUPDIR}/testrsync\""
+    runaction
+    greplog "Debug: Rsync transfer of $BN_SRCDIR finished successfully.$"
+}
+
+@test "verify remote backup, short format" {
+    run rsync -ain --exclude var --delete "${BN_SRCDIR}/" "${BN_REMOTEUSER}@${BN_REMOTEHOST}:${BN_BACKUPDIR}/testrsync${BN_SRCDIR}/bntest.0"
     [ "$status" -eq 0 ]
-    grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
+    ! echo "$output" | grep -qv '^skipping non-regular file'
 }
 
-@test "short: remote dest backup exists" {
+@test "verify remote backup rotation, short format" {
     skip "not implemented"
 }
 
-@test "short: remote dest rsync options as expected" {
-    skip "not implemented"
-}
-
-@test "short: remote dest backup ingests update" {
-    skip "not implemented"
-}
-
-@test "short: remote dest backup rotation" {
-    skip "not implemented"
-}
-
-@test "short: remote dest backup appears valid" {
-    skip "not implemented"
-}
-
-@test "long: remote dest backup action runs without errors" {
+@test "create remote backup, long format" {
     cleanup_backups remote
-    setconfig backup.d/test.rsync general format long
-    setconfig backup.d/test.rsync general backupdir rsynctest.long
-    setconfig backup.d/test.rsync dest dest remote
-    setconfig backup.d/test.rsync dest host bntest1
-    setconfig backup.d/test.rsync dest user vagrant
-    remote_command "mkdir -p /var/backups/rsynctest.long/var/cache/bntest/bntest/daily.1"
-    run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.rsync"
+    setconfig general format long
+    setconfig dest dest remote
+    setconfig dest host "$BN_REMOTEHOST"
+    setconfig dest user "$BN_REMOTEUSER"
+    remote_command "mkdir -p \"${BN_BACKUPDIR}/testrsync\""
+    runaction
+    greplog "Debug: Rsync transfer of $BN_SRCDIR finished successfully.$"
+}
+
+@test "verify remote backup, long format" {
+    run rsync -ain --exclude var --delete "${BN_SRCDIR}/" "${BN_REMOTEUSER}@${BN_REMOTEHOST}:${BN_BACKUPDIR}/testrsync${BN_SRCDIR}/daily.1"
     [ "$status" -eq 0 ]
-    grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
+    ! echo "$output" | grep -qv '^skipping non-regular file'
 }
 
-@test "long: remote dest backup exists" {
+@test "verify remote backup rotation, long format" {
     skip "not implemented"
 }
 
-@test "long: remote dest rsync options as expected" {
-    skip "not implemented"
-}
-
-@test "long: remote dest backup ingests update" {
-    skip "not implemented"
-}
-
-@test "long: remote dest backup rotation" {
-    skip "not implemented"
-}
-
-@test "long: remote dest backup appears valid" {
-    skip "not implemented"
-}
-
-@test "mirror: remote dest backup action runs without errors" {
+@test "create remote backup, mirror format" {
     cleanup_backups remote
-    setconfig backup.d/test.rsync general format mirror
-    setconfig backup.d/test.rsync general backupdir rsynctest.mirror
-    setconfig backup.d/test.rsync dest dest remote
-    setconfig backup.d/test.rsync dest host bntest1
-    setconfig backup.d/test.rsync dest user vagrant
-    remote_command "mkdir -p /var/backups/rsynctest.mirror/var/cache/bntest"
-    run backupninja -f "${BATS_TMPDIR}/backupninja.conf" --now --run "${BATS_TMPDIR}/backup.d/test.rsync"
+    setconfig general format mirror
+    setconfig dest dest remote
+    setconfig dest host "$BN_REMOTEHOST"
+    setconfig dest user "$BN_REMOTEUSER"
+    remote_command "mkdir -p \"${BN_BACKUPDIR}/testrsync\""
+    runaction
+    greplog "Debug: Rsync transfer of $BN_SRCDIR finished successfully.$"
+}
+
+@test "verify remote backup, mirror format" {
+    run rsync -ain --exclude var --delete "${BN_SRCDIR}/" "${BN_REMOTEUSER}@${BN_REMOTEHOST}:${BN_BACKUPDIR}/testrsync${BN_SRCDIR}/"
     [ "$status" -eq 0 ]
-    grep -q "Info: FINISHED: 1 actions run. 0 fatal. 0 error. 0 warning." "${BATS_TMPDIR}/log/backupninja.log"
+    ! echo "$output" | grep -qv '^skipping non-regular file'
 }
 
-@test "mirror: remote dest backup exists" {
-    skip "not implemented"
-}
 
-@test "mirror: remote dest rsync options as expected" {
-    skip "not implemented"
-}
-
-@test "mirror: remote dest backup ingests update" {
-    skip "not implemented"
-}
-
-@test "mirror: remote dest backup appears valid" {
-    skip "not implemented"
-}
