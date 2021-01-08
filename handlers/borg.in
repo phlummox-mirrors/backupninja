@@ -175,9 +175,13 @@ debug "$nice $execstr"
 
 if [ $test = 0 ]; then
    output=`$nice su -c "$execstr" 2>&1`
-   if [ $? = 0 ]; then
+   ret=$?
+   if [ $ret = 0 ]; then
       debug $output
       info "Successfully finished backing up source."
+   elif [ $ret = 1 ]; then
+      warning "Backing up source finished with warnings, details below."
+      warning $output
    else
       error $output
       fatal "Failed backing up source."
@@ -196,12 +200,16 @@ if [ "$prune" == "yes" ]; then
    debug "$prunestr"
    if [ $test = 0 ]; then
       output="`su -c "$prunestr" 2>&1`"
-      if [ $? = 0 ]; then
+      ret=$?
+      if [ $ret = 0 ]; then
          debug $output
          info "Removing old backups succeeded."
-      else
+      elif [ $ret = 1 ]; then
+         warning "Removing old backups finished with warnings, details below."
          warning $output
-         warning "Failed removing old backups."
+      else
+         error $output
+         fatal "Failed removing old backups."
       fi
    fi
 fi
