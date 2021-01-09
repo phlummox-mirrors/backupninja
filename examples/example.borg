@@ -206,3 +206,11 @@ exclude = /var/lib/mysql
 ##
 ## Default:
 # cache_directory =
+
+## command-line options to use with ssh
+##
+## an example setting would be:
+## sshoptions = -i /root/.ssh/id_rsa_borg
+##
+## Default:
+# sshoptions = 

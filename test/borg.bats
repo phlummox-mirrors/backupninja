@@ -243,7 +243,7 @@ finish_borg() {
     setconfig dest user "$BN_REMOTEUSER"
     setconfig dest host "$BN_REMOTEHOST"
     testaction
-    greplog "Debug: ssh -o PasswordAuthentication=no ${BN_REMOTEHOST} -p 22 -l ${BN_REMOTEUSER} 'echo -n 1'"
+    greplog "Debug: ssh\s\+-o PasswordAuthentication=no ${BN_REMOTEHOST} -p 22 -l ${BN_REMOTEUSER} 'echo -n 1'"
     greplog 'Debug: executing borg create$' "\bssh://${BN_REMOTEUSER}@${BN_REMOTEHOST}:22${BN_BACKUPDIR}/testborg::"
 }
 
@@ -258,7 +258,7 @@ finish_borg() {
     setconfig dest user "$BN_REMOTEUSER"
     setconfig dest host "$BN_REMOTEHOST"
     testaction
-    greplog "Debug: ssh -o PasswordAuthentication=no ${BN_REMOTEHOST} -p 22 -l ${BN_REMOTEUSER} 'echo -n 1'"
+    greplog "Debug: ssh\s\+-o PasswordAuthentication=no ${BN_REMOTEHOST} -p 22 -l ${BN_REMOTEUSER} 'echo -n 1'"
     greplog 'Debug: executing borg create$' "\bssh://${BN_REMOTEUSER}@${BN_REMOTEHOST}:22${BN_BACKUPDIR}/testborg::"
 }
 
@@ -268,7 +268,7 @@ finish_borg() {
     setconfig dest host "$BN_REMOTEHOST"
     delconfig dest port
     testaction
-    greplog "Debug: ssh -o PasswordAuthentication=no ${BN_REMOTEHOST} -p 22 -l ${BN_REMOTEUSER} 'echo -n 1'"
+    greplog "Debug: ssh\s\+ -o PasswordAuthentication=no ${BN_REMOTEHOST} -p 22 -l ${BN_REMOTEUSER} 'echo -n 1'"
     greplog 'Debug: executing borg create$' "\bssh://${BN_REMOTEUSER}@${BN_REMOTEHOST}:22${BN_BACKUPDIR}/testborg::"
 
     # defined parameter
@@ -276,7 +276,7 @@ finish_borg() {
     setconfig dest user "$BN_REMOTEUSER"
     setconfig dest host "$BN_REMOTEHOST"
     testaction
-    greplog "Debug: ssh -o PasswordAuthentication=no ${BN_REMOTEHOST} -p 7722 -l ${BN_REMOTEUSER} 'echo -n 1'"
+    greplog "Debug: ssh\s\+-o PasswordAuthentication=no ${BN_REMOTEHOST} -p 7722 -l ${BN_REMOTEUSER} 'echo -n 1'"
     greplog 'Debug: executing borg create$' "\bssh://${BN_REMOTEUSER}@${BN_REMOTEHOST}:7722${BN_BACKUPDIR}/testborg::"
 }
 
@@ -314,6 +314,26 @@ finish_borg() {
     setconfig dest compression auto,zstd,13
     testaction
     greplog 'Debug: executing borg create$' "\s--compression auto,zstd,13\b"
+}
+
+@test "check config parameter dest/sshoptions" {
+    # undefined parameter
+    setconfig dest user $BN_REMOTEUSER
+    setconfig dest host $BN_REMOTEHOST
+    delconfig dest sshoptions
+    testaction
+    not_greplog "Debug: export BORG_RSH="
+    greplog "Debug: ssh\s\+-o PasswordAuthentication=no\s"
+    greplog "Debug: Connected to ${BN_REMOTEHOST} as ${BN_REMOTEUSER} successfully$"
+
+    # defined parameter
+    setconfig dest user $BN_REMOTEUSER
+    setconfig dest host $BN_REMOTEHOST
+    setconfig dest sshoptions "-i /root/.ssh/id_ed25519"
+    testaction
+    greplog "Debug: export BORG_RSH=\"ssh -i /root/.ssh/id_ed25519\"$"
+    greplog "Debug: ssh -i /root/.ssh/id_ed25519 -o PasswordAuthentication=no\s"
+    greplog "Debug: Connected to ${BN_REMOTEHOST} as ${BN_REMOTEUSER} successfully$"
 }
 
 @test "create local backup without encryption" {

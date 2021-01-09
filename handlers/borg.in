@@ -49,9 +49,15 @@ getconf archive {now:%Y-%m-%dT%H:%M:%S}
 getconf compression lz4
 getconf encryption none
 getconf passphrase
+getconf sshoptions
 
 debug "export BORG_PASSPHRASE=\"<redacted>\""
 export BORG_PASSPHRASE="$passphrase"
+
+if [ -n "$sshoptions" ]; then
+   debug "export BORG_RSH=\"ssh $sshoptions\""
+   export BORG_RSH="ssh $sshoptions"
+fi
 
 ### CHECK CONFIG ###
 
@@ -98,8 +104,8 @@ fi
 # check the connection at the source and destination
 [ -n "$test" ] || test=0
 if [ "$host" != "localhost" ] && ([ "$testconnect" = "yes" ] || [ "${test}" -eq 1 ]); then
-   debug "ssh -o PasswordAuthentication=no $host -p $port -l $user 'echo -n 1'"
-   local ret=`ssh -o PasswordAuthentication=no $host -p $port -l $user 'echo -n 1'`
+   debug "ssh $sshoptions -o PasswordAuthentication=no $host -p $port -l $user 'echo -n 1'"
+   local ret=`ssh $sshoptions -o PasswordAuthentication=no $host -p $port -l $user 'echo -n 1'`
    if [ "$ret" = 1 ]; then
       debug "Connected to $host as $user successfully"
    else
@@ -222,5 +228,8 @@ fi
 
 debug "unset BORG_PASSPHRASE"
 unset BORG_PASSPHRASE
+
+debug "unset BORG_RSH"
+unset BORG_RSH
 
 return 0
