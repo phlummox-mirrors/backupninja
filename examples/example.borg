@@ -117,6 +117,16 @@ exclude = /var/lib/mysql
 ## Default:
 # prune_options =
 
+## by default borg emits a warning when a source file or directory
+## vanishes during the backup operations
+## set to yes to ignore such warnings
+##
+## Example:
+## ignore_missing = yes
+##
+## Default:
+# ignore_missing =
+
 ######################################################
 ## destination section
 ## (where the files are copied to)

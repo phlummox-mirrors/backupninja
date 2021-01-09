@@ -219,6 +219,19 @@ finish_borg() {
     greplog 'Debug: export BORG_CACHE_DIR="/var/cache/borg"$'
 }
 
+@test "check config parameter source/ignore_missing" {
+    setconfig source ignore_missing yes
+    setconfig dest archive testarchive
+    setconfig dest encryption none
+    setconfig dest compression zstd,16
+    delconfig dest passphrase
+    cleanup_backups local
+    ( sleep 1; mv /var/cache/bntest/lib /tmp ) &
+    runaction
+    mv /tmp/lib /var/cache/bntest
+    greplog "Info: Backing up source finished with missing file warnings."
+}
+
 @test "check config parameter dest/user" {
     # absent parameter
     delconfig dest user

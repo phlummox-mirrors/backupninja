@@ -36,6 +36,7 @@ getconf prune yes
 getconf keep 30d
 getconf prune_options
 getconf cache_directory
+getconf ignore_missing
 
 setsection dest
 getconf user
@@ -180,8 +181,14 @@ if [ $test = 0 ]; then
       debug $output
       info "Successfully finished backing up source."
    elif [ $ret = 1 ]; then
-      warning "Backing up source finished with warnings, details below."
-      warning $output
+      warnmsg=$(echo "$output" | sed -n '1,/^-\+$/{x;p;d;}; x' | sed '/^$/d') 
+      if [ "$ignore_missing" = "yes" ] && ! echo "$warnmsg" | grep -qv '\[Errno 2\] No such file or directory:'; then
+         debug $output
+         info "Backing up source finished with missing file warnings."
+      else
+         warning $output
+         warning "Backing up source finished with warnings."
+      fi
    else
       error $output
       fatal "Failed backing up source."
@@ -205,8 +212,8 @@ if [ "$prune" == "yes" ]; then
          debug $output
          info "Removing old backups succeeded."
       elif [ $ret = 1 ]; then
-         warning "Removing old backups finished with warnings, details below."
          warning $output
+         warning "Removing old backups finished with warnings."
       else
          error $output
          fatal "Failed removing old backups."
