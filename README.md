@@ -135,11 +135,11 @@ Unless otherwise specified, the config file format is "ini style."
 For example:
 
         # this is a comment
-        
+
         [fishes]
         fish = red
         fish = blue
-        
+
         [fruit]
         apple = yes
         pear = no thanks \

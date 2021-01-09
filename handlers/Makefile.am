@@ -14,7 +14,7 @@ EXTRA_DIST = Makefile.am $(DIST_HANDLERS)
 edit = sed \
     -e "s,@BASH\@,$(BASH),g" \
     -e "s,@AWK\@,$(AWK),g" \
-    -e "s,@SED\@,$(SED),g" 
+    -e "s,@SED\@,$(SED),g"
 
 pkgdata_DATA = $(HANDLERS)
 
@@ -79,7 +79,7 @@ rdiff.helper: $(srcdir)/rdiff.helper.in
 	$(edit) $(srcdir)/rdiff.helper.in > rdiff.helper
 
 rsync: $(srcdir)/rsync.in
-	rm -f rsync 
+	rm -f rsync
 	$(edit) $(srcdir)/rsync.in > rsync
 
 sh: $(srcdir)/sh.in

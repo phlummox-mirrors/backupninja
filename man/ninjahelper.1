@@ -25,7 +25,7 @@ backupninja configuration.
 .SH DESCRIPTION
 .B Ninjahelper
 is an helper script to walk you through configuration of the backup
-tasks for backupninja. It is a curses based "wizard" with an intuitive 
+tasks for backupninja. It is a curses based "wizard" with an intuitive
 menu-driven interface.
 .PP
 .SH ADDING NEW HELPERS
@@ -38,7 +38,7 @@ handler "blue", create the file /usr/share/backupninja/blue.helper.
 .IP (2)
 next, add your helper to the global HELPERS variable and define the main
 function for your helper (the function name is always <helper>_wizard). To
-use the blue.helper as an example: 
+use the blue.helper as an example:
 HELPERS="$HELPERS blue:description_of_this_helper"
        blue_wizard() {
          ... do work here ...
@@ -53,9 +53,9 @@ would think, try to make your helper as simple as possible. Walk like a cat,
 become your shadow, don't let your senses betray you.
 
 .SH SEE ALSO
-.BR backupninja (1), 
-.BR backupninja.conf (5), 
-.BR backup.d (5), 
+.BR backupninja (1),
+.BR backupninja.conf (5),
+.BR backup.d (5),
 .br
 .SH AUTHOR
 BACKUPNINJA was written by the riseup.net collective.

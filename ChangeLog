@@ -27,7 +27,7 @@ version 1.1.0 -- June 29, 2018
 	 · Avoid looking for partitions on zram devices
 	   Thanks to Glandos <bugs-0xacab@antipoul.fr> for the patch
 	 · Support extracting LUKS headers from partitions
-	   Thanks to Lyz <lyz@riseup.net> for the patch. 
+	   Thanks to Lyz <lyz@riseup.net> for the patch.
 
 version 1.0.2 -- September 05, 2017
     handler changes

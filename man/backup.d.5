@@ -3,7 +3,7 @@
 .\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
 .\" other parameters are allowed: see man(7), man(1)
 .TH BACKUP.D 5 "October 10, 2005" "riseup" "backupninja package"
-.SH NAME 
+.SH NAME
 BACKUP.D \- Action configuration files for \fBbackupninja(1)\fP.
 
 .\" Please adjust this date whenever revising the manpage.
@@ -51,9 +51,9 @@ backup action for safe backups of trac repositories.
 backup action for burning backups to CD/DVD or creating ISOs.
 
 .TP
-These files must be owned by root and must not be world or group readable/writable. Support for additional configuration types can be added by dropping bash scripts with the name of the suffix into /usr/share/backupninja. 
+These files must be owned by root and must not be world or group readable/writable. Support for additional configuration types can be added by dropping bash scripts with the name of the suffix into /usr/share/backupninja.
 .TP
-The configuration files are processed in alphabetical order. However, it is suggested that you name the config files in "sysvinit style." 
+The configuration files are processed in alphabetical order. However, it is suggested that you name the config files in "sysvinit style."
 .TP
 For example:
  10-local.pgsql.disabled
@@ -83,7 +83,7 @@ These values for "when" are invalid:
   when = tuesday at 2
   when = tues at 02
 
-A configuration file will be processed at the time(s) specified by the "when" option. If multiple "when" options are present, then they all apply. If two configurations files are scheduled to run in the same hour, then we fall back on the alphabetical ordering specified above. The "when" must occur before any sections in the action configuration file. 
+A configuration file will be processed at the time(s) specified by the "when" option. If multiple "when" options are present, then they all apply. If two configurations files are scheduled to run in the same hour, then we fall back on the alphabetical ordering specified above. The "when" must occur before any sections in the action configuration file.
 
 .SH FILE FORMAT
 
@@ -99,9 +99,9 @@ The file format of the action configuration files is "ini style." Sections are c
    i will not have a pear.
 
 .SH SEE ALSO
-.BR backupninja (1), 
-.BR ninjahelper (1), 
-.BR backupninja.conf (5), 
+.BR backupninja (1),
+.BR ninjahelper (1),
+.BR backupninja.conf (5),
 .br
 .SH AUTHOR
 BACKUPNINJA was written by the riseup.net collective.

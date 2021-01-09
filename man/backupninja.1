@@ -24,7 +24,7 @@ BACKUPNINJA \- A lightweight, extensible meta-backup system
 .B "backupninja [ \-h ] [ \-v ] [ \-d ] [ \-n ] [ \-t ] [ \-f filename ] [ \-\-run filename ]"
 .br
 .SH DESCRIPTION
-.B Backupninja 
+.B Backupninja
 allows you to coordinate system backups by dropping a few
 simple configuration files into /etc/backup.d/. Most programs you
 might use for making backups don't have their own configuration file
@@ -58,30 +58,30 @@ encrypted remote backups (via duplicity).
 .IP -
 safe backup of MySQL, PostgreSQL, OpenLDAP, and subversion databases.
 .IP -
-burn CD/DVDs or create ISOs. 
-	 
+burn CD/DVDs or create ISOs.
+
 .\" TeX users may be more comfortable with the \fB<whatever>\fP and
-.\" \fI<whatever>\fP escape sequences to invoke bold face and italics, 
+.\" \fI<whatever>\fP escape sequences to invoke bold face and italics,
 .\" respectively.
 
 .SH OPTIONS
 .TP
-.B \-h, \-\-help           
+.B \-h, \-\-help
 Show summary of options
 .TP
-.B \-V, \-\-version           
+.B \-V, \-\-version
 Show backupninja version number
 .TP
-.B \-d, \-\-debug          
+.B \-d, \-\-debug
 Run in debug mode, where all log messages are output to the current shell.
 .TP
-.B \-f, \-\-conffile CONF_FILE  
+.B \-f, \-\-conffile CONF_FILE
 Use CONF_FILE for the main configuration instead of /etc/backupninja.conf
 .TP
-.B \-t, \-\-test           
+.B \-t, \-\-test
 Run in test mode, no actions are actually taken.
 .TP
-.B \-n, \-\-now            
+.B \-n, \-\-now
 Perform actions now, instead of when they might be scheduled.
 .TP
 .B \-\-run ACTION_FILE
@@ -130,9 +130,9 @@ Now, you should be able to ssh from user 'root' on srchost to user 'backup' on d
 .PD
 
 .SH SEE ALSO
-.BR ninjahelper (1), 
-.BR backupninja.conf (5), 
-.BR backup.d (5), 
+.BR ninjahelper (1),
+.BR backupninja.conf (5),
+.BR backup.d (5),
 .br
 .SH AUTHOR
 BACKUPNINJA was written by the riseup.net collective.
