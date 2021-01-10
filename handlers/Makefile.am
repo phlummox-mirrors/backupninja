@@ -1,7 +1,7 @@
 
 HANDLERS = borg borg.helper dup dup.helper maildir makecd	\
-         makecd.helper mysql mysql.helper pgsql pgsql.helper rdiff	\
-         rdiff.helper rsync sh svn sys sys.helper trac tar tar.helper
+         makecd.helper mysql mysql.helper pgsql pgsql.helper restic  \
+         restic.helper rdiff rdiff.helper rsync sh svn sys sys.helper trac tar tar.helper
 
 DIST_HANDLERS = borg.in borg.helper.in dup.in dup.helper.in maildir.in makecd.in	\
          makecd.helper.in mysql.in mysql.helper.in pgsql.in pgsql.helper.in rdiff.in	\
