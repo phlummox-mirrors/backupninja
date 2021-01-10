@@ -176,7 +176,6 @@ runaction() {
     if [ -f "${BATS_TMPDIR}/backup.d/${ACTIONFILE}" ]; then
         [ -f "${BATS_TMPDIR}/log/backupninja.log" ] && rm -f "${BATS_TMPDIR}/log/backupninja.log"
         run backupninja -f "${BATS_TMPDIR}/backupninja.conf" $TEST --debug --now --run "${BATS_TMPDIR}/backup.d/${ACTIONFILE}"
-        [ "$status" -eq 0 ]
     else
         echo "action file not found: ${BATS_TMPDIR}/backup.d/${ACTIONFILE}"
         false

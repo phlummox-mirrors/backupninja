@@ -14,8 +14,14 @@ create_test_action() {
 
 @test "general: error thrown on bad command-line option" {
     run backupninja --foo
+    [ "$status" -eq 3 ]
+    echo "${lines[0]}" | grep -q "Error: Unknown option --foo"
+}
+
+@test "general: error thrown on attempt to run as non-root user" {
+    run sudo -u vagrant backupninja -f "${BATS_TMPDIR}/backupninja.conf"
     [ "$status" -eq 2 ]
-    [ "${lines[0]}" = "Unknown option --foo" ]
+    [ "${lines[1]}" = "backupninja can only be run as root" ]
 }
 
 @test "general: logfile is created" {
@@ -65,7 +71,6 @@ create_test_action() {
 @test "reports: error report is mailed" {
     create_test_action fatal test_error
     run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
-    [ "$status" -eq 0 ]
     sleep 0.1
     grep -q "\*failed\* -- ${BATS_TMPDIR}/backup.d/test.sh" /var/mail/vagrant
 }
@@ -75,7 +80,6 @@ create_test_action() {
     setconfig backupninja.conf reportsuccess no
     setconfig backupninja.conf reportwarning yes
     run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
-    [ "$status" -eq 0 ]
     sleep 0.1
     grep -q "Warning: test_warning" /var/mail/vagrant
 }
@@ -84,7 +88,6 @@ create_test_action() {
     create_test_action
     setconfig backupninja.conf reportsuccess yes
     run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
-    [ "$status" -eq 0 ]
     sleep 0.1
     grep -q "success -- ${BATS_TMPDIR}/backup.d/test.sh" /var/mail/vagrant
 }
@@ -94,7 +97,6 @@ create_test_action() {
     setconfig backupninja.conf reportsuccess yes
     setconfig backupninja.conf reportinfo yes
     run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
-    [ "$status" -eq 0 ]
     sleep 0.1
     grep -q "Info: test_info" /var/mail/vagrant
 }
@@ -105,7 +107,6 @@ create_test_action() {
     setconfig backupninja.conf reportsuccess yes
     setconfig backupninja.conf reportspace yes
     run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
-    [ "$status" -eq 0 ]
     sleep 0.1
     grep -q "/dev/sda1" /var/mail/vagrant
 }
@@ -174,4 +175,40 @@ create_test_action() {
     grep -q "Debug: skipping ${BATS_TMPDIR}/backup.d/test.sh because current time does not match 21 at 09:00" "${BATS_TMPDIR}/log/backupninja.log"
 }
 
+@test "exit code: rc=2 when halt error raised in handler" {
+    create_test_action halt test_halt
+    run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
+    [ "$status" -eq 2 ]
+}
 
+@test "exit code: rc=2 when fatal error raised in handler" {
+    create_test_action fatal test_fatal
+    run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
+    [ "$status" -eq 2 ]
+}
+
+@test "exit code: rc=1 when error raised in handler" {
+    create_test_action error test_error
+    run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
+    [ "$status" -eq 1 ]
+}
+
+@test "exit code: rc=1 when warning raised in handler and reportwarning=yes" {
+    create_test_action warning test_warning
+    setconfig backupninja.conf reportwarning yes
+    run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
+    [ "$status" -eq 1 ]
+}
+
+@test "exit code: rc=0 when warning raised in handler and reportwarning=no" {
+    create_test_action warning test_warning
+    setconfig backupninja.conf reportwarning no
+    run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
+    [ "$status" -eq 0 ]
+}
+
+@test "exit code: rc=0 when no warnings/errors raised in handler" {
+    create_test_action "true"
+    run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
+    [ "$status" -eq 0 ]
+}
