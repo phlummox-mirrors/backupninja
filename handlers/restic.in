@@ -73,6 +73,8 @@ function run_cmd {
   local pass=0
   local cmd=$1
 
+  debug "$cmd"
+
   [ $test -eq 1 ] && return 0
 
   while [ $pass -lt $retry_run ]; do
@@ -299,7 +301,6 @@ if [ "$run_backup" == "yes" ]; then
 
   # execute backup
   info "Taking backup snapshot."
-  debug "Running: $cmd"
   run_cmd "$cmd" || \
     fatal "Restic backup failed."
 
@@ -383,7 +384,6 @@ if [[ "$run_forget" == "yes" ]]; then
 
   # execute forget
   info "Removing old snapshots based on defined retention policy."
-  debug "Running: $cmd"
   run_cmd "$cmd" || \
     fatal "Restic forget expired snapshots failed."
 
@@ -421,7 +421,6 @@ if [ "$run_check" == "yes" ]; then
 
   # execute check
   info "Checking repository integrity and consistency."
-  debug "Running: $cmd"
   run_cmd "$cmd" || \
     fatal "Restic check repository integrity and consistency failed."
 
@@ -440,7 +439,6 @@ if [ "$run_prune" == "yes" ]; then
 
   # execute prune
   info "Removing data not referenced and not needed any more."
-  debug "Running: $cmd"
   run_cmd "$cmd" || \
     fatal "Restic prune repository failed."
 
@@ -458,7 +456,6 @@ if [ "$run_rebuild_index" == "yes" ]; then
 
   # execute rebuild-index
   info "Rebuilding index based on files in the repository."
-  debug "Running: $cmd"
   run_cmd "$cmd" || \
     fatal "Restic rebuild index repository failed."
 
