@@ -186,7 +186,7 @@ if [ $test = 0 ]; then
       debug $output
       info "Successfully finished backing up source."
    elif [ $ret = 1 ]; then
-      warnmsg=$(echo "$output" | sed -n '1,/^-\+$/{x;p;d;}; x' | sed '/^$/d') 
+      warnmsg=$(echo "$output" | @SED@ -n '1,/^-\+$/{x;p;d;}; x' | @SED@ '/^$/d')
       if [ "$ignore_missing" = "yes" ] && ! echo "$warnmsg" | grep -qv '\[Errno 2\] No such file or directory:'; then
          debug $output
          info "Backing up source finished with missing file warnings."
