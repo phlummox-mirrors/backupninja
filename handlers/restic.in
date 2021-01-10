@@ -143,9 +143,9 @@ function run_cmd {
 ### REPOSITORY ################################################################
 
 # SFTP repository
-if [ "$(echo "$repository" | /usr/bin/awk -F ':' '{print $1}')" == "sftp" ]; then
+if [ "$(echo "$repository" | @AWK@ -F ':' '{print $1}')" == "sftp" ]; then
 
-  remote="$(echo "$repository" | /usr/bin/awk -F ':' '{print $2}')"
+  remote="$(echo "$repository" | @AWK@ -F ':' '{print $2}')"
 
   # try SSH connection
   ssh -q "$remote" exit || \
@@ -154,7 +154,7 @@ if [ "$(echo "$repository" | /usr/bin/awk -F ':' '{print $1}')" == "sftp" ]; the
 fi
 
 # REST Server repository
-if [ "$(echo "$repository" | /usr/bin/awk -F ':' '{print $1}')" == "rest" ]; then
+if [ "$(echo "$repository" | @AWK@ -F ':' '{print $1}')" == "rest" ]; then
 
   remote="${repository#rest:}"
 
@@ -165,7 +165,7 @@ if [ "$(echo "$repository" | /usr/bin/awk -F ':' '{print $1}')" == "rest" ]; the
 fi
 
 # Amazon S3 repository
-if [ "$(echo "$repository" | /usr/bin/awk -F ':' '{print $1}')" == "s3" ]; then
+if [ "$(echo "$repository" | @AWK@ -F ':' '{print $1}')" == "s3" ]; then
 
   ( [ -z "$aws_access_key_id" ] || [ -z "$aws_secret_access_key" ] ) && \
     fatal "Missing some S3 credentials."
@@ -178,7 +178,7 @@ if [ "$(echo "$repository" | /usr/bin/awk -F ':' '{print $1}')" == "s3" ]; then
 fi
 
 # OpenStack Swift repository
-if [ "$(echo "$repository" | /usr/bin/awk -F ':' '{print $1}')" == "swift" ]; then
+if [ "$(echo "$repository" | @AWK@ -F ':' '{print $1}')" == "swift" ]; then
 
   (
     [ -z "$os_auth_url" ] || [ -z "$os_tenant_id" ] || [ -z "$os_tenant_name" ] || \
@@ -196,7 +196,7 @@ if [ "$(echo "$repository" | /usr/bin/awk -F ':' '{print $1}')" == "swift" ]; th
 fi
 
 # Backblaze B2 repository
-if [ "$(echo "$repository" | /usr/bin/awk -F ':' '{print $1}')" == "b2" ]; then
+if [ "$(echo "$repository" | @AWK@ -F ':' '{print $1}')" == "b2" ]; then
 
   ( [ -z "$b2_account_id" ] || [ -z "$b2_account_key" ] ) && \
     fatal "Missing some B2 credentials."
@@ -207,7 +207,7 @@ if [ "$(echo "$repository" | /usr/bin/awk -F ':' '{print $1}')" == "b2" ]; then
 fi
 
 # Microsoft Azure Blob Storage repository
-if [ "$(echo "$repository" | /usr/bin/awk -F ':' '{print $1}')" == "azure" ]; then
+if [ "$(echo "$repository" | @AWK@ -F ':' '{print $1}')" == "azure" ]; then
 
   ( [ -z "$azure_account_name" ] || [ -z "$azure_account_key" ] ) && \
     fatal "Missing some Azure credentials."
@@ -218,7 +218,7 @@ if [ "$(echo "$repository" | /usr/bin/awk -F ':' '{print $1}')" == "azure" ]; th
 fi
 
 # Google Cloud Storage repository
-if [ "$(echo "$repository" | /usr/bin/awk -F ':' '{print $1}')" == "gs" ]; then
+if [ "$(echo "$repository" | @AWK@ -F ':' '{print $1}')" == "gs" ]; then
 
   ( [ -z "$google_project_id" ] || [ -z "$google_application_credentials" ] ) && \
     fatal "Missing some Google credentials."
