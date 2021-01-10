@@ -648,3 +648,11 @@ if [ -n "$reporthost" ]; then
    debug "send $logfile to $reportuser@$reporthost:$reportdirectory"
    rsync -qt $logfile $reportuser@$reporthost:$reportdirectory
 fi
+
+# return exit code
+[ $halts == 0 ] || exit 2
+[ $fatals == 0 ] || exit 2
+[ $errors == 0 ] || exit 1
+[ "$reportwarning" == "yes" -a $warnings != 0 ] && exit 1
+
+exit 0
