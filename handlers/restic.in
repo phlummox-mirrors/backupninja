@@ -93,7 +93,7 @@ function run_cmd {
 ### GLOBAL OPTIONS ############################################################
 
 [ -z "$repository" ] && \
-  fatal "The repo option must be set."
+  fatal "The repository option must be set."
 
 [ -z "$password" ] && [ -z "$password_file" ] && \
     fatal "The password must be set by option 'password' or 'password_file'."
