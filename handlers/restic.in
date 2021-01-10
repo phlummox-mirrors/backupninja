@@ -72,6 +72,9 @@ function export_debug {
 function run_cmd {
   local pass=0
   local cmd=$1
+
+  [ $test -eq 1 ] && return 0
+
   while [ $pass -lt $retry_run ]; do
     (( pass++ ))
     debug "Attempt $pass"
