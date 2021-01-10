@@ -554,7 +554,7 @@ fi
 
 if [ "$UID" != "0" ]; then
    echo "`basename $0` can only be run as root"
-   exit 1
+   exit 2
 fi
 
 ## Process each configuration file
