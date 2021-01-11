@@ -491,6 +491,41 @@ if [[ "$run_forget" == "yes" ]]; then
 
 fi
 
+### PRUNE ######################################################################
+
+if [ "$run_prune" == "yes" ]; then
+
+  # format command
+  cmd="restic prune"
+  execstr="${precmd}${cmd} ${cmd_global_options//$'\n'}"
+
+  # debug
+  debug "executing restic prune"
+  debug "$execstr"
+
+  # execute
+  if [ $test -eq 1 ]; then
+    info "Test mode enabled, skipping restic prune."
+  else
+    info "Removing unreferenced data from repository."
+    output=$($execstr 2>&1)
+    ret=$?
+    if [ $ret -eq 0 ]; then
+      debug $output
+      info "Restic prune successful."
+    else
+      error $output
+      fatal "Restic prune failed."
+    fi
+  fi
+
+  debug "Unsetting variables"
+  unset execstr
+  unset output
+  unset ret
+
+fi
+
 ### CHECK ######################################################################
 
 if [ "$run_check" == "yes" ]; then
@@ -540,41 +575,6 @@ if [ "$run_check" == "yes" ]; then
 
   debug "Unsetting variables"
   unset cmd_options
-  unset execstr
-  unset output
-  unset ret
-
-fi
-
-### PRUNE ######################################################################
-
-if [ "$run_prune" == "yes" ]; then
-
-  # format command
-  cmd="restic prune"
-  execstr="${precmd}${cmd} ${cmd_global_options//$'\n'}"
-
-  # debug
-  debug "executing restic prune"
-  debug "$execstr"
-
-  # execute
-  if [ $test -eq 1 ]; then
-    info "Test mode enabled, skipping restic prune."
-  else
-    info "Removing unreferenced data from repository."
-    output=$($execstr 2>&1)
-    ret=$?
-    if [ $ret -eq 0 ]; then
-      debug $output
-      info "Restic prune successful."
-    else
-      error $output
-      fatal "Restic prune failed."
-    fi
-  fi
-
-  debug "Unsetting variables"
   unset execstr
   unset output
   unset ret
