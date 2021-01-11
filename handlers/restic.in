@@ -9,6 +9,8 @@
 setsection general
 
 getconf testconnect no
+getconf nicelevel
+getconf ionicelevel
 
 getconf run_backup        "no"
 getconf run_forget        "no"
@@ -59,6 +61,16 @@ setsection gs
 
 getconf google_project_id
 getconf google_application_credentials
+
+# Check that the ionicelevel is valid
+if [ -n "$nicelevel" ] && { [ "$nicelevel" -lt -20 ] || [ "$nicelevel" -gt 19 ]; }; then
+   fatal "The value of nicelevel is expected to be either empty or an integer from -20 to 19. Got: $nicelevel"
+fi
+
+# Check that the ionicelevel is valid
+if [ -n "$ionicelevel" ] && echo "$ionicelevel" | grep -vq "^[0-7]$"; then
+   fatal "The value of ionicelevel is expected to be either empty or an integer from 0 to 7. Got: $ionicelevel"
+fi
 
 ### HELPERS ###################################################################
 
@@ -118,6 +130,16 @@ function test_rest_connection() {
     fatal "Failed connecting to REST backend at ${remote}."
   fi
 }
+
+### PRE-COMMANDS ##############################################################
+
+[ -n "$nicelevel" ] && \
+  precmd+="nice -n $nicelevel "
+
+[ -n "$ionicelevel" ] && \
+  precmd+="ionice -c2 -n $ionicelevel "
+
+
 
 ### GLOBAL OPTIONS ############################################################
 
@@ -336,7 +358,8 @@ if [ "$run_backup" == "yes" ]; then
     cmd_options+="--with_atime "
 
   # format command
-  execstr="restic backup ${cmd_global_options//$'\n'}${cmd_options//$'\n'}"
+  cmd="restic backup"
+  execstr="${precmd}${cmd} ${cmd_global_options//$'\n'}${cmd_options//$'\n'}"
 
   # debug
   debug "executing restic backup"
@@ -437,7 +460,8 @@ if [[ "$run_forget" == "yes" ]]; then
     cmd_options+="--prune "
 
   # format command
-  execstr="restic forget ${cmd_global_options//$'\n'}${cmd_options//$'\n'}"
+  cmd="restic forget"
+  execstr="${precmd}${cmd} ${cmd_global_options//$'\n'}${cmd_options//$'\n'}"
 
   # debug
   debug "executing restic forget"
@@ -491,7 +515,8 @@ if [ "$run_check" == "yes" ]; then
     cmd_options+="--with-cache "
 
   # format command
-  execstr="restic check ${cmd_global_options//$'\n'}${cmd_options//$'\n'}"
+  cmd="restic check"
+  execstr="${precmd}${cmd} ${cmd_global_options//$'\n'}${cmd_options//$'\n'}"
 
   # debug
   debug "executing restic check"
@@ -526,7 +551,8 @@ fi
 if [ "$run_prune" == "yes" ]; then
 
   # format command
-  execstr="restic prune ${cmd_global_options//$'\n'}"
+  cmd="restic prune"
+  execstr="${precmd}${cmd} ${cmd_global_options//$'\n'}"
 
   # debug
   debug "executing restic prune"

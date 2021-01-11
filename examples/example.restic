@@ -69,6 +69,23 @@ password = secret
 # Path to a file containing PEM encoded TLS client certificate and private key [path]
 #tls_client_cert =
 
+## Adjust process scheduling priority. When set to to an integer value between
+## -19 and 20, the backup command will be started with the desired scheduling
+## priority. A positive integer indicates lower priority, the default priority
+## being 0. [integer]
+##
+## Default:
+# nicelevel =
+
+## Adjust I/O scheduling class and priority. When set to to an integer value
+## between 0 and 7, the backup command will be started with the best-effort
+## class and desired priority level. [integer]
+##
+## See the ionice(1) man page for more details about available levels.
+##
+## Default:
+# ionicelevel =
+
 [s3]
 
 #aws_access_key_id =
