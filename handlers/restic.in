@@ -8,7 +8,7 @@
 
 setsection general
 
-getconf testconnect no
+getconf testconnect yes
 getconf nicelevel
 getconf ionicelevel
 
