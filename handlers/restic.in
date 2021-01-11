@@ -8,6 +8,8 @@
 
 setsection general
 
+getconf testconnect no
+
 getconf run_backup        "no"
 getconf run_forget        "no"
 getconf run_check         "no"
@@ -90,6 +92,58 @@ function run_cmd {
   return 1
 }
 
+function test_sftp_connection() {
+  local remote
+  local sftpport
+  local output
+  local ret
+
+  remote=$1
+
+  if echo "$remote" | grep -q ':[0-9]\+$'; then
+    sftpport="-P $(echo $remote | @AWK@ -F ':' '{print $2}') "
+    remote=$(echo $remote | @AWK@ -F ':' '{print $1}')
+  fi
+
+  debug "echo | sftp -o PasswordAuthentication=no ${sftpport}${remote}"
+  output=$(echo | sftp -o PasswordAuthentication=no ${sftpport}${remote})
+  ret=$?
+
+  if [ $ret -eq 0 ]; then
+    debug "Connection test to SFTP backend ${remote} succeeded."
+  else
+    debug $output
+    fatal "Failed connecting to SFTP backend at ${remote}."
+  fi
+}
+
+function test_rest_connection() {
+  local remote
+  local output
+  local ret
+
+  local remote=$1
+
+  if [ ! -x $(which wget) ]; then
+    error "Unable to test REST connection, wget executable not found!"
+    return
+  fi
+
+  debug "wget --tries=1 --method=HEAD \"${remote}/config\""
+  output=$(wget --tries=1 --method=HEAD "${remote}/config")
+  ret=$?
+
+  if [ $ret -eq 0 ]; then
+    debug "Connection test to REST backend at ${remote} succeeded."
+  elif [ $ret -eq 8 ]; then
+    debug $output
+    fatal "REST backend at ${remote} returned an error, repository may not be created."
+  else
+    debug $output
+    fatal "Failed connecting to REST backend at ${remote}."
+  fi
+}
+
 ### GLOBAL OPTIONS ############################################################
 
 [ -z "$repository" ] && \
@@ -145,22 +199,32 @@ function run_cmd {
 # SFTP repository
 if [ "$(echo "$repository" | @AWK@ -F ':' '{print $1}')" == "sftp" ]; then
 
-  remote="$(echo "$repository" | @AWK@ -F ':' '{print $2}')"
+  # connection test
+  if [ "$testconnect" = "yes" ] || [ "$test" -eq 1 ]; then
 
-  # try SSH connection
-  ssh -q "$remote" exit || \
-    fatal "Cannot connect to '$remote'."
+    if echo "$repository" | grep -q '^sftp://'; then
+      remote=$(echo "$repository" | @AWK@ -F '//' '{print $2}')
+    elif echo "$repository" | grep -q '^sftp:'; then
+      remote=$(echo "$repository" | @AWK@ -F ':' '{print $2}')
+    fi
+
+    [ -n "$remote" ] || fatal "Unable to parse SFTP repository URL ${repository}."
+    test_sftp_connection $remote
+
+  fi
 
 fi
 
 # REST Server repository
 if [ "$(echo "$repository" | @AWK@ -F ':' '{print $1}')" == "rest" ]; then
 
-  remote="${repository#rest:}"
+  # connection test
+  if [ "$testconnect" = "yes" ] || [ "$test" -eq 1 ]; then
 
-  # try HTTP connection
-  [ "$(curl -I "$remote" 2>/dev/null | head -n 1 | cut -d$' ' -f2)" == "200" ] || \
-    fatal "Cannot connect to '$remote'."
+    remote="${repository#rest:}"
+    test_rest_connection $remote
+
+  fi
 
 fi
 
