@@ -14,7 +14,6 @@ getconf run_backup        "no"
 getconf run_forget        "no"
 getconf run_check         "no"
 getconf run_prune         "no"
-getconf run_rebuild_index "no"
 
 getconf cacert
 getconf cache_dir
@@ -546,40 +545,6 @@ if [ "$run_prune" == "yes" ]; then
     else
       error $output
       fatal "Restic prune failed."
-    fi
-  fi
-
-  debug "Unsetting variables"
-  unset execstr
-  unset output
-  unset ret
-
-fi
-
-### REBUILD INDEX ##############################################################
-
-if [ "$run_rebuild_index" == "yes" ]; then
-
-  # format command
-  execstr="restic rebuild-index ${cmd_global_options//$'\n'}"
-
-  # debug
-  debug "executing restic rebuild-index"
-  debug "$execstr"
-
-  # execute
-  if [ $test -eq 1 ]; then
-    info "Test mode enabled, skipping restic rebuild-index."
-  else
-    info "Rebuilding repository index."
-    output=$($execstr 2>&1)
-    ret=$?
-    if [ $ret -eq 0 ]; then
-      debug $output
-      info "Restic rebuild-index successful."
-    else
-      error $output
-      fatal "Restic rebuild-index failed."
     fi
   fi
 

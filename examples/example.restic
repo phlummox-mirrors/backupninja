@@ -21,9 +21,6 @@ run_backup = yes
 # Remove unneeded data from the repository [yes/no]
 #run_prune = no
 
-# Build a new index file [yes/no]
-#run_rebuild_index = no
-
 # Retry to run the command [integer]
 #retry_run = 1
 
