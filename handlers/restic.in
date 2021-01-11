@@ -16,9 +16,6 @@ getconf run_check         "no"
 getconf run_prune         "no"
 getconf run_rebuild_index "no"
 
-getconf retry_run 1
-getconf retry_wait 5
-
 getconf cacert
 getconf cache_dir
 getconf cleanup_cache
@@ -69,27 +66,6 @@ getconf google_application_credentials
 function export_debug {
   export "$1"="$2"
   debug "$1=${!1}"
-}
-
-function run_cmd {
-  local pass=0
-  local cmd=$1
-
-  debug "$cmd"
-
-  [ $test -eq 1 ] && return 0
-
-  while [ $pass -lt $retry_run ]; do
-    (( pass++ ))
-    debug "Attempt $pass"
-    info "Running command in a subshell. This may take a while..."
-    # return when cmd succeeded, pass when failed
-    eval $cmd && return 0 || :
-    sleep $retry_wait
-  done
-
-  # if we reach here, we have failed
-  return 1
 }
 
 function test_sftp_connection() {
@@ -361,19 +337,37 @@ if [ "$run_backup" == "yes" ]; then
     cmd_options+="--with_atime "
 
   # format command
-  cmd="restic backup ${cmd_global_options//$'\n'}${cmd_options//$'\n'}"
+  execstr="restic backup ${cmd_global_options//$'\n'}${cmd_options//$'\n'}"
 
-  # execute backup
-  info "Taking backup snapshot."
-  run_cmd "$cmd" || \
-    fatal "Restic backup failed."
+  # debug
+  debug "executing restic backup"
+  debug "$execstr"
+
+  # execute
+  if [ $test -eq 1 ]; then
+    info "Test mode enabled, skipping restic backup."
+  else
+    info "Creating new backup snapshot."
+    output=$($execstr 2>&1)
+    ret=$?
+    if [ $ret -eq 0 ]; then
+      debug $output
+      info "Restic backup successful."
+    else
+      error $output
+      fatal "Restic backup failed."
+    fi
+  fi
 
   # set bash orginal globbing behavior
   set +f
 
   debug "Unsetting variables"
-  unset cmd
   unset cmd_options
+  unset execstr
+  unset output
+  unset ret
+
 fi
 
 ### FORGET #####################################################################
@@ -444,16 +438,33 @@ if [[ "$run_forget" == "yes" ]]; then
     cmd_options+="--prune "
 
   # format command
-  cmd="restic forget ${cmd_global_options//$'\n'}${cmd_options//$'\n'}"
+  execstr="restic forget ${cmd_global_options//$'\n'}${cmd_options//$'\n'}"
 
-  # execute forget
-  info "Removing old snapshots based on defined retention policy."
-  run_cmd "$cmd" || \
-    fatal "Restic forget expired snapshots failed."
+  # debug
+  debug "executing restic forget"
+  debug "$execstr"
+
+  # execute
+  if [ $test -eq 1 ]; then
+    info "Test mode enabled, skipping restic forget."
+  else
+    info "Removing old snapshots based on defined retention policy."
+    output=$($execstr 2>&1)
+    ret=$?
+    if [ $ret -eq 0 ]; then
+      debug $output
+      info "Restic forget successful."
+    else
+      error $output
+      fatal "Restic forget failed."
+    fi
+  fi
 
   debug "Unsetting variables"
-  unset cmd
   unset cmd_options
+  unset execstr
+  unset output
+  unset ret
 
 fi
 
@@ -481,16 +492,33 @@ if [ "$run_check" == "yes" ]; then
     cmd_options+="--with-cache "
 
   # format command
-  cmd="restic check ${cmd_global_options//$'\n'}${cmd_options//$'\n'}"
+  execstr="restic check ${cmd_global_options//$'\n'}${cmd_options//$'\n'}"
 
-  # execute check
-  info "Checking repository integrity and consistency."
-  run_cmd "$cmd" || \
-    fatal "Restic check repository integrity and consistency failed."
+  # debug
+  debug "executing restic check"
+  debug "$execstr"
+
+  # execute
+  if [ $test -eq 1 ]; then
+    info "Test mode enabled, skipping restic check."
+  else
+    info "Checking repository integrity and consistency."
+    output=$($execstr 2>&1)
+    ret=$?
+    if [ $ret -eq 0 ]; then
+      debug $output
+      info "Restic check successful."
+    else
+      error $output
+      fatal "Restic check failed."
+    fi
+  fi
 
   debug "Unsetting variables"
-  unset cmd
   unset cmd_options
+  unset execstr
+  unset output
+  unset ret
 
 fi
 
@@ -499,15 +527,32 @@ fi
 if [ "$run_prune" == "yes" ]; then
 
   # format command
-  cmd="restic prune ${cmd_global_options//$'\n'}"
+  execstr="restic prune ${cmd_global_options//$'\n'}"
 
-  # execute prune
-  info "Removing data not referenced and not needed any more."
-  run_cmd "$cmd" || \
-    fatal "Restic prune repository failed."
+  # debug
+  debug "executing restic prune"
+  debug "$execstr"
+
+  # execute
+  if [ $test -eq 1 ]; then
+    info "Test mode enabled, skipping restic prune."
+  else
+    info "Removing unreferenced data from repository."
+    output=$($execstr 2>&1)
+    ret=$?
+    if [ $ret -eq 0 ]; then
+      debug $output
+      info "Restic prune successful."
+    else
+      error $output
+      fatal "Restic prune failed."
+    fi
+  fi
 
   debug "Unsetting variables"
-  unset cmd
+  unset execstr
+  unset output
+  unset ret
 
 fi
 
@@ -516,15 +561,32 @@ fi
 if [ "$run_rebuild_index" == "yes" ]; then
 
   # format command
-  cmd="restic rebuild-index ${cmd_global_options//$'\n'}"
+  execstr="restic rebuild-index ${cmd_global_options//$'\n'}"
 
-  # execute rebuild-index
-  info "Rebuilding index based on files in the repository."
-  run_cmd "$cmd" || \
-    fatal "Restic rebuild index repository failed."
+  # debug
+  debug "executing restic rebuild-index"
+  debug "$execstr"
+
+  # execute
+  if [ $test -eq 1 ]; then
+    info "Test mode enabled, skipping restic rebuild-index."
+  else
+    info "Rebuilding repository index."
+    output=$($execstr 2>&1)
+    ret=$?
+    if [ $ret -eq 0 ]; then
+      debug $output
+      info "Restic rebuild-index successful."
+    else
+      error $output
+      fatal "Restic rebuild-index failed."
+    fi
+  fi
 
   debug "Unsetting variables"
-  unset cmd
+  unset execstr
+  unset output
+  unset ret
 
 fi
 
