@@ -139,8 +139,6 @@ function test_rest_connection() {
 [ -n "$ionicelevel" ] && \
   precmd+="ionice -c2 -n $ionicelevel "
 
-
-
 ### GLOBAL OPTIONS ############################################################
 
 [ -z "$repository" ] && \
