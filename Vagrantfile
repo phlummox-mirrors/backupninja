@@ -56,10 +56,6 @@ Vagrant.configure("2") do |config|
       ssh vagrant@bntest1 "sudo systemctl reload sshd"
     SHELL
 
-    local.vm.synced_folder ".", "/vagrant", type: "rsync",
-    rsync__exclude: ".git/",
-    rsync__args: ["--recursive", "--delete"]
-
     local.vm.provider :virtualbox do |vb|
       unless File.exist?(empty_disk)
         vb.customize ['createhd', '--filename', empty_disk, '--size', 100 ]
@@ -79,5 +75,9 @@ Vagrant.configure("2") do |config|
       vb.customize ['storageattach', :id, '--storagectl', 'SATA Controller', '--port', 4, '--device', 0, '--type', 'hdd', '--medium', luksdev_disk]
     end
   end
+
+  config.vm.synced_folder ".", "/vagrant", type: "rsync",
+    rsync__exclude: ".git/",
+    rsync__args: ["--recursive", "--delete"]
 
 end
