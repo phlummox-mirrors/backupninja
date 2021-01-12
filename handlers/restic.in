@@ -279,32 +279,33 @@ if [ "$run_backup" == "yes" ]; then
   getconf time
   getconf with_atime
 
-  # prevent bash from expanding glob
-  set -f
+  set -o noglob
+  SAVEIFS=$IFS
+  IFS=$(echo -en "\n\b")
 
   [ -z "$include" ] && [ -z "$files_from" ] && \
     fatal "No files or directories specified for backup."
 
   [ -n "$include" ] && \
-    cmd_options+="$(for i in $include; do echo "$i "; done)"
+    cmd_options+="$(for i in $include; do echo "'$i' "; done)"
 
   [ -n "$files_from" ] && \
-    cmd_options+="$(for i in $files_from; do echo "--files-from $i "; done)"
+    cmd_options+="$(for i in $files_from; do echo "--files-from '$i' "; done)"
 
   [ -d "$repository" ] && \
     cmd_options+="--exclude $repository "
 
   [ -n "$exclude" ] && \
-    cmd_options+="$(for i in $exclude; do echo "--exclude $i "; done)"
+    cmd_options+="$(for i in $exclude; do echo "--exclude '$i' "; done)"
 
   [ "$exclude_caches" == "yes" ] && \
     cmd_options+="--exclude-caches "
 
   [ -n "$exclude_file" ] && \
-    cmd_options+="$(for i in $exclude_file; do echo "--exclude-file $i "; done)"
+    cmd_options+="$(for i in $exclude_file; do echo "--exclude-file '$i' "; done)"
 
   [ -n "$exclude_if_present" ] && \
-    cmd_options+="$(for i in $exclude_if_present; do echo "--exclude-if-present $i "; done)"
+    cmd_options+="$(for i in $exclude_if_present; do echo "--exclude-if-present '$i' "; done)"
 
   [ "$force" == "yes" ] && \
     cmd_options+="--force "
@@ -319,13 +320,16 @@ if [ "$run_backup" == "yes" ]; then
     cmd_options+="--parent $parent "
 
   [ -n "$tag" ] && \
-    cmd_options+="$(for i in $tag; do echo "--tag=$i "; done)"
+    cmd_options+="$(for i in $tag; do echo "--tag='$i' "; done)"
 
   [ -n "$time" ] && \
     cmd_options+="--time $time "
 
   [ "$with_atime" == "yes" ] && \
     cmd_options+="--with_atime "
+
+  IFS=$SAVEIFS
+  set +o noglob
 
   # format command
   cmd="restic backup"
@@ -350,9 +354,6 @@ if [ "$run_backup" == "yes" ]; then
       fatal "Restic backup failed."
     fi
   fi
-
-  # set bash orginal globbing behavior
-  set +f
 
   debug "Unsetting variables"
   unset cmd_options
@@ -383,6 +384,10 @@ if [[ "$run_forget" == "yes" ]]; then
   getconf group_by
   getconf dry_run
   getconf prune
+
+  set -o noglob
+  SAVEIFS=$IFS
+  IFS=$(echo -en "\n\b")
 
   [ -n "$keep_last" ] && \
     cmd_options+="--keep-last $keep_last "
@@ -428,6 +433,9 @@ if [[ "$run_forget" == "yes" ]]; then
 
   [ -n "$prune" ] && \
     cmd_options+="--prune "
+
+  IFS=$SAVEIFS
+  set +o noglob
 
   # format command
   cmd="restic forget"
