@@ -180,11 +180,13 @@ if [ "$packages" == "yes" ]; then
       $packagemgr $packagemgroptions > $packagesfile || fatal "can not save $packagemgr info to $packagesfile"
       set +o noglob
    fi
-   if [ -z "$debconfgetselections" ]; then
-      warning "can't find debconf-get-selections, skipping package selection states. You might want to install the debconf-utils package."
-   else
-      debug "$debconfgetselections > $selectionsfile"
-      $debconfgetselections > $selectionsfile || fatal "can not save $debconfgetselections info to $selectionsfile"
+   if [ "$os" = "debian" ]; then
+      if [ -z "$debconfgetselections" ]; then
+         warning "can't find debconf-get-selections, skipping package selection states. You might want to install the debconf-utils package."
+      else
+         debug "$debconfgetselections > $selectionsfile"
+         $debconfgetselections > $selectionsfile || fatal "can not save $debconfgetselections info to $selectionsfile"
+      fi
    fi
 fi
 
