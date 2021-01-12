@@ -375,8 +375,8 @@ function process_action() {
                [ $debug ] && colorize "$a"
             done
          )
-         retcode=$?
-         # ^^^^^^^^ we have a problem! we can't grab the return code "$?". grrr.
+         retcode=${PIPESTATUS[0]}
+         debug "handler returned exit code $retcode"
          echo_debug_msg=0
 
       else
@@ -468,10 +468,9 @@ while [ $# -ge 1 ]; do
          ;;
       *)
          debug=1
-         echo "Unknown option $1"
-         fatal "Unknown option $1"
+         error "Unknown option $1"
          usage
-         exit
+         exit 3
          ;;
    esac
    shift
@@ -554,7 +553,7 @@ fi
 
 if [ "$UID" != "0" ]; then
    echo "`basename $0` can only be run as root"
-   exit 1
+   exit 3
 fi
 
 ## Process each configuration file
@@ -648,3 +647,11 @@ if [ -n "$reporthost" ]; then
    debug "send $logfile to $reportuser@$reporthost:$reportdirectory"
    rsync -qt $logfile $reportuser@$reporthost:$reportdirectory
 fi
+
+# return exit code
+[ $halts == 0 ] || exit 2
+[ $fatals == 0 ] || exit 2
+[ $errors == 0 ] || exit 1
+[ "$reportwarning" == "yes" -a $warnings != 0 ] && exit 1
+
+exit 0
