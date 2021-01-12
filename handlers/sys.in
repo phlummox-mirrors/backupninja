@@ -278,6 +278,10 @@ else
    fi
 fi
 
+STATUS="Getting EFI variables information:"
+catifexec "/bin/efibootmgr"
+catifexec "/usr/sbin/efibootmgr"
+
 STATUS="Getting bootloader information:"
 catifexec "/bin/ls" "-alR /boot"
 
