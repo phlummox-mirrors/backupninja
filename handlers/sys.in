@@ -203,11 +203,14 @@ DASHES="-----------------------------------------------------------------"
 
 cat /dev/null > $sysreportfile || fatal "can not write to $sysreportfile"
 
-
-catiffile () {
+catstatus () {
    echo $HASHES >> $sysreportfile
    echo "# $STATUS" >> $sysreportfile
    echo $HASHES >> $sysreportfile
+}
+
+catiffile () {
+   catstatus
    if [ -f $1 ]; then
       echo "file: $1" >> $sysreportfile
       echo $DASHES >> $sysreportfile
@@ -226,9 +229,7 @@ catiffile () {
 
 catifexec () {
    if [ -x $1 ]; then
-      echo $HASHES >> $sysreportfile
-      echo "# $STATUS" >> $sysreportfile
-      echo $HASHES >> $sysreportfile
+      catstatus
       $*  >> $sysreportfile 2>&1 || info "executing of $1 failed"
    fi
 }
@@ -252,24 +253,29 @@ catifexec "/usr/bin/free"
 STATUS="Checking free disk space:"
 catifexec "/bin/df" "-al --exclude-type=tmpfs"
 
-STATUS="Collecting what services run at what run level:"
-if [ $os = "redhat" ]; then
-   catifexec "/sbin/chkconfig" "--list"
+if [ -d /run/systemd/system ]; then
+   STATUS="Collecting information about systemd units"
+   catifexec "/usr/bin/systemctl" "list-units --all"
+   STATUS="Collecting information about systemd timers"
+   catifexec "/usr/bin/systemctl" "list-timers --all"
+else
    STATUS="Collecting information about /etc/rc.d:"
-   catiffile "/bin/ls /etc/rc.d/rc*.d/"
-
-elif [ $os = "debian" ]; then
-   for level in 0 1 2 3 4 5 6 S; do
-      echo "Level: $level" >> $sysreportfile
-      for f in /etc/rc${level}.d/*; do
-         # Remove /etc/Knn or Snn from beginning
-         ff=$(echo $f | @SED@ 's_/etc/rc..d/[KS][0-9][0-9]__')
-         if [ $f != $ff ]; then
-            echo $ff >> $sysreportfile
-         fi
+   if [ -x /usr/sbin/chkconfig ]; then
+      catifexec "/usr/sbin/chkconfig" "--list"
+   else
+      catstatus
+      for level in 0 1 2 3 4 5 6 S; do
+         echo "Level: $level" >> $sysreportfile
+         for f in /etc/rc${level}.d/*; do
+            # Remove /etc/Knn or Snn from beginning
+            ff=$(echo $f | @SED@ 's_/etc/rc..d/[KS][0-9][0-9]__')
+            if [ $f != $ff ]; then
+               echo $ff >> $sysreportfile
+            fi
+         done
+         echo "" >> $sysreportfile
       done
-      echo "" >> $sysreportfile
-   done
+   fi
 fi
 
 STATUS="Getting bootloader information:"
