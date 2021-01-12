@@ -234,22 +234,27 @@ fi
 
 if [ "$need_init" = "yes" ]; then
 
-  info "Initializing repository at $repository"
-
   cmd="restic init"
   execstr="${cmd} ${cmd_global_options//$'\n'}"
 
   debug "executing restic init"
   debug "$execstr"
-  output=$($execstr 2>&1)
-  ret=$?
 
-  if [ $ret -eq 0 ]; then
-    warning $output
-    warning "Repository has been initialized."
+  if [ $test -eq 1 ]; then
+    info "Test mode enabled, skipping restic init."
   else
-    error $output
-    fatal "Unable to initialize repository, aborting!"
+    info "Initializing repository at $repository"
+
+    output=$($execstr 2>&1)
+    ret=$?
+
+    if [ $ret -eq 0 ]; then
+      warning $output
+      warning "Repository has been initialized."
+    else
+      error $output
+      fatal "Unable to initialize repository, aborting!"
+    fi
   fi
 
 fi
