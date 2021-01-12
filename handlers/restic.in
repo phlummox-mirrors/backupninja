@@ -79,58 +79,6 @@ function export_debug {
   debug "$1=${!1}"
 }
 
-function test_sftp_connection() {
-  local remote
-  local sftpport
-  local output
-  local ret
-
-  remote=$1
-
-  if echo "$remote" | grep -q ':[0-9]\+$'; then
-    sftpport="-P $(echo $remote | @AWK@ -F ':' '{print $2}') "
-    remote=$(echo $remote | @AWK@ -F ':' '{print $1}')
-  fi
-
-  debug "echo | sftp -o PasswordAuthentication=no ${sftpport}${remote}"
-  output=$(echo | sftp -o PasswordAuthentication=no ${sftpport}${remote})
-  ret=$?
-
-  if [ $ret -eq 0 ]; then
-    debug "Connection test to SFTP backend ${remote} succeeded."
-  else
-    debug $output
-    fatal "Failed connecting to SFTP backend at ${remote}."
-  fi
-}
-
-function test_rest_connection() {
-  local remote
-  local output
-  local ret
-
-  local remote=$1
-
-  if [ ! -x $(which wget) ]; then
-    error "Unable to test REST connection, wget executable not found!"
-    return
-  fi
-
-  debug "wget --tries=1 --method=HEAD \"${remote}/config\""
-  output=$(wget --tries=1 --method=HEAD "${remote}/config")
-  ret=$?
-
-  if [ $ret -eq 0 ]; then
-    debug "Connection test to REST backend at ${remote} succeeded."
-  elif [ $ret -eq 8 ]; then
-    debug $output
-    fatal "REST backend at ${remote} returned an error, repository may not be created."
-  else
-    debug $output
-    fatal "Failed connecting to REST backend at ${remote}."
-  fi
-}
-
 ### PRE-COMMANDS ##############################################################
 
 [ -n "$nicelevel" ] && \
@@ -190,38 +138,6 @@ function test_rest_connection() {
   cmd_global_options+="--tls-client-cert $tls_client_cert "
 
 ### REPOSITORY ################################################################
-
-# SFTP repository
-if [ "$(echo "$repository" | @AWK@ -F ':' '{print $1}')" == "sftp" ]; then
-
-  # connection test
-  if [ "$testconnect" = "yes" ] || [ "$test" -eq 1 ]; then
-
-    if echo "$repository" | grep -q '^sftp://'; then
-      remote=$(echo "$repository" | @AWK@ -F '//' '{print $2}')
-    elif echo "$repository" | grep -q '^sftp:'; then
-      remote=$(echo "$repository" | @AWK@ -F ':' '{print $2}')
-    fi
-
-    [ -n "$remote" ] || fatal "Unable to parse SFTP repository URL ${repository}."
-    test_sftp_connection $remote
-
-  fi
-
-fi
-
-# REST Server repository
-if [ "$(echo "$repository" | @AWK@ -F ':' '{print $1}')" == "rest" ]; then
-
-  # connection test
-  if [ "$testconnect" = "yes" ] || [ "$test" -eq 1 ]; then
-
-    remote="${repository#rest:}"
-    test_rest_connection $remote
-
-  fi
-
-fi
 
 # Amazon S3 repository
 if [ "$(echo "$repository" | @AWK@ -F ':' '{print $1}')" == "s3" ]; then
@@ -284,6 +200,30 @@ if [ "$(echo "$repository" | @AWK@ -F ':' '{print $1}')" == "gs" ]; then
 
   export_debug GOOGLE_PROJECT_ID "$google_project_id"
   export_debug GOOGLE_APPLICATION_CREDENTIALS "$google_application_credentials"
+
+fi
+
+### TEST #######################################################################
+
+if [ "$testconnect" = "yes" ] || [ "$test" -eq 1 ]; then
+
+  info "Attempting to connect to repository at ${repository}"
+
+  cmd="restic snapshots"
+  execstr="${cmd} ${cmd_global_options//$'\n'}"
+
+  debug "executing restic snapshots"
+  debug "$execstr"
+  output=$($execstr 2>&1)
+  ret=$?
+
+  if [ $ret -eq 0 ]; then
+    debug $output
+    info "Connected successfully."
+  else
+    error $output
+    fatal "The specified repository is absent or unusable!"
+  fi
 
 fi
 
