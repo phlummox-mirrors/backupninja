@@ -319,7 +319,7 @@ if [ -f /etc/cluster.conf -o -f /etc/cluster.xml ] ; then
 fi
 
 STATUS="Gathering sysctl information (sysctl -a):"
-catiffile "sysctl -a 2>/dev/null"
+catifexec "/sbin/sysctl" "-a"
 STATUS="Gathering sysctl information (/etc/sysctl.conf):"
 catiffile "/etc/sysctl.conf"
 
