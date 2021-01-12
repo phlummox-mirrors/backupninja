@@ -265,8 +265,8 @@ if [ "$run_backup" == "yes" ]; then
 
   setsection backup
 
-  getconf include "/"
-  getconf exclude "/dev /lost+found /media /mnt /proc /run /sys /tmp /var/cache /var/lock /var/spool /var/run /var/tmp"
+  getconf include
+  getconf exclude
   getconf exclude_caches
   getconf exclude_file
   getconf exclude_if_present
