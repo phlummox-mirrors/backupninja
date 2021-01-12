@@ -111,6 +111,18 @@ root@srchost# ssh-copy-id \-i /root/.ssh/id_dsa.pub backup@desthost
 .TP
 Now, you should be able to ssh from user 'root' on srchost to user 'backup' on desthost without specifying a password. When prompted for a password by ssh-keygen, just leave it blank by hitting return. The "wizard" \fBninjahelper(1)\fP will walk you through these steps.
 
+.SH EXIT VALUES
+.PD 0
+\fB0\fP        success
+.br
+\fB1\fP        errors or warnings emitted during backup
+.br
+\fB2\fP        one or more backup actions failed
+.br
+\fB3\fP        syntax or usage error
+.br
+.PD
+
 .SH FILES
 .PD 0
 \fB/usr/sbin/backupninja\fP        main script
