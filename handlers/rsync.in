@@ -141,7 +141,6 @@ function eval_config {
   if [ "$from" == "remote" ]; then
     getconf testconnect no
     getconf protocol ssh
-    getconf ssh ssh
     getconf host
 
     if [ "$protocol" == "ssh" ]; then
@@ -183,7 +182,6 @@ function eval_config {
   if [ "$dest" == "remote" ]; then
     getconf testconnect no
     getconf protocol ssh
-    getconf ssh ssh
     getconf host
 
     if [ "$protocol" == "ssh" ]; then

@@ -119,9 +119,6 @@ include = /var
 exclude = exclude_folder1
 exclude = exclude_folder2
 
-# ssh command line (remote only)
-#ssh = ssh
-
 # ssh or rsync (remote source only)
 #protocol = ssh
 
@@ -166,9 +163,6 @@ exclude = exclude_folder2
 
 #  when "yes", test the connection for a remote source before backup
 #testconnect = no
-
-# ssh command line (remote dest only)
-#ssh = ssh
 
 # ssh or rsync (remote dest only)
 #protocol = ssh
