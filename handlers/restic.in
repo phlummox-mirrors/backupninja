@@ -8,7 +8,6 @@
 
 setsection general
 
-getconf testconnect yes
 getconf nicelevel
 getconf ionicelevel
 
@@ -205,24 +204,52 @@ fi
 
 ### TEST #######################################################################
 
-if [ "$testconnect" = "yes" ] || [ "$test" -eq 1 ]; then
+info "Attempting to connect to repository at ${repository}"
 
-  info "Attempting to connect to repository at ${repository}"
+cmd="restic snapshots"
+execstr="${cmd} ${cmd_global_options//$'\n'}"
 
-  cmd="restic snapshots"
+debug "executing restic snapshots"
+debug "$execstr"
+output=$($execstr 2>&1)
+ret=$?
+
+if [ $ret -eq 0 ]; then
+  debug $output
+  info "Connected successfully."
+else
+  setsection backup
+  getconf init yes
+  if [ "$init" = "yes" ]; then
+    debug $output
+    info "Unable to find a repository at ${repository}, will attempt to create one."
+    need_init="yes"
+  else
+    error $output
+    fatal "The specified repository is absent or unusable!"
+  fi
+fi
+
+### INIT #######################################################################
+
+if [ "$need_init" = "yes" ]; then
+
+  info "Initializing repository at $repository"
+
+  cmd="restic init"
   execstr="${cmd} ${cmd_global_options//$'\n'}"
 
-  debug "executing restic snapshots"
+  debug "executing restic init"
   debug "$execstr"
   output=$($execstr 2>&1)
   ret=$?
 
   if [ $ret -eq 0 ]; then
-    debug $output
-    info "Connected successfully."
+    warning $output
+    warning "Repository has been initialized."
   else
     error $output
-    fatal "The specified repository is absent or unusable!"
+    fatal "Unable to initialize repository, aborting!"
   fi
 
 fi

@@ -86,12 +86,6 @@ password = secret
 ## Default:
 # ionicelevel =
 
-## Check if remote host is alive before attempting backup. Supports SFTP and REST
-## backends at the moment. Set to no to skip this test. [yes/no]
-##
-## Default:
-# testconnect = yes
-
 [s3]
 
 #aws_access_key_id =
@@ -133,6 +127,9 @@ password = secret
 #google_application_credentials =
 
 [backup]
+
+# Initialize the repository if it doesn't exist [yes/no]
+#init = yes
 
 # Files adn directories to backup (can be specified multiple times) [path]
 #include = /
