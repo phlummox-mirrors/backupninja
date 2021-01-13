@@ -141,6 +141,10 @@ remote_command() {
     ssh "${BN_REMOTEUSER}@${BN_REMOTEHOST}" "$1"
 }
 
+remote_background_command() {
+    ssh -f "${BN_REMOTEUSER}@${BN_REMOTEHOST}" "$1"
+}
+
 # remove backup test artifacts
 cleanup_backups() {
     for c in "$@"; do

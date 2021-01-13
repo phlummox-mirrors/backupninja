@@ -27,6 +27,7 @@ Vagrant.configure("2") do |config|
       systemctl reload sshd
       echo -e "vagrant\nvagrant" | passwd vagrant
       chown vagrant: /var/backups
+      wget -q https://github.com/restic/rest-server/releases/download/v0.10.0/rest-server_0.10.0_linux_amd64.tar.gz -O - | tar -xz -C /usr/local/bin --strip-components=1
     SHELL
   end
 

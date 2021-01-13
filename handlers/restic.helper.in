@@ -1,0 +1,177 @@
+#!/usr/bin/env bash
+# -*- mode: sh; sh-basic-offset: 2; indent-tabs-mode: nil; -*-
+# vim: set filetype=sh sw=2 sts=2 expandtab autoindent:
+#
+# restic helper for backupninja
+#
+
+HELPERS="$HELPERS restic:fast_secure_efficient_backup"
+
+declare -a restic_includes
+declare -a restic_excludes
+
+# FUNCTIONS
+
+function do_restic_repository() {
+  REPLY=
+  while [ -z "$REPLY" -o -z "$restic_repository" ]; do
+    inputBox "$restic_title - Repository" "Enter Repository (eg. rclone:remote:bucket):" "$restic_repository"
+    [ $? = 0 ] || return 1
+    restic_repository="$REPLY"
+  done
+}
+
+function do_restic_password_file() {
+  REPLY=
+  while [ -z "$REPLY" -o -z "$restic_password_file" ]; do
+    inputBox "$restic_title - Password File" "Enter password-file (eg. /etc/restic.passwd) containing repository password:" "$restic_password_file"
+    [ $? = 0 ] || return 1
+    restic_password_file="$REPLY"
+  done
+}
+
+function do_restic_general() {
+  # set restic_repository
+  do_restic_repository ; [ $? = 0 ] || return 1
+
+  # set restic_password_file
+  do_restic_password_file ; [ $? = 0 ] || return 1
+
+  _gen_done="(DONE)"
+  setDefault back
+}
+
+function do_restic_includes() {
+   set -o noglob
+   # choose the files to backup
+   REPLY=
+   while [ -z "$REPLY" ]; do
+      formBegin "$restic_title - host system: includes"
+         for ((i=0; i < ${#restic_includes[@]} ; i++)); do
+            formItem include ${restic_includes[$i]}
+         done
+         formItem include
+         formItem include
+         formItem include
+         formItem include
+         formItem include
+         formItem include
+         formItem include
+         formItem include
+      formDisplay
+      [ $? = 0 ] || return
+      unset restic_includes
+      restic_includes=($REPLY)
+   done
+   set +o noglob
+}
+
+function do_restic_excludes() {
+   set -o noglob
+   formBegin "$restic_title: host system: excludes"
+     for ((i=0; i < ${#restic_excludes[@]} ; i++))
+     do
+       formItem exclude ${restic_excludes[$i]}
+     done
+     formItem exclude
+     formItem exclude
+     formItem exclude
+     formItem exclude
+     formItem exclude
+     formItem exclude
+     formItem exclude
+     formItem exclude
+   formDisplay
+   [ $? = 0 ] || return
+   unset restic_excludes
+   restic_excludes=($REPLY)
+   set +o noglob
+}
+
+function do_restic_backup() {
+  do_restic_includes
+  [ $? = 0 ] || return 1
+
+  do_restic_excludes
+  [ $? = 0 ] || return 1
+
+  _back_done="(DONE)"
+  setDefault finish
+}
+
+
+function do_restic_finish() {
+  get_next_filename $configdirectory/90.restic
+
+  cat > $next_filename <<EOF
+## for more options see
+## - example.restic
+## - $restic_docs
+
+# Minimal output
+[general]
+run_backup = yes
+EOF
+
+  echo "repository = $restic_repository" >> $next_filename
+  echo "password_file = $restic_password_file" >> $next_filename
+
+  cat >> $next_filename <<EOF
+
+[backup]
+EOF
+
+   ## includes ##
+   set -o noglob
+   for ((i=0; i < ${#restic_includes[@]} ; i++)); do
+      echo "include = ${restic_includes[$i]}" >> $next_filename
+   done
+   set +o noglob
+
+   ## excludes ##
+   set -o noglob
+   for ((i=0; i < ${#restic_excludes[@]} ; i++)); do
+     echo exclude = ${restic_excludes[$i]} >> $next_filename
+   done
+   set +o noglob
+
+  chmod 600 $next_filename
+}
+
+function restic_main_menu() {
+  while true; do
+    genitem="General Restic settings $_gen_done"
+    backitem="Backup settings $_back_done"
+    menuBox "$restic_title" "choose a step:" \
+      gen "$genitem" \
+      back "$backitem" \
+      finish "finish and create config file"
+    [ $? = 0 ] || return
+    result="$REPLY"
+    case "$result" in
+      "gen") do_restic_general;;
+      "back") do_restic_backup;;
+      "finish")
+        if [[ "$_gen_done$_back_done" != "(DONE)(DONE)" ]]; then
+          msgBox "$restic_title" "You cannot create the config file until all steps are completed."
+        else
+          do_restic_finish
+          return
+        fi
+        ;;
+    esac
+  done
+}
+
+function restic_wizard {
+  require_packages rclone
+
+  # global variables
+  restic_title="restic action wizard"
+  restic_docs="https://restic.readthedocs.io/en/latest"
+
+  _gen_done=
+  _back_done=
+
+  restic_main_menu
+}

@@ -104,6 +104,7 @@ file in `/etc/backup.d` according to the file's suffix:
 
  - `.sh`: run this file as a shell script.
  - `.rdiff`: filesystem backup (using rdiff-backup)
+ - `.restic`: filesystem backup (using restic)
  - `.dup`: filesystem backup (using duplicity)
  - `.borg`: filesystem backup (using borg)
  - `.mysql`: backup mysql databases

@@ -15,6 +15,8 @@ version 1.1.0 -- June 29, 2018
 	 . Add initial support for the borgbackup program
 	   Thanks to Ben <ben@wainei.net> and Thomas Preissler
 	   <thomas@preissler.co.uk> for contributing patches
+	restic:
+	 . Add support for restic.
 	dup:
 	 · Fix symmetric encryption
 	   Thanks to Matthijs Wensveen <matthijs.wensveen@gmail.com> for

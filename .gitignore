@@ -35,6 +35,8 @@ handlers/pgsql
 handlers/pgsql.helper
 handlers/rdiff
 handlers/rdiff.helper
+handlers/restic
+handlers/restic.helper
 handlers/rsync
 handlers/sh
 handlers/svn
