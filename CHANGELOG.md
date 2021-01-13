@@ -219,7 +219,7 @@ The "happy birthdays" release!
 
 - Make it clear what lockfile could not be acquired, if any.
 
-# [1.0-rc1] - 2012-05-15
+## [1.0-rc1] - 2012-05-15
 
 ### handler changes
 
