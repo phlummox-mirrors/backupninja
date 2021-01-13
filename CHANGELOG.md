@@ -11,9 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### backupninja changes
 
-- Add validation check for when parameter. Thanks to ulrich
+- Add validation check for when parameter. (#640) Thanks to ulrich
   <ulrich@habmalnefrage.de> for the patch.
-- Quote output strings passed to logging functions.
+- Quote output strings passed to logging functions (#11278).
 - Ignore files in /etc/backup.d that lack suffix. Thanks to David Gasaway
   <dave@gasaway.org> for the patch.
 - Add Vagrantfile to help with testing/release process.
@@ -33,15 +33,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### dup
 
-- Fix symmetric encryption. Thanks to Matthijs Wensveen
+- Fix symmetric encryption. (#11274) Thanks to Matthijs Wensveen
   <matthijs.wensveen@gmail.com> for the patch.
-- Bail if archive dir doesn't exist. Thanks to Hugh Nowlan <nosmo@nosmo.me> for
-  the patch.
+- Bail if archive dir doesn't exist. (#11286) Thanks to Hugh Nowlan
+  <nosmo@nosmo.me> for the patch.
 
 #### sys
 
-- Use lsblk instead of sfdisk to get a list of block devices. Thanks to Romain
-  Dessort <romain@univers-libre.net> for the patch.
+- Use lsblk instead of sfdisk to get a list of block devices. (#11273)
+  Thanks to Romain Dessort <romain@univers-libre.net> for the patch.
 - Avoid looking for partitions on zram devices. Thanks to Glandos
   <bugs-0xacab@antipoul.fr> for the patch.
 - Support extracting LUKS headers from partitions. Thanks to Lyz
