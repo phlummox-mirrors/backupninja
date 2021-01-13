@@ -211,7 +211,7 @@ execstr="${cmd} ${cmd_global_options//$'\n'}"
 
 debug "executing restic snapshots"
 debug "$execstr"
-output=$($execstr 2>&1)
+output=$(eval $execstr 2>&1)
 ret=$?
 
 if [ $ret -eq 0 ]; then
@@ -245,7 +245,7 @@ if [ "$need_init" = "yes" ]; then
   else
     info "Initializing repository at $repository"
 
-    output=$($execstr 2>&1)
+    output=$(eval $execstr 2>&1)
     ret=$?
 
     if [ $ret -eq 0 ]; then
@@ -344,7 +344,7 @@ if [ "$run_backup" == "yes" ]; then
     info "Test mode enabled, skipping restic backup."
   else
     info "Creating new backup snapshot."
-    output=$($execstr 2>&1)
+    output=$(eval $execstr 2>&1)
     ret=$?
     if [ $ret -eq 0 ]; then
       debug $output
@@ -450,7 +450,7 @@ if [[ "$run_forget" == "yes" ]]; then
     info "Test mode enabled, skipping restic forget."
   else
     info "Removing old snapshots based on defined retention policy."
-    output=$($execstr 2>&1)
+    output=$(eval $execstr 2>&1)
     ret=$?
     if [ $ret -eq 0 ]; then
       debug $output
@@ -486,7 +486,7 @@ if [ "$run_prune" == "yes" ]; then
     info "Test mode enabled, skipping restic prune."
   else
     info "Removing unreferenced data from repository."
-    output=$($execstr 2>&1)
+    output=$(eval $execstr 2>&1)
     ret=$?
     if [ $ret -eq 0 ]; then
       debug $output
@@ -540,7 +540,7 @@ if [ "$run_check" == "yes" ]; then
     info "Test mode enabled, skipping restic check."
   else
     info "Checking repository integrity and consistency."
-    output=$($execstr 2>&1)
+    output=$(eval $execstr 2>&1)
     ret=$?
     if [ $ret -eq 0 ]; then
       debug $output
