@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [tests] Add a testsuite
+- [core] Add `--version` (`-V`) command-line option
+- [borg] New config options: `cache_directory`, `sshoptions` (#11310),
+  `ignore_missing` and `port`
+- [restic] Introduce new handler for the restic backup program
+- [sys] Add SystemD and EFI infos to sytem report (#11325)
+- [all] Added new config setting `ionicelevel`
+
+### Changed
+
+- [core] Implement non-zero exit codes for main process (#8279)
+- [borg] Emit warning if borg returns exit code 1 instead of fail
+- [dup] Allow `bandwidthlimit` with `desturl`
+- [rsync] Change default ssh key file to RSA in `id_file` (#11315)
+- [project] Adopt Keep a Changelog format and convert old ChangeLog to markdown
+- [project] Moved project group from RiseupLabs to Liberate (#11314)
+
+### Removed
+
+- [core] Support for vservers support has been completely removed
+- [rsync] Removed unused config parameter `ssh` (#4379)
+
+### Fixed
+
+- [core] Fix issue with zero-padded integers in when setting (#9397)
+- [core] Fix incorrect warning related to day component in when setting
+- [borg] Fix connection test when empty remote directory exists
+- [borg] Properly quote create_options setting (#11304)
+- [borg] Raise fatal error if includes are missing
+- [dup] Test ssh connection when test mode enabled
+- [mysql] Fix helper writing incomplete config file (#11272)
+- [rsync] Fix initial directory creation in `mirror` and remote `short` modes
+- [sys] Fix LUKS version 2 header backup (#11316)
+- [sys] Fix dumping non-existent partition tables (#11293)
+- [sys] Fix error in rc.d info gathering on redhat/centos (##11294)
+- [sys] Fix error in sysctl info gathering
+
 ## [1.1.0] - 2018-06-29
 
 ### backupninja changes
