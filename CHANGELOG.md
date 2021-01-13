@@ -58,25 +58,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### dup
 
 - For local backups, check that the destination directory exists.  Thanks to
-  ulrich for the preliminary patch. (Redmine#4049)
+  ulrich for the preliminary patch. (#4049)
 - Gracefully handle legacy spaces between -o and IdentityFile.
 - Don't remove useful signature files with --extra-clean, on duplicity versions
   that have a sane handling of the cache.  Thanks to Alexander Mette
-  <mail@amette.eu> for the patch!  (Closes: Redmine#6357)
-- Fix buggy version comparison. (Redmine#6746)
+  <mail@amette.eu> for the patch!  (Closes: #6357)
+- Fix buggy version comparison. (#6746)
 - Support using a different passphrase for the signing key from the one used
-  for the encryption key (Closes: #726072).  Thanks to Dominik George
+  for the encryption key (Closes: DEBBUG-726072).  Thanks to Dominik George
       <nik@naturalnet.de> for the patch!
-- Run duplicity in a C locales environment (Closes: #736280).  Thanks to
+- Run duplicity in a C locales environment (Closes: DEBBUG-736280).  Thanks to
   Jonathan Dupart <jonathan@dupart.org> for the report, and the initial patch!
-- Fix handling of Dropbox access token (Closes: GitLab#11260).
+- Fix handling of Dropbox access token (Closes: #11260).
 
 #### mysql
 
 - Make "nodata" option compatible with compress=no.
-- Fix non-qualified table name extraction. (Closes: Redmine#4373)
+- Fix non-qualified table name extraction. (Closes: #4373)
 - Skip dumping information and performance\_schema databasase.  (Closes:
-  GitLab#11148)
+  #11148)
 
 #### rdiff
 
@@ -85,12 +85,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### rsync
 
-- Solve quoting issue with "su". (Closes: #683731, Redmine#4019)
+- Solve quoting issue with "su". (Closes: DEBBUG-683731, #4019)
 - Update increment folder date to avoid ending up with contradictory
-  information. (Closes: Redmine#3929)
+  information. (Closes: #3929)
 - Force rsync handler run bash at the remote destination.  (Closes:
-  Redmine#3003)
-- Support running in test mode (Closes: Redmine#8196).  Thanks to shred for the
+  #3003)
+- Support running in test mode (Closes: #8196).  Thanks to shred for the
   initial patch.
 
 #### sys
@@ -99,11 +99,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Provide the ability to backup the MBR for every device found, and to backup
   the BIOS (if the flashrom program is installed, and the mainboard is
   supported).
-- Add suse to the list of supported OS (Redmine#7101).  Thanks to Christian
+- Add suse to the list of supported OS (#7101).  Thanks to Christian
   Prause <cprause@suse.com> for the patch.
 - Fix indentation. Thanks to Jools Wills <jools@oxfordinspire.co.uk> for the
-  patch. (Closes: Redmine#6802)
-- Exclude tmpfs filesystems from df output. (Closes: Debian#745818)
+  patch. (Closes: #6802)
+- Exclude tmpfs filesystems from df output. (Closes: DEBBUG-745818)
 
 #### tar
 
@@ -114,18 +114,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### rdiff
 
-- Don't give misleading information regarding required fields.  (Redmine#4410)
+- Don't give misleading information regarding required fields.  (#4410)
 - Support output\_as\_info.  Thanks to David Gasaway <dave@gasaway.org> for the
   patch!
 
 #### sys
 
-- Remove spurious quotes that broke the helper (Closes: Redmine#6803).  Thanks
+- Remove spurious quotes that broke the helper (Closes: #6803).  Thanks
   to Jools Wills <jools@oxfordinspire.co.uk> for the patch.
 
 ### backupninja changes
 
-- Indentation fixes, thanks to exobuzz. (Redmine#6726)
+- Indentation fixes, thanks to exobuzz. (#6726)
 - Ignore jobs whose filename ends with "~".  Thanks to Mark Janssen
   <mark@sig-io.nl> for the patch.
 
@@ -144,7 +144,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   files.
 - INSTALL.md: recommend using packages on Debian and derivatives.
 - bandwidthlimit for the dup handler needs to be given in KB/s, and not (as
-  wrongly advertised previously) in Kbit/s.  (Closes: GitLab#7603)
+  wrongly advertised previously) in Kbit/s.  (Closes: #7603)
 
 ## [1.0.1] - 2012-06-29
 
@@ -152,7 +152,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### rsync
 
-- Issue warnings, not fatal errors, on non-fatal rsync errors.  (Redmine#3966)
+- Issue warnings, not fatal errors, on non-fatal rsync errors.  (#3966)
 
 ## [1.0] - 2012-06-15
 
@@ -163,14 +163,14 @@ The "happy birthdays" release!
 #### mysql
 
 - Use --skip-events when backing up the performance_schema database.  (Closes:
-  #673572)
+  DEBBUG-673572)
 
 #### rsync
 
 - Generate excludes command-line snippet the same way as the duplicity handler
   does.
 - Run rsync command-line through a shell, so that single-quotes around excludes
-  are interpreted (Closes: #677410)
+  are interpreted (Closes: DEBBUG-677410)
 
 #### sys
 
@@ -190,9 +190,9 @@ The "happy birthdays" release!
 - Add support for RackSpace's CloudFiles.  Thanks to Yuval Kogman
   <nothingmuch@woobling.org> for the patch.
 - Adapt for new duplicity SSH backend.  Support bandwidthlimit with new
-  duplicity, using trickle.  (Closes: #657201)
+  duplicity, using trickle.  (Closes: DEBBUG-657201)
 - Report failure output at error loglevel so that it is emailed (Closes:
-  #536858)
+  DEBBUG-536858)
 
 #### maildir
 
@@ -200,11 +200,11 @@ The "happy birthdays" release!
 
 #### mysql
 
-- Don't attempt to dump performance_schema database (Redmine#3741).
+- Don't attempt to dump performance_schema database (#3741).
 
 #### pgsql
 
-- Don't produce empty uncompressed backups (Redmine#3820).
+- Don't produce empty uncompressed backups (#3820).
 
 #### rdiff-backup
 
@@ -212,27 +212,27 @@ The "happy birthdays" release!
 
 #### rysnc
 
-- Fix numericids option (Redmine#3691).
-- Mangle $rsync_options just afterwards (Redmine#3702, Redmine#3001).
+- Fix numericids option (#3691).
+- Mangle $rsync_options just afterwards (#3702, #3001).
 - Fix metadata rotation.
 - Allow disabling rotation or setting 2 days as minimum for backup increments
-  in rsync short format (Redmine#2107).
-- Abort on rsync error (Redmine#3692).
-- Cleanup orphaned metadata (Redmine#3727).
+  in rsync short format (#2107).
+- Abort on rsync error (#3692).
+- Cleanup orphaned metadata (#3727).
 - Use the backup start time and not the time the backup was finished.  (Closes:
-  #654192).
+  DEBBUG-654192).
 - Use 'debug', 'fatal' and 'warning' functions instead of regular echo and exit
-  (Redmine#3840, Redmine#3721).
-- Quoting $starttime (Redmine#3868).
+  (#3840, #3721).
+- Quoting $starttime (#3868).
 - Validate created date on long_rotation to avoid too many arguments at
-  comparison (Redmine#3868).
+  comparison (#3868).
 - Quoting $exclude and $excludes and avoiding a for loop on $exclude to not
-  expand wildcards in beforehand (Redmine#3882).
-- Quote excludes (Redmine#3882).
-- Changing remaining 'exit' to 'fatal' at rsync handler (Redmine#3721).
-- Removing duplicated locking support (Redmine#3838).
-- Documenting rotation parameters at example.rsync (Redmine#3891).
-- Ensure that a non-zero rsync exit status is caught (Redmine#3892).
+  expand wildcards in beforehand (#3882).
+- Quote excludes (#3882).
+- Changing remaining 'exit' to 'fatal' at rsync handler (#3721).
+- Removing duplicated locking support (#3838).
+- Documenting rotation parameters at example.rsync (#3891).
+- Ensure that a non-zero rsync exit status is caught (#3892).
 
 #### build system changes
 
@@ -257,10 +257,10 @@ The "happy birthdays" release!
 
 #### dup
 
-- Cleanup: stop supporting duplicity < 0.6.01 (Redmine#2538).
+- Cleanup: stop supporting duplicity < 0.6.01 (#2538).
 - Fix incorrect duplicity version check for keepincroffulls.  Thanks to Olivier
-  Berger <oberger@ouvaton.org> for the patch.  (Closes Redmine bug #3443)
-  (Closes: #641120)
+  Berger <oberger@ouvaton.org> for the patch.  (Closes #3443)
+  (Closes: DEBBUG-641120)
 
 #### ldap
 
@@ -270,12 +270,12 @@ The "happy birthdays" release!
 
 #### rsync
 
-- Fixing $rsync_options output when rsync is local (Closes Redmine bug #3001)
-  (Closes: #639545)
+- Fixing $rsync_options output when rsync is local (Closes #3001)
+  (Closes: DEBBUG-639545)
 
 #### sh
 
-- Allow 'when = XXX' with spaces (Redmine#2769).  Thanks to aihtdikh for the
+- Allow 'when = XXX' with spaces (#2769).  Thanks to aihtdikh for the
   patch.
 
 #### sys
@@ -287,7 +287,7 @@ The "happy birthdays" release!
 #### rdiff
 
 - Fix infinite loop when version inconsistency is detected.  Thanks to Chris
-  Lamb <lamby@debian.org> for the patch.  (Closes: #639547)
+  Lamb <lamby@debian.org> for the patch.  (Closes: DEBBUG-639547)
 
 ## [0.9.9] - 2011-05-15
 
@@ -295,13 +295,13 @@ The "happy birthdays" release!
 
 - Use locking to avoid running concurrent instances of the same backup action.
   Thanks to Olivier Berger <oberger@ouvaton.org> for the patch.  (Closes:
-  #511300)
+  DEBBUG-511300)
 
 ### handler changes
 
 #### all handlers:
 
-- Stop using "local VAR" outside functions. (Closes: #530647)
+- Stop using "local VAR" outside functions. (Closes: DEBBUG-530647)
 
 #### dup
 
@@ -310,8 +310,8 @@ The "happy birthdays" release!
 - Remove support for duplicity < 0.4.4. Even etch-backports has a newer one.
 - Now support remove-all-inc-but-n-full command for duplicity >= 0.9.10 to
   allow removal of increments for older full backups.  Thanks to Olivier Berger
-  <oberger@ouvaton.org> for the patch.  (Closes Redmine bug #2492) (Closes:
-  #603478)
+  <oberger@ouvaton.org> for the patch.  (Closes #2492) (Closes:
+  DEBBUG-603478)
 
 #### ldap
 
@@ -320,7 +320,7 @@ The "happy birthdays" release!
 #### mysql
 
 - Fix reliance on bash for pipefail.  Thanks to Sergio Talens-Oliag
-  <sto@debian.org> for the patch.  (Closes: #602374)
+  <sto@debian.org> for the patch.  (Closes: DEBBUG-602374)
 
 #### postgresql
 
@@ -337,25 +337,25 @@ The "happy birthdays" release!
 #### rsync
 
 - Fix long rotation.
-- Make units clearer (Closes Redmine bug #2737)
-- Do arithmetic using bash rather than bc (Closes: #603173)
+- Make units clearer (Closes #2737)
+- Do arithmetic using bash rather than bc (Closes: DEBBUG-603173)
 
 #### sys
 
-- Fix hwinfo (Closes: #625501)
+- Fix hwinfo (Closes: DEBBUG-625501)
 - Fix gathering of information about loaded modules: cut is in /usr/bin
   actually.
 
 #### tar
 
-- Install by default. (Closes Redmine bug #2907)
+- Install by default. (Closes #2907)
 
 ### helper changes
 
 #### dup
 
 - Fix separate signing key usecase. Thanks to Ian Beckwith for the patch.
-- Make units clearer (Closes Redmine bug #2737)
+- Make units clearer (Closes #2737)
 
 #### rdiff
 
@@ -363,7 +363,7 @@ The "happy birthdays" release!
 
 #### tar
 
-- Install by default. (Closes Redmine bug #2907)
+- Install by default. (Closes #2907)
 
 ### documentation changes
 
@@ -374,7 +374,7 @@ The "happy birthdays" release!
 ### backupninja changes
 
 - Do not error out when no job is configured. Thanks to Jordi Mallach
-  <jordi@debian.org> for the patch (Closes: #597684)
+  <jordi@debian.org> for the patch (Closes: DEBBUG-597684)
 
 ### handler changes
 
@@ -395,17 +395,17 @@ The "happy birthdays" release!
 
 #### sys
 
-- Only run mdadm if RAID devices actually exist (Closes: #572450)
+- Only run mdadm if RAID devices actually exist (Closes: DEBBUG-572450)
 
 #### dup
 
 - Now default to use --full-if-older-than; see the new "increments" option to
   opt-out or tweak the default (30D) delay between full backups. Thanks a lot
-  to Olivier Berger (Closes: #535996)
+  to Olivier Berger (Closes: DEBBUG-535996)
 - Use duplicity's --extra-clean option to get rid of unnecessary old cache
   files when cleaning up. This is enabled when using duplicity 0.6.01 or newer,
-  that depends on local caching (Closes: #572721)
-- Ignore anything but digits and "." when comparing versions (Closes: #578987)
+  that depends on local caching (Closes: DEBBUG-572721)
+- Ignore anything but digits and "." when comparing versions (Closes: DEBBUG-578987)
 - Put archive directory (cache) into /var/cache/backupninja/duplicity rather
   than the default /root/.cache/duplicity, unless the user has specified it
   (Closes: 580213)
@@ -415,7 +415,7 @@ The "happy birthdays" release!
 
 #### mysql
 
-- Don't lock tables in the information_schema database (Closes: #587011)
+- Don't lock tables in the information_schema database (Closes: DEBBUG-587011)
 - Fix code logic to make dbusername/dbpassword actually usable (Closes Redmine
   bug #2264)
 
@@ -429,7 +429,7 @@ The "happy birthdays" release!
 
 #### manpage
 
-- Fix typo in manpage (Closes: #583778)
+- Fix typo in manpage (Closes: DEBBUG-583778)
 
 #### ldap
 
@@ -441,21 +441,21 @@ The "happy birthdays" release!
 ### backupninja changes
 
 - fix bug in reportspace, thanks Dan Garthwaite
-- do not assume English locale when using date (Closes: #465837)
+- do not assume English locale when using date (Closes: DEBBUG-465837)
 - add 'when = manual' option, that can be used in the global config file or in
   a given backup action file. Thanks Tuomas Jormola for the preliminary patch
-  (Closes: #511299)
+  (Closes: DEBBUG-511299)
 - new reportinfo option: when set, messages sent by handlers with "info" are
-  included in the report e-mail (closes #563734)
+  included in the report e-mail (closes DEBBUG-563734)
 - reportspace: skip non-directories and places that don't exist on the local
-  filesystem (Closes: #536049)
-- set BACKUPNINJA_DEBUG when invoked with -d (Closes: #537266)
+  filesystem (Closes: DEBBUG-536049)
+- set BACKUPNINJA_DEBUG when invoked with -d (Closes: DEBBUG-537266)
 
 ### lib changes
 
 #### easydialog
 
-- Allow form fields input to grow up to 100 chars (Closes: #562249)
+- Allow form fields input to grow up to 100 chars (Closes: DEBBUG-562249)
 
 ### handler changes
 
@@ -471,13 +471,13 @@ The "happy birthdays" release!
 - add missing destid_file options to ssh connections
 - added sshoptions variable for arbitrary ssh options
 - updated example file to include destid_file, destport and sshoptions
-- use any subdirectories not just "a" to "z". Thanks Chris Nolan! (Redmine#606)
+- use any subdirectories not just "a" to "z". Thanks Chris Nolan! (#606)
 
 #### mysql
 
 - Options passed to mysqldump are now customizable with the new sqldumpoptions
   configuration variable. Thanks to Chris Lamb for his preliminary patch
-  (Closes: #502966)
+  (Closes: DEBBUG-502966)
 - Hide 'mysqladmin ping' output, to prevent confusing the user in case mysqld
   is running but the authentication fails, which apparently does not prevent
   mysqldump to work.
@@ -497,7 +497,7 @@ The "happy birthdays" release!
 
 #### rdiff
 
-- Fix include/exclude paths with spaces (Closes: #398435)
+- Fix include/exclude paths with spaces (Closes: DEBBUG-398435)
 - Fix confusing error if rdiff-backup cannot be found on remote server.
 - Increased element number in include/exclude and vserver ninjahelper interface
 
@@ -513,9 +513,9 @@ The "happy birthdays" release!
 
 - Fixed bandwidthlimit syntax error. Thanks to Ian Beckwith for the patch.
 - Send duplicity output to debug line by line instead of as a whole at one time
-  (Closes: #536360)
+  (Closes: DEBBUG-536360)
 - Report duplicity output as "info" so that it can be included in report e-mail
-  when reportinfo is on (Closes: #563734)
+  when reportinfo is on (Closes: DEBBUG-563734)
 - Fix include/exclude paths with spaces
 - Support backups to Amazon S3 buckets, thanks to stefan for the patch.
 
@@ -523,7 +523,7 @@ The "happy birthdays" release!
 
 #### dup
 
-- Do not propose to exclude /home/\*/.gnupg twice anymore (Closes: #563044)
+- Do not propose to exclude /home/\*/.gnupg twice anymore (Closes: DEBBUG-563044)
 
 ### autotools
 
@@ -536,8 +536,8 @@ The "happy birthdays" release!
 
 - fix bug in cstream definition, thanks Jamie McClelland
 - Allow the entire backup run to be halted by an action, thanks to Matthew
-  Palmer (Closes: #455836)
-- Fixed tr construct reporting a warning (Closes: #452669)
+  Palmer (Closes: DEBBUG-455836)
+- Fixed tr construct reporting a warning (Closes: DEBBUG-452669)
 
 ### lib changes
 
@@ -556,25 +556,25 @@ The "happy birthdays" release!
 
 - General cleanup
 - Better support for new duplicity (>= 0.4.4) command line syntax: run
-  remove-older-than when $keep is not set to yes (Closes: #458816), and run
+  remove-older-than when $keep is not set to yes (Closes: DEBBUG-458816), and run
   "duplicity cleanup" before any other duplicity command; both only trigger a
   warning on failure, since they should not stop backups from being done. Also
   migrated full/incremental backup switch to the new syntax.
 - Support every duplicity-supported transport with new configuration option
-  desturl (Closes: #483712, #346040, Trac#2).
+  desturl (Closes: DEBBUG-483712, DEBBUG-346040, Trac#2).
 - Actually allow to backup only VServers, by relaxing $include test.
 - Set secure permissions on tmpdir when creating it.
 
 #### ldap
 
 - support HDB backend just as the BDB one, and make message clearer when no
-  supported backend is found (Closes: #476910)
+  supported backend is found (Closes: DEBBUG-476910)
 
 #### rdiff
 
 - Fixed ignore_version default value missing
 - Add patch from Matthew Palmer to rdiff handler to incorporate sshoptions into
-  options via remote-schema not already specified (Closes: #424639)
+  options via remote-schema not already specified (Closes: DEBBUG-424639)
 
 #### wget
 
@@ -621,7 +621,7 @@ The "happy birthdays" release!
 ### backupninja changes
 
 - Fixed checks on configuration files permissions, since the patch applied to
-  fix #370396 broke this, especially for configuration files created with
+  fix DEBBUG-370396 broke this, especially for configuration files created with
   permissions 000 by an older ninjahelper version.
 - Enhanced portability for other platforms
 - Added quoting because it was needed to prevent shell expansion, broking the
@@ -634,7 +634,7 @@ The "happy birthdays" release!
 #### dup
 
 - Support duplicity >= 0.4.3 invocation syntax (--ssh-command option is not
-  supported anymore) (Closes: #447425)
+  supported anymore) (Closes: DEBBUG-447425)
 - New tmpdir configuration option, very useful in case duplicity tends to fill
   up /tmp.
 
@@ -642,7 +642,7 @@ The "happy birthdays" release!
 
 - Fixed shell command quoting issues, missing 'then' clauses, cleaned up
   compress=yes to be less redundant and not create empty uncompressed file
-  (Closes: #394935)
+  (Closes: DEBBUG-394935)
 - Fixed ninjahelper to properly set compress option, standardized on yes/no
   instead of on/off
 - Fixed problem that caused combination of slapcat and compress to not work
@@ -660,28 +660,28 @@ The "happy birthdays" release!
 #### mysql
 
 - Fixed case where odd combination of configuration options caused sqldump
-  backups to get overwritten with an empty file (Closes: #402679)
+  backups to get overwritten with an empty file (Closes: DEBBUG-402679)
 - Added 'nodata' option to enable you to specify tables that you want to omit
   the data from a backup, but still backup the table structure. This is very
   useful in cases where tables contain large amounts of cache data. See the
-  example.mysql for options, thanks Daniel Bonniot (Closes: #408829)
+  example.mysql for options, thanks Daniel Bonniot (Closes: DEBBUG-408829)
 - Enhance code for selecting databases by asking MySQL not to give us the
   header (-N), to not draw pretty boxes around the output (-B), send the query
   via -e instead of a pipe and ensure MySQL listens to -B. Thanks to Matthew
-  Palmer (Closes: #452039).
+  Palmer (Closes: DEBBUG-452039).
 
 #### pgsql
 
 - Support configuring PGSQLUSER for real, and document it a bit; this broken
   support actually prevented pgsql handler to work for VServers (Closes:
-  #396578)
+  DEBBUG-396578)
 
 #### rdiff-backup
 
 - Added cstream support to allow for bandwidth limiting
-- Handle "keep = yes" to disable old backups removal (Closes: #424633)
+- Handle "keep = yes" to disable old backups removal (Closes: DEBBUG-424633)
 - Add configuration option to allow you to disable the version check as in some
-  instances this may be an ok scenario (Closes: #424632)
+  instances this may be an ok scenario (Closes: DEBBUG-424632)
 - Added local destination support to helper (Closes: Trac#4)
 - Allow exclude-only configurations (Closes: Trac#21)
 
@@ -693,20 +693,20 @@ The "happy birthdays" release!
 - Fixed integer comparison (Closes: Trac#3)
 - Renamed handler to 'rsync', replaces outdated rub handler
 - updated examples/Makefile.am and handlers/Makefile.am to include rsnap/rsync
-  (Closes: #440554)
+  (Closes: DEBBUG-440554)
 - Added example.rsync configuration file
 
 #### sys
 
 - Fixed typo breaking things for VServers.
-- Fix bug when vrootdir is on its own partition (Closes: #395928)
+- Fix bug when vrootdir is on its own partition (Closes: DEBBUG-395928)
 - Better sfdisk error and output handling: should now properly warn when it
   does not manage to backup a partition table, and shut up when it succeeds
-  (Closes: #396632)
+  (Closes: DEBBUG-396632)
 - Added option to not use sfdisk at all, useful for vserver/xen instances that
-  produce warnings about no harddisks found (Closes: #404071)
-- Fixed example in example.sys to detail the __star__ in partitionsfile and
-  note why its necessary (Closes: #409192)
+  produce warnings about no harddisks found (Closes: DEBBUG-404071)
+- Fixed example in example.sys to detail the `__star__` in partitionsfile and
+  note why its necessary (Closes: DEBBUG-409192)
 - Force C locale for sfdisk to ensure english words are found in grep
 - Make directory where output is placed configurable, and create the parent dir
   if it doesn't exist (Closes: Trac#1)
@@ -731,17 +731,17 @@ The "happy birthdays" release!
 
 - Fixed bug in toint(), and thus isnow(), which caused it to not work when run
   from cron.
-- Recursively ignore subdirs in /etc/backup.d (Closes: #361102)
+- Recursively ignore subdirs in /etc/backup.d (Closes: DEBBUG-361102)
 - Add admingroup option to configuration to allow a group that can read/write
   configurations (instead of only allowing root). Checks and complains about
   group-readable files only when the group differs from the one in the
   configuration file (default is root as before).  Thanks to Martin Krafft for
-  the patch (Closes: #370396).
+  the patch (Closes: DEBBUG-370396).
 - When determining which backup actions to make, find now follows symlinks for
   $configdirectory
 - Changed order of -s to mail for compatibility
 - fixed permission stat call so it uses the --format supported by coreutils
-  (Closes: #382747)
+  (Closes: DEBBUG-382747)
 - Added disk space report option (thanks Adam Kosmin)
 
 ### handler changes
@@ -762,21 +762,21 @@ The "happy birthdays" release!
 
 #### mysql
 
-- Fixed improper use of $vuserhome (Closes: #351083)
+- Fixed improper use of $vuserhome (Closes: DEBBUG-351083)
 - Fixed erroneous removal of tmpfile when it didn't exit
 - Fixed inversed vsname emptiness check
 - Fixed su quote usage to be more posixy
 - Compress for sqldumps now happens in-line to save some disk space (Closes:
-  #370778)
+  DEBBUG-370778)
 - Fixed --defaults-file now as --defaults-extra-file (thanks rhatto)
 
 #### pgsql
 
 - Fixed inversed vsname emptiness check
 - Fixed su quote usage to be more posixy
-- Fixed shell expansion, thanks Thomas Kotzian (Closes: #363297)
+- Fixed shell expansion, thanks Thomas Kotzian (Closes: DEBBUG-363297)
 - postgres user UID is now the one from inside the vserver if necessary
-- Compress now happens in-line to save some disk space (Closes: #370778)
+- Compress now happens in-line to save some disk space (Closes: DEBBUG-370778)
 - $PGSQLUSER is used instead of hardcoding user 'postgres' (although this is
   the default)
 
@@ -807,7 +807,7 @@ The "happy birthdays" release!
 - Does not pretend anymore that duplicity can work without any passphrase
 - Support duplicity 0.4.2 (with Debian patches applied; upstream's 0.4.3 will
   integrate them); documented how to write sftp-compatible sshoptions (Closes:
-  #388543)
+  DEBBUG-388543)
 - Now forbid to (try to) include /.
 
 #### sys
@@ -820,7 +820,7 @@ The "happy birthdays" release!
 
 #### ldap
 
-- Compress now happens in-line to save some disk space (Closes: #370778)
+- Compress now happens in-line to save some disk space (Closes: DEBBUG-370778)
 
 #### makecd
 
@@ -828,20 +828,20 @@ The "happy birthdays" release!
 
 #### trac
 
-- fixed problem when src was set to the trac repo directly (Closes: #382737)
+- fixed problem when src was set to the trac repo directly (Closes: DEBBUG-382737)
 
 ### lib changes
 
 #### vserver
 
-- init_vservers: fixed Debian bug #351083 (improper readlink syntax)
+- init_vservers: fixed DEBBUG-351083 (improper readlink syntax)
 - found_vservers: escaped special grep repetition character +
 - forced mktemp to use a template with a name to be more compatible with
   different versions of mktemp, thanks anarcat
 
 ### ninjahelper changes
 
-- Recursively ignore subdirs in /etc/backup.d (Closes: #361102)
+- Recursively ignore subdirs in /etc/backup.d (Closes: DEBBUG-361102)
 - Fix configdirectory error that forced you to use /etc/backup.d, thanks
   anarcat
 - When determining which backup actions to list, find now follows symlinks for
@@ -889,8 +889,8 @@ The "happy birthdays" release!
 
 #### duplicity
 
-- fixed (again...) globbing in include and exclude options (Debian bug #348022,
-  follow-up to #338796)
+- fixed (again...) globbing in include and exclude options (DEBBUG-348022,
+  follow-up to DEBBUG-338796)
 - warn if vsnames or vsinclude is enabled while vservers support is disabled in
   backupninja.conf
 - now works when multiple vservers names are given (separated by space) in
