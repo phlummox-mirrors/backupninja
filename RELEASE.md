@@ -9,10 +9,11 @@ Upstream
 
         perl -pi -E \
            "s{^AC_INIT\(\[backupninja\],\[[0-9.]+\],}{AC_INIT([backupninja],[$VERSION],}" \
-           configure.ac && \
-        RELEASE_DATE=$(LC_ALL=C date '+%B %d, %Y') perl -pi -E \
-           "s{^version\s+[0-9.]+\s+--\s+UNRELEASED$}{version $VERSION -- $RELEASE_DATE}" \
-           ChangeLog
+           configure.ac
+
+        RELEASE_DATE=$(LC_ALL=C date '+%B %d, %Y'); perl -pi -E \
+           "s{^## \[Unreleased\].*}{## [$VERSION] - $RELEASE_DATE}" \
+           CHANGELOG.md
 
 * commit, tag and create the tarball:
 
@@ -81,4 +82,4 @@ Open the next development cycle
 ===============================
 
 * `git checkout master`
-* Add an empty new section in `ChangeLog`, commit and push.
+* Add an empty new section in `CHANGELOG.md`, commit and push.
