@@ -437,6 +437,7 @@ bandwidthlimit = $dup_bandwidth
 ##
 ## Default:
 # sshoptions = 
+sshoptions = $dup_sshoptions
 
 # put the backups under this destination directory
 # if using 'desturl' above, this must not be set
