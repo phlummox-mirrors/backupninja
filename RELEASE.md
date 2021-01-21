@@ -5,13 +5,13 @@ Upstream
 
         export VERSION=x.y.z
 
-* update `configure.ac` and `ChangeLog`
+* update `configure.ac` and `CHANGELOG.md`
 
         perl -pi -E \
-           "s{^AC_INIT\(\[backupninja\],\[[0-9.]+\],}{AC_INIT([backupninja],[$VERSION],}" \
+           "s{^AC_INIT\(\[backupninja\],\[[0-9.rc]+\],}{AC_INIT([backupninja],[$VERSION],}" \
            configure.ac
 
-        RELEASE_DATE=$(LC_ALL=C date '+%B %d, %Y'); perl -pi -E \
+        RELEASE_DATE=$(LC_ALL=C date '+%Y-%m-%d'); perl -pi -E \
            "s{^## \[Unreleased\].*}{## [$VERSION] - $RELEASE_DATE}" \
            CHANGELOG.md
 
