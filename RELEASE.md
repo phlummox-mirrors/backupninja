@@ -17,7 +17,7 @@ Upstream
 
 * commit, tag and create the tarball:
 
-        git commit configure.ac ChangeLog \
+        git commit configure.ac CHANGELOG.md \
             -m "Releasing backupninja $VERSION" && \
         git clean -fdx && \
         git tag -s "backupninja-$VERSION" \
