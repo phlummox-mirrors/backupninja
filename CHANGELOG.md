@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- [dup] Fix missing options from config file created with helper.
+- [dup] Fix missing options from config file created with helper (DEBBUG-726119)
 
 ## [1.2.0-rc1] - 2021-01-14
 
@@ -21,14 +21,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `ignore_missing` and `port`
 - [restic] Introduce new handler for the restic backup program
 - [sys] Add SystemD and EFI infos to sytem report (#11325)
-- [all] Added new config setting `ionicelevel`
+- [all] Added new config setting `ionicelevel` (DEBBUG-409239)
 
 ### Changed
 
 - [core] Implement non-zero exit codes for main process (#8279)
 - [borg] Emit warning if borg returns exit code 1 instead of fail
 - [dup] Allow `bandwidthlimit` with `desturl`
-- [rsync] Change default ssh key file to RSA in `id_file` (#11315)
+- [rsync] Change default ssh key file to RSA in `id_file` (#11315, DEBBUG-976650)
 - [project] Adopt Keep a Changelog format and convert old ChangeLog to markdown
 - [project] Moved project group from RiseupLabs to Liberate (#11314)
 
@@ -41,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [core] Fix issue with zero-padded integers in when setting (#9397)
 - [core] Fix incorrect warning related to day component in when setting
+  (DEBBUG-974770)
 - [borg] Fix connection test when empty remote directory exists
 - [borg] Properly quote create_options setting (#11304)
 - [borg] Raise fatal error if includes are missing
@@ -48,7 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [mysql] Fix helper writing incomplete config file (#11272)
 - [rsync] Fix initial directory creation in `mirror` and remote `short` modes
 - [sys] Fix LUKS version 2 header backup (#11316)
-- [sys] Fix dumping non-existent partition tables (#11293)
+- [sys] Fix dumping non-existent partition tables (#11293, DEBBUG-956206)
 - [sys] Fix error in rc.d info gathering on redhat/centos (##11294)
 - [sys] Fix error in sysctl info gathering
 
