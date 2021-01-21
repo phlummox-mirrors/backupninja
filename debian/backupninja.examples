@@ -4,6 +4,7 @@ examples/example.maildir
 examples/example.makecd
 examples/example.mysql
 examples/example.pgsql
+examples/example.restic
 examples/example.rdiff
 examples/example.rsync
 examples/example.sh

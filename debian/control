@@ -35,7 +35,8 @@ Suggests:
  subversion,
  trickle,
  wodim,
- borgbackup
+ borgbackup,
+ restic
 Description: lightweight, extensible meta-backup system
  Backupninja lets you drop simple config files in /etc/backup.d to
  coordinate system backups. Backupninja is a master of many arts,
@@ -49,7 +50,7 @@ Description: lightweight, extensible meta-backup system
  .
  Backupninja currently supports common backup utilities, easing their 
  configuration, currently supported are: rdiff-backup, duplicity, rsync,
- borgbackup and CD/DVD.
+ borgbackup, restic and CD/DVD.
  .
  Most handlers have their own dependencies/recommendations, shown in brackets
  below:
@@ -62,3 +63,4 @@ Description: lightweight, extensible meta-backup system
   - svn [subversion]
   - tar [bzip2]
   - borg [borgbackup]
+  - restic [restic]
