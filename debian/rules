@@ -26,5 +26,5 @@ override_dh_fixperms:
 	chmod 2770 $(TMP)/etc/backup.d
 
 override_dh_installchangelogs:
-	dh_installchangelogs ChangeLog
+	dh_installchangelogs CHANGELOG.md
 
