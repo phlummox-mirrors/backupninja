@@ -3,7 +3,6 @@ Section: admin
 Priority: optional
 Maintainer: Debian backupninja maintainers <pkg-backupninja@lists.riseup.net>
 Uploaders: Micah Anderson <micah@riseup.net>,
- intrigeri <intrigeri@debian.org>,
  Jerome Charaoui <jerome@riseup.net>
 Build-Depends:
  debhelper (>= 10)
