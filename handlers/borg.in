@@ -14,13 +14,17 @@
 #
 #
 
+debug "export BORG_RELOCATED_REPO_ACCESS_IS_OK=yes"
 export BORG_RELOCATED_REPO_ACCESS_IS_OK=yes
+
+debug "export BORG_UNKNOWN_UNENCRYPTED_REPO_ACCESS_IS_OK=yes"
 export BORG_UNKNOWN_UNENCRYPTED_REPO_ACCESS_IS_OK=yes
 
 ### GET CONFIG ###
 
 getconf testconnect yes
 getconf nicelevel 0
+getconf ionicelevel
 getconf bwlimit
 
 setsection source
@@ -31,10 +35,13 @@ getconf create_options
 getconf prune yes
 getconf keep 30d
 getconf prune_options
+getconf cache_directory
+getconf ignore_missing
 
 setsection dest
 getconf user
 getconf host
+getconf port 22
 getconf directory
 # strip trailing /
 directory=${directory%/}
@@ -42,39 +49,76 @@ getconf archive {now:%Y-%m-%dT%H:%M:%S}
 getconf compression lz4
 getconf encryption none
 getconf passphrase
+getconf sshoptions
 
+debug "export BORG_PASSPHRASE=\"<redacted>\""
 export BORG_PASSPHRASE="$passphrase"
+
+if [ -n "$sshoptions" ]; then
+   debug "export BORG_RSH=\"ssh $sshoptions\""
+   export BORG_RSH="ssh $sshoptions"
+fi
 
 ### CHECK CONFIG ###
 
+# source includes at least one path
+[ -n "$include" ] || fatal "No source includes specified"
+
 # destination specific checks
-[ "$directory" != "" ] || fatal "Destination directory not set"
+[ -n "$directory" ] || fatal "Destination directory not set"
 if [ "$host" != "localhost" ]; then
-  execstr_repository="ssh://${user}@${host}${directory}"
+   [ -n "$user" ] || fatal "Destination user not set"
+   [ -n "$host" ] || fatal "Destination host not set"
+  execstr_repository="ssh://${user}@${host}:${port}${directory}"
 else
   execstr_repository="$directory"
 fi
 execstr_archive="$archive"
 
+if [ -n "$cache_directory" ]; then
+   cache_parent_dir=$(dirname "$(readlink -f "$cache_directory")")
+   [ -d "$cache_parent_dir" ] || fatal "Cache directory parent dir '$cache_parent_dir' is absent or is not a directory."
+   debug "export BORG_CACHE_DIR=\"${cache_directory}\""
+   export BORG_CACHE_DIR="$cache_directory"
+else
+   # Cache dir not set, let's clear out the environment variable to avoid
+   # having this directory be pointed to a random destination.
+   # Also apparently if we set the variable to an empty string, borg uses the
+   # empty string as though it was some path we specified and backup runs
+   # error out, so we need to unset the variable completely.
+   debug "unset BORG_CACHE_DIR"
+   unset BORG_CACHE_DIR
+fi
+
+# Check that the ionicelevel is valid
+if [ -n "$ionicelevel" ] && echo "$ionicelevel" | grep -vq "^[0-7]$"; then
+   fatal "The value of ionicelevel is expected to be either empty or an integer from 0 to 7. Got: $ionicelevel"
+fi
+
+# Only use ionice if ionicelevel is not empty
+nice="nice -n $nicelevel"
+if [ -n "$ionicelevel" ]; then
+   nice="ionice -c2 -n $ionicelevel $nice"
+fi
+
 # check the connection at the source and destination
 [ -n "$test" ] || test=0
 if [ "$host" != "localhost" ] && ([ "$testconnect" = "yes" ] || [ "${test}" -eq 1 ]); then
-   debug "ssh -o PasswordAuthentication=no $host -l $user 'echo -n 1'"
-   local ret=`ssh -o PasswordAuthentication=no $host -l $user 'echo -n 1'`
+   debug "ssh $sshoptions -o PasswordAuthentication=no $host -p $port -l $user 'echo -n 1'"
+   local ret=`ssh $sshoptions -o PasswordAuthentication=no $host -p $port -l $user 'echo -n 1'`
    if [ "$ret" = 1 ]; then
       debug "Connected to $host as $user successfully"
    else
       teststr="borg list --show-rc -v $execstr_repository"
       debug "$teststr"
       output=`su -c "$teststr" 2>&1`
-      if echo "$output" | grep "terminating with success status" ; then
+      if echo "$output" | grep "terminating with success status" \
+         || echo "$output" | grep "^\S\+ is not a valid repository." \
+         || echo "$output" | grep "^Repository \S\+ does not exist."; then
          debug "Connected to $host as $user successfully (forced command)"
       else
-         if echo "$output" | grep -E "Repository.+does not exist" ; then
-            debug "Connected to $host as $user successfully (forced command)"
-         else
-            fatal "Can't connect to $host as $user."
-         fi
+         error $output
+         fatal "Can't connect to $host as $user."
       fi
    fi
 fi
@@ -83,6 +127,7 @@ fi
 
 if [ "$init" == "yes" ]; then
    initstr="borg init --encryption=$encryption $execstr_repository"
+   debug "executing borg init"
    debug "$initstr"
    if [ $test = 0 ]; then
       output="`su -c "$initstr" 2>&1`"
@@ -124,22 +169,34 @@ if [ ! -z $bwlimit ]; then
    execstr="${execstr} --remote-ratelimit=${bwlimit}"
 fi
 
-if [ ! -z $create_options ]; then
+if [ ! -z "$create_options" ]; then
    execstr="${execstr} ${create_options}"
 fi
 
 # include client-part and server-part
 execstr="${execstr} ${excludes} $execstr_repository::$execstr_archive ${includes}"
-debug "$execstr"
+
+debug "executing borg create"
+debug "$nice $execstr"
 
 if [ $test = 0 ]; then
-   output=`nice -n $nicelevel su -c "$execstr" 2>&1`
-   if [ $? = 0 ]; then
+   output=`$nice su -c "$execstr" 2>&1`
+   ret=$?
+   if [ $ret = 0 ]; then
       debug $output
-      info "Successfully finished backing up source $label"
+      info "Successfully finished backing up source."
+   elif [ $ret = 1 ]; then
+      warnmsg=$(echo "$output" | @SED@ -n '1,/^-\+$/{x;p;d;}; x' | @SED@ '/^$/d')
+      if [ "$ignore_missing" = "yes" ] && ! echo "$warnmsg" | grep -qv '\[Errno 2\] No such file or directory:'; then
+         debug $output
+         info "Backing up source finished with missing file warnings."
+      else
+         warning $output
+         warning "Backing up source finished with warnings."
+      fi
    else
       error $output
-      fatal "Failed backuping up source $label"
+      fatal "Failed backing up source."
    fi
 fi
 
@@ -151,19 +208,28 @@ if [ "$prune" == "yes" ]; then
       prune_options="${prune_options} --keep-within=${keep}"
    fi
    prunestr="borg prune $prune_options $execstr_repository"
+   debug "executing borg prune"
    debug "$prunestr"
    if [ $test = 0 ]; then
       output="`su -c "$prunestr" 2>&1`"
-      if [ $? = 0 ]; then
+      ret=$?
+      if [ $ret = 0 ]; then
          debug $output
          info "Removing old backups succeeded."
-      else
+      elif [ $ret = 1 ]; then
          warning $output
-         warning "Failed removing old backups."
+         warning "Removing old backups finished with warnings."
+      else
+         error $output
+         fatal "Failed removing old backups."
       fi
    fi
 fi
 
+debug "unset BORG_PASSPHRASE"
 unset BORG_PASSPHRASE
+
+debug "unset BORG_RSH"
+unset BORG_RSH
 
 return 0

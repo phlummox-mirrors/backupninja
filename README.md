@@ -24,7 +24,6 @@ The key features of backupninja are:
  - console-based wizard (ninjahelper) makes it easy to create
    backup action configuration files
  - passwords are never sent via the command line to helper programs
- - works with [Linux-Vservers](http://linux-vserver.org/)
 
 The following backup types are supported:
 
@@ -82,8 +81,7 @@ To add an additional 'wizard' to ninjahelper, follow these steps:
            }
 
 3. Look at the existing helpers to see how they are written. Try to re-use
-   functions, such as the dialog functions that are defined in `easydialog.sh`,
-   or the vserver functions defined in `lib/vserver`.
+   functions, such as the dialog functions that are defined in `easydialog.sh`.
 
 4. Test, re-test, and test again. Try to break the helper by going backwards,
    try to think like someone who has no idea how to configure your handler
@@ -106,6 +104,7 @@ file in `/etc/backup.d` according to the file's suffix:
 
  - `.sh`: run this file as a shell script.
  - `.rdiff`: filesystem backup (using rdiff-backup)
+ - `.restic`: filesystem backup (using restic)
  - `.dup`: filesystem backup (using duplicity)
  - `.borg`: filesystem backup (using borg)
  - `.mysql`: backup mysql databases
@@ -137,11 +136,11 @@ Unless otherwise specified, the config file format is "ini style."
 For example:
 
         # this is a comment
-        
+
         [fishes]
         fish = red
         fish = blue
-        
+
         [fruit]
         apple = yes
         pear = no thanks \
@@ -214,25 +213,6 @@ Duplicity can store backups on Amazon S3 buckets, taking care of encryption.
 Since it performs incremental backups it minimizes the number of request per
 operation therefore reducing the costs. The boto Python interface to Amazon
 Web Services is needed to use duplicity with S3 (Debian package: `python-boto`).
-
-
-Vservers
---------
-
-If you are using [Linux-Vservers](http://linux-vserver.org/) there are some
-special capabilities that different handlers have to make vserver
-backups easier.
-
-Set the variable `vservers` to be `yes` in `/etc/backupninja.conf` and see the
-example configuration files for each handler to configure the vserver specific
-variables.
-
-Additional vserver variables that can be configured in `/etc/backupninja.conf`,
-but they probably don't need to be changed:
-
- - `VSERVERINFO` (default: `/usr/sbin/vserver-info`)
- - `VSERVER` (default: `/usr/sbin/vserver`)
- - `VROOTDIR` (default: `$VSERVERINFO info SYSINFO |grep vserver-Rootdir | awk '{print $2}'`)
 
 .sh configuration files
 -----------------------

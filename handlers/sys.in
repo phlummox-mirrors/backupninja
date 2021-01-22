@@ -126,21 +126,6 @@ getconf mbrfile $parentdir/mbr.__star__.bin
 getconf FLASHROM `which flashrom`
 getconf bios no
 
-getconf vsnames all
-
-# If vservers are configured, check that the ones listed in $vsnames are running.
-usevserver=no
-if [ $vservers_are_available = yes ]; then
-   if [ "$vsnames" = all ]; then
-      vsnames="$found_vservers"
-   fi
-   if ! vservers_running "$vsnames" ; then
-      fatal "At least one of the vservers listed in vsnames ($vsnames) is not running."
-   fi
-   info "Using vservers '$vsnames'"
-   usevserver=yes
-fi
-
 ## SANITY CHECKS #########################
 
 if [ "$luksheaders" == "yes" ]; then
@@ -186,47 +171,6 @@ fi
 #
 
 if [ "$packages" == "yes" ]; then
-
-   if [ $usevserver = yes ]; then
-      info "vserver root directory set to: $VROOTDIR"
-      for vserver in $vsnames; do
-         info "examining vserver: $vserver"
-         # is it running ?
-         vservers_running $vserver
-         if [ $? -ne 0 ]; then
-            warning "The vserver $vserver is not running."
-            continue
-         fi
-         # is $packagemgr available inside $vserver ?
-         if [ ! -x "${VROOTDIR}/${vserver}${packagemgr}" ]; then
-            warning "can't find $packagemgr in vserver $vserver, skipping installed packages report."
-         else
-            # don't expand * since it can be used in $packagemgroptions
-            set -o noglob
-            debug "$VSERVER $vserver exec $packagemgr $packagemgroptions > $VROOTDIR/$vserver$packagesfile"
-            $VSERVER $vserver exec $packagemgr $packagemgroptions > $VROOTDIR/$vserver$packagesfile || fatal "can not save $packagemgr info to $packagesfile"
-            set +o noglob
-         fi
-         # is $debconfgetselections available inside $vserver ?
-         found=no
-         # case #1: it is available on the host, is it available inside $vserver ?
-         if [ -n "$debconfgetselections" ]; then
-            [ -x "${VROOTDIR}/${vserver}${debconfgetselections}" ] && found=yes
-         # case #2: it is not available on the host, is it available inside $vserver ?
-         else
-            [ -n "`$VSERVER $vserver exec which debconf-get-selections`" ] && found=yes
-         fi
-         if [ "$found" != yes ]; then
-            warning "can't find debconf-get-selections in vserver $vserver, skipping package selection states. You may want to install the debconf-utils package."
-         else
-            debug "$VSERVER $vserver exec $debconfgetselections > $VROOTDIR/$vserver$selectionsfile"
-            $VSERVER $vserver exec $debconfgetselections > $VROOTDIR/$vserver$selectionsfile || fatal "can not save debconf-get-selections info to $selectionsfile"
-         fi
-         unset found
-      done
-   fi
-
-   # We want to perform this on the host as well
    if [ -z "$packagemgr" -o ! -x "$packagemgr" ]; then
       warning "can't find ${packagemgr}, skipping installed packages report."
    else
@@ -236,11 +180,13 @@ if [ "$packages" == "yes" ]; then
       $packagemgr $packagemgroptions > $packagesfile || fatal "can not save $packagemgr info to $packagesfile"
       set +o noglob
    fi
-   if [ -z "$debconfgetselections" ]; then
-      warning "can't find debconf-get-selections, skipping package selection states. You might want to install the debconf-utils package."
-   else
-      debug "$debconfgetselections > $selectionsfile"
-      $debconfgetselections > $selectionsfile || fatal "can not save $debconfgetselections info to $selectionsfile"
+   if [ "$os" = "debian" ]; then
+      if [ -z "$debconfgetselections" ]; then
+         warning "can't find debconf-get-selections, skipping package selection states. You might want to install the debconf-utils package."
+      else
+         debug "$debconfgetselections > $selectionsfile"
+         $debconfgetselections > $selectionsfile || fatal "can not save $debconfgetselections info to $selectionsfile"
+      fi
    fi
 fi
 
@@ -257,11 +203,14 @@ DASHES="-----------------------------------------------------------------"
 
 cat /dev/null > $sysreportfile || fatal "can not write to $sysreportfile"
 
-
-catiffile () {
+catstatus () {
    echo $HASHES >> $sysreportfile
    echo "# $STATUS" >> $sysreportfile
    echo $HASHES >> $sysreportfile
+}
+
+catiffile () {
+   catstatus
    if [ -f $1 ]; then
       echo "file: $1" >> $sysreportfile
       echo $DASHES >> $sysreportfile
@@ -280,9 +229,7 @@ catiffile () {
 
 catifexec () {
    if [ -x $1 ]; then
-      echo $HASHES >> $sysreportfile
-      echo "# $STATUS" >> $sysreportfile
-      echo $HASHES >> $sysreportfile
+      catstatus
       $*  >> $sysreportfile 2>&1 || info "executing of $1 failed"
    fi
 }
@@ -306,25 +253,34 @@ catifexec "/usr/bin/free"
 STATUS="Checking free disk space:"
 catifexec "/bin/df" "-al --exclude-type=tmpfs"
 
-STATUS="Collecting what services run at what run level:"
-if [ $os = "redhat" ]; then
-   catifexec "/sbin/chkconfig" "--list"
+if [ -d /run/systemd/system ]; then
+   STATUS="Collecting information about systemd units"
+   catifexec "/usr/bin/systemctl" "list-units --all"
+   STATUS="Collecting information about systemd timers"
+   catifexec "/usr/bin/systemctl" "list-timers --all"
+else
    STATUS="Collecting information about /etc/rc.d:"
-   catiffile "/bin/ls /etc/rc.d/rc*.d/"
-
-elif [ $os = "debian" ]; then
-   for level in 0 1 2 3 4 5 6 S; do
-      echo "Level: $level" >> $sysreportfile
-      for f in /etc/rc${level}.d/*; do
-         # Remove /etc/Knn or Snn from beginning
-         ff=$(echo $f | @SED@ 's_/etc/rc..d/[KS][0-9][0-9]__')
-         if [ $f != $ff ]; then
-            echo $ff >> $sysreportfile
-         fi
+   if [ -x /usr/sbin/chkconfig ]; then
+      catifexec "/usr/sbin/chkconfig" "--list"
+   else
+      catstatus
+      for level in 0 1 2 3 4 5 6 S; do
+         echo "Level: $level" >> $sysreportfile
+         for f in /etc/rc${level}.d/*; do
+            # Remove /etc/Knn or Snn from beginning
+            ff=$(echo $f | @SED@ 's_/etc/rc..d/[KS][0-9][0-9]__')
+            if [ $f != $ff ]; then
+               echo $ff >> $sysreportfile
+            fi
+         done
+         echo "" >> $sysreportfile
       done
-      echo "" >> $sysreportfile
-   done
+   fi
 fi
+
+STATUS="Getting EFI variables information:"
+catifexec "/bin/efibootmgr"
+catifexec "/usr/sbin/efibootmgr"
 
 STATUS="Getting bootloader information:"
 catifexec "/bin/ls" "-alR /boot"
@@ -363,7 +319,7 @@ if [ -f /etc/cluster.conf -o -f /etc/cluster.xml ] ; then
 fi
 
 STATUS="Gathering sysctl information (sysctl -a):"
-catiffile "sysctl -a 2>/dev/null"
+catifexec "/sbin/sysctl" "-a"
 STATUS="Gathering sysctl information (/etc/sysctl.conf):"
 catiffile "/etc/sysctl.conf"
 
@@ -551,11 +507,6 @@ if [ $os = "redhat" ]; then
    catifexec "rpm" "-q -V selinux-policy-strict"
 fi
 
-if [ $usevserver = yes ]; then
-   STATUS="Gathering vserver information"
-   catiffile "/proc/virtual"
-fi
-
 if [ "$partitions" == "yes" ]; then
    if [ "$dosfdisk" == "yes" ]; then
       if [ ! -x "$SFDISK" ]; then
@@ -594,7 +545,7 @@ if [ "$hardware" == "yes" ]; then
       echo -e "\n\n====================== summary ======================\n" >>  $hardwarefile
       debug "$HWINFO --short --cpu --network --disk --pci  >> $hardwarefile"
       $HWINFO --short --cpu --network --disk --pci  >> $hardwarefile
-      for flag in cpu network bios pci; do
+      for flag in cpu network disk bios pci; do
          echo -e "\n\n====================== $flag ======================\n" >>  $hardwarefile
          $HWINFO --$flag >> $hardwarefile
       done
@@ -609,12 +560,18 @@ fi
 if [ "$partitions" == "yes" ]; then
    if [ "$dosfdisk" == "yes" ]; then
       devices=`LC_ALL=C $LSBLK --output NAME,TYPE --list --paths 2>/dev/null | grep "disk$" | grep -v '^/dev/zram' | @AWK@ '{print $1}'`
+      partitions=`LC_ALL=C $SFDISK -l 2>/dev/null |grep "^/dev" | @AWK@ '{print $1}'`
       if [ "$devices" == "" ]; then
          warning "No harddisks found"
       fi
       for dev in $devices; do
          debug "$SFDISK will try to backup partition tables for device $dev"
          [ -b $dev ] || continue
+         echo "${partitions}" | grep -q "${dev}"
+         if [ $? -ne 0 ] ; then
+             info "The device $dev does not appear to have any partitions"
+             continue
+         fi
          label=${dev#/dev/}
          label=${label//\//-}
          outputfile=${partitionsfile//__star__/$label}
@@ -633,8 +590,10 @@ if [ "$partitions" == "yes" ]; then
 fi
 
 if [ "$luksheaders" == "yes" ]; then
-   devices=`LC_ALL=C $SFDISK -l 2>/dev/null | grep -E '^(Disk )?/dev/' | @SED@ -e 's/Disk //' -re 's/:? +.*//g'`
-   [ -n "$devices" ] || warning "No block device found"
+   devices=`LC_ALL=C $LSBLK --output NAME,TYPE --list --paths 2>/dev/null | grep "disk$" | grep -v '^/dev/zram' | @AWK@ '{print $1}'`
+   if [ "$devices" == "" ]; then
+      warning "No harddisks found"
+   fi
    partitions=`LC_ALL=C $SFDISK -l 2>/dev/null |grep "^/dev" | @AWK@ '{print $1}'`
    [ -n "$partitions" ] || warning "No partitions found"
    targetdevices=""
@@ -648,20 +607,9 @@ if [ "$luksheaders" == "yes" ]; then
       label=${dev#/dev/}
       label=${label//\//-}
       outputfile=${luksheadersfile//__star__/$label}
-      # the following sizes are expressed in terms of 512-byte sectors
-      debug "Let us find out the LUKS header size for $dev"
-      debug "$CRYPTSETUP luksDump \"$dev\" | grep '^Payload offset:' | @AWK@ '{print $3}'"
-      headersize=`$CRYPTSETUP luksDump "$dev" | grep '^Payload offset:' | @AWK@ '{print $3}'`
-      if [ $? -ne 0 ]; then
-         warning "Could not compute the size of LUKS header, skipping $dev"
-         continue
-      elif [ -z "$headersize" -o -n "`echo \"$headersize\" | @SED@ 's/[0-9]*//g'`" ]; then
-         warning "The computed size of LUKS header is not an integer, skipping $dev"
-         continue
-      fi
       debug "Let us backup the LUKS header of $dev"
-      debug "$DD if=\"${dev}\" of=\"${outputfile}\" bs=512 count=\"${headersize}\""
-      output=`$DD if="${dev}" of="${outputfile}" bs=512 count="${headersize}" 2>&1`
+      debug "$CRYPTSETUP luksHeaderBackup \"${dev}\" --header-backup-file \"${outputfile}\""
+      output=`$CRYPTSETUP luksHeaderBackup "${dev}" --header-backup-file "${outputfile}" 2>&1`
       exit_code=$?
       if [ $exit_code -eq 0 ]; then
          debug "$output"

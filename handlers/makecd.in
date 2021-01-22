@@ -12,6 +12,20 @@ getconf isoonly yes
 getconf imagefile backup.iso
 getconf device
 getconf nicelevel 0
+getconf ionicelevel
+
+## Check config
+
+# Check that the ionicelevel is valid
+if [ -n "$ionicelevel" ] && echo "$ionicelevel" | grep -vq "^[0-7]$"; then
+   fatal "The value of ionicelevel is expected to be either empty or an integer from 0 to 7. Got: $ionicelevel"
+fi
+
+# Only use ionice if ionicelevel is not empty
+nice="nice -n $nicelevel"
+if [ -n "$ionicelevel" ]; then
+   nice="ionice -c2 -n $ionicelevel $nice"
+fi
 
 # define needed executables:
 MKISOFS="/usr/bin/genisoimage"
@@ -36,7 +50,7 @@ if [ "$isoonly" == "no" ]; then
 fi
 
 outputfile="$backupdir/$imagefile"
-execstr="nice -n $nicelevel $MKISOFS --quiet -R -o $outputfile "
+execstr="$nice $MKISOFS --quiet -R -o $outputfile "
 
 str=""
 # excludes

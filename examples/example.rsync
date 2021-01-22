@@ -4,8 +4,6 @@
 # Mandatory options are uncommented with sugested values
 # Other options are commented out with their default values
 #
-# Note: You dont need to manually specify vservers using "include = /vservers".
-#       They're automatically backuped if vserver is set to "yes" on you backupninja.conf.
 
 [general]
 
@@ -77,6 +75,16 @@ days = 7
 # rsync command nice level
 #nicelevel = 0
 
+## ionicelevel is optional. If it is left undefined or empty, ionice will not
+## be used at all. If it is set to to an integer value from 0 to 7, then ionice
+## will be used with the best effort class (-c2) and with the ionicelevel as
+## the class data (-n).
+##
+## See the ionice(1) man page for more details about available levels.
+##
+## Default:
+# ionicelevel =
+
 # set to "yes" if your system isnt handling timestamps correctly
 #enable_mv_timestamp_bug = no
 
@@ -111,14 +119,6 @@ include = /var
 exclude = exclude_folder1
 exclude = exclude_folder2
 
-# exlude some vserver from backup
-# this is used only if vservers = yes on backupninja.conf
-exclude_vserver = excluded_vserver1
-exclude_vserver = excluded_vserver2
-
-# ssh command line (remote only)
-#ssh = ssh
-
 # ssh or rsync (remote source only)
 #protocol = ssh
 
@@ -127,7 +127,7 @@ exclude_vserver = excluded_vserver2
 #rsync = $RSYNC
 
 # rsync command options
-#rsync_options = "-av --delete --recursive"
+#rsync_options = -av --delete --recursive
 
 # when set to 1, use numeric ids instead of user/group mappings on rsync
 #numericids =
@@ -142,7 +142,7 @@ exclude_vserver = excluded_vserver2
 #remote_rsync = rsync
 
 # ssh key file (remote source only)
-#id_file = /root/.ssh/id_dsa
+#id_file = /root/.ssh/id_rsa
 
 # set to "yes" to rsync use a batch file as source
 #batch = no
@@ -164,9 +164,6 @@ exclude_vserver = excluded_vserver2
 #  when "yes", test the connection for a remote source before backup
 #testconnect = no
 
-# ssh command line (remote dest only)
-#ssh = ssh
-
 # ssh or rsync (remote dest only)
 #protocol = ssh
 
@@ -186,7 +183,7 @@ exclude_vserver = excluded_vserver2
 #user =
 
 # ssh key file (remote destination only)
-#id_file = /root/.ssh/id_dsa
+#id_file = /root/.ssh/id_rsa
 
 # set a bandwidth limit in KB/s (remote destination only)
 #bandwidthlimit =

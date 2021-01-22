@@ -1,11 +1,12 @@
 
 HANDLERS = borg borg.helper dup dup.helper maildir makecd	\
-         makecd.helper mysql mysql.helper pgsql pgsql.helper rdiff	\
-         rdiff.helper rsync sh svn sys sys.helper trac tar tar.helper
+         makecd.helper mysql mysql.helper pgsql pgsql.helper restic  \
+         restic.helper rdiff rdiff.helper rsync sh svn sys sys.helper trac tar tar.helper
 
 DIST_HANDLERS = borg.in borg.helper.in dup.in dup.helper.in maildir.in makecd.in	\
          makecd.helper.in mysql.in mysql.helper.in pgsql.in pgsql.helper.in rdiff.in	\
-         rdiff.helper.in rsync.in sh.in svn.in sys.in sys.helper.in trac.in tar.in tar.helper.in wget
+         rdiff.helper.in restic.in restic.helper.in rsync.in sh.in svn.in sys.in sys.helper.in	\
+		 trac.in tar.in tar.helper.in wget
 
 CLEANFILES = $(HANDLERS)
 
@@ -14,7 +15,7 @@ EXTRA_DIST = Makefile.am $(DIST_HANDLERS)
 edit = sed \
     -e "s,@BASH\@,$(BASH),g" \
     -e "s,@AWK\@,$(AWK),g" \
-    -e "s,@SED\@,$(SED),g" 
+    -e "s,@SED\@,$(SED),g"
 
 pkgdata_DATA = $(HANDLERS)
 
@@ -78,8 +79,16 @@ rdiff.helper: $(srcdir)/rdiff.helper.in
 	rm -f rdiff.helper
 	$(edit) $(srcdir)/rdiff.helper.in > rdiff.helper
 
+restic: $(srcdir)/restic.in
+	rm -f restic
+	$(edit) $(srcdir)/restic.in > restic
+
+restic.helper: $(srcdir)/restic.helper.in
+	rm -f restic.helper
+	$(edit) $(srcdir)/restic.helper.in > restic.helper
+
 rsync: $(srcdir)/rsync.in
-	rm -f rsync 
+	rm -f rsync
 	$(edit) $(srcdir)/rsync.in > rsync
 
 sh: $(srcdir)/sh.in

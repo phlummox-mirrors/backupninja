@@ -66,7 +66,7 @@ function check_consistency() {
          fatal "User must be specified for remote $section."
       fi
       if [ "$host" == "" ]; then
-         fatal "Host must be specifed for remote $section."
+         fatal "Host must be specified for remote $section."
       fi
    fi
 }
@@ -83,6 +83,7 @@ function check_cstream() {
 getconf options
 getconf testconnect yes
 getconf nicelevel 0
+getconf ionicelevel
 getconf bwlimit
 getconf ignore_version no
 getconf output_as_info no
@@ -95,9 +96,8 @@ check_consistency "source" "$type" "$user" "$host"
 getconf label
 getconf keep 60
 getconf include
-getconf vsnames all
-getconf vsinclude
 getconf exclude
+
 
 setsection dest
 getconf directory; destdir=$directory
@@ -115,22 +115,15 @@ fi
 
 ### CHECK CONFIG ###
 
-# If vservers are configured, check that the ones listed in $vsnames do exist.
-usevserver=no
-if [ $vservers_are_available = yes ]; then
-   if [ "$vsnames" = all ]; then
-      vsnames="$found_vservers"
-   else
-      if ! vservers_exist "$vsnames" ; then
-         fatal "At least one of the vservers listed in vsnames ($vsnames) does not exist."
-      fi
-   fi
-   if [ -n "$vsinclude" ]; then
-      info "Using vservers '$vsnames'"
-      usevserver=yes
-   fi
-else
-   [ -z "$vsinclude" ] || warning 'vservers support disabled in backupninja.conf, vsincludes configuration lines will be ignored'
+# Check that the ionicelevel is valid
+if [ -n "$ionicelevel" ] && echo "$ionicelevel" | grep -vq "^[0-7]$"; then
+   fatal "The value of ionicelevel is expected to be either empty or an integer from 0 to 7. Got: $ionicelevel"
+fi
+
+# Only use ionice if ionicelevel is not empty
+nice="nice -n $nicelevel"
+if [ -n "$ionicelevel" ]; then
+   nice="ionice -c2 -n $ionicelevel $nice"
 fi
 
 # check the connection at the source and destination
@@ -142,8 +135,11 @@ fi
 
 if [ "$ignore_version" != "yes" ]; then
    # see that rdiff-backup has the same version at the source and destination
+   debug "executing rdiff-backup version checks"
    sourceversion=`get_version $sourceuser $sourcehost`
    destversion=`get_version $destuser $desthost`
+   debug "source version: $sourceversion"
+   debug "destination version: $destversion"
    if [ "$sourceversion" != "$destversion" ]; then
       fatal "rdiff-backup does not have the same version at the source and at the destination."
    fi
@@ -164,6 +160,11 @@ case $desttype in
    *      ) fatal "desttype '$desttype' is neither local nor remote" ;;
 esac
 
+# check keep parameter format
+if [ "$keep" != "yes" ] && ! echo "$keep" | grep -qe '^[0-9]\+[smhDWMY]\?$'; then
+   fatal "Keep parameter contains an invalid value ($keep)."
+fi
+
 ### REMOVE OLD BACKUPS ###
 
 if [ "$keep" != yes ]; then
@@ -179,6 +180,7 @@ if [ "$keep" != yes ]; then
    fi
    removestr="${removestr}${destdir}/${label}";
 
+   debug "executing rdiff-backup --remove-older-than"
    debug "$removestr"
    if [ $test = 0 ]; then
       output="`su -c "$removestr" 2>&1`"
@@ -243,35 +245,18 @@ for i in $include; do
 done
 IFS=$SAVEIFS
 
-# vsinclude
-if [ $usevserver = yes ]; then
-   for vserver in $vsnames; do
-      SAVEIFS=$IFS
-      IFS=$(echo -en "\n\b")
-      for vi in $vsinclude; do
-         str="${vi//__star__/*}"
-         str="$VROOTDIR/$vserver$str"
-         if [ -n "$str" ]; then
-            execstr="${execstr}--include '$str' "
-         else
-            warning "vsinclude statement '${vi//__star__/*}' will be ignored for VServer $vserver. $symlinks_warning"
-         fi
-      done
-      IFS=$SAVEIFS
-   done
-fi
-
 set +o noglob
 
 # exclude everything else
-[ "$include" != "" -o "$vsinclude" != "" ] && execstr="${execstr}--exclude '/*' "
+[ "$include" != "" ] && execstr="${execstr}--exclude '/*' "
 
 # include client-part and server-part
 execstr="${execstr}$execstr_sourcepart $execstr_destpart"
 
-debug "$execstr"
+debug "executing rdiff-backup"
+debug "$nice $execstr"
 if [ $test = 0 ]; then
-   output=`nice -n $nicelevel su -c "$execstr" 2>&1`
+   output=`$nice su -c "$execstr" 2>&1`
    if [ $? = 0 ]; then
       if [ "$output_as_info" == "yes" ]; then
          info "$output"

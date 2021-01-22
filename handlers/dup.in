@@ -8,6 +8,7 @@
 getconf options
 getconf testconnect yes
 getconf nicelevel 0
+getconf ionicelevel
 getconf tmpdir
 
 setsection gpg
@@ -19,8 +20,6 @@ getconf signkey
 
 setsection source
 getconf include
-getconf vsnames all
-getconf vsinclude
 getconf exclude
 
 setsection dest
@@ -47,18 +46,34 @@ destdir=${destdir%/}
 
 ### SANITY CHECKS ##############################################################
 
-[ -n "$desturl" -o -n "$destdir" ]  || fatal "The destination directory (destdir) must be set when desturl is not used."
-[ -n "$include" -o -n "$vsinclude" ]  || fatal "No source includes specified"
+if [ -z "$desturl" ]; then
+   # desturl undefined, ensure desthost, destuser and destdir are set
+   [ -n "$desthost" ] || fatal "The destination host (desthost) must be set when desturl is not used."
+   [ -n "$destuser" ] || fatal "The destination user (destuser) must be set when desturl is not used."
+   [ -n "$destdir" ] || fatal "The destination directory (destdir) must be set when desturl is not used."
+else
+   # desturl overrides other destination specifiers, warn if they are used
+   [ -z "$destuser" ] || warning 'the configured destuser is ignored since desturl is set'
+   [ -z "$desthost" ] || warning 'the configured desthost is ignored since desturl is set'
+   [ -z "$destdir" ] || warning 'the configured destdir is ignored since desturl is set'
+fi
+
+[ -n "$include" ]  || fatal "No source includes specified."
+
 [ -n "$password" ] || fatal "The password option must be set."
+
 if [ -n "$signkey" -a -n "$encryptkey" -a "$signkey" != "$encryptkey" ]; then
    [ -n "$signpassword" ] || fatal "The signpassword option must be set because signkey is different from encryptkey."
 fi
+
 if [ "`echo $desturl | @AWK@ -F ':' '{print $1}'`" == "s3+http" ]; then
    [ -n "$awsaccesskeyid" -a -n "$awssecretaccesskey" ]  || fatal "AWS access keys must be set for S3 backups."
 fi
+
 if [ "`echo $desturl | @AWK@ -F ':' '{print $1}'`" == "cf+http" ]; then
    [ -n "$cfusername" -a -n "$cfapikey" ]  || fatal "Cloudfiles access keys must be set for S3 backups."
 fi
+
 if [ "`echo $desturl | @AWK@ -F ':' '{print $1}'`" == "dpbx" ]; then
    [ -n "$dropboxappkey" -a -n "$dropboxappsecret" ]  || fatal "Dropbox app ID and secret must be set for Dropbox backups."
 
@@ -69,49 +84,34 @@ if [ "`echo $desturl | @AWK@ -F ':' '{print $1}'`" == "dpbx" ]; then
    fi
 fi
 
+# Ensure ftp_password is defined if needed
 if [ "`echo $desturl | @AWK@ -F ':' '{print $1}'`" == "ftp" ]; then
    [ -n "$ftp_password" ]  || fatal "ftp_password must be set for FTP backups."
 fi
-if [ "`echo $desturl | @AWK@ -F ':' '{print $1}'`" == "file" ]; then
-   if [ ! -e "`echo $desturl | @AWK@ -F '://' '{print $2}'`" ]; then
-      fatal "The destination directory ($desturl) does not exist."
-   elif [ ! -d "`echo $desturl | @AWK@ -F '://' '{print $2}'`" ]; then
-      fatal "The destination ($desturl) is not a directory."
-   fi
+
+# Check that the ionicelevel is valid
+if [ -n "$ionicelevel" ] && echo "$ionicelevel" | grep -vq "^[0-7]$"; then
+   fatal "The value of ionicelevel is expected to be either empty or an integer from 0 to 7. Got: $ionicelevel"
 fi
 
-### VServers
-# If vservers are configured, check that the ones listed in $vsnames do exist.
-usevserver=no
-if [ $vservers_are_available = yes ]; then
-   if [ "$vsnames" = all ]; then
-      vsnames="$found_vservers"
-   else
-      if ! vservers_exist "$vsnames" ; then
-            fatal "At least one of the vservers listed in vsnames ($vsnames) does not exist."
-      fi
-   fi
-   if [ -n "$vsinclude" ]; then
-      info "Using vservers '$vsnames'"
-      usevserver=yes
-   fi
-else
-   [ -z "$vsinclude" ] || warning 'vservers support disabled in backupninja.conf, vsincludes configuration lines will be ignored'
+# Only use ionice if ionicelevel is not empty
+nice="nice -n $nicelevel"
+if [ -n "$ionicelevel" ]; then
+   nice="ionice -c2 -n $ionicelevel $nice"
 fi
 
 ### See if we can login on $desthost
-if [ "$testconnect" == "yes" ]; then
+[ -n "$test" ] || test=0
+if [ "$testconnect" == "yes" ] || [ "${test}" -eq 1 ]; then
    if [ -n "$desturl" ]; then
       warning 'testconnect can not be used when desturl is set'
    else
       debug "ssh $sshoptions -o PasswordAuthentication=no $desthost -l $destuser 'echo -n 1'"
-      if [ ! $test ]; then
-         result=`ssh $sshoptions -o PasswordAuthentication=no $desthost -l $destuser 'echo -n 1'`
-         if [ "$result" != "1" ]; then
-            fatal "Can't connect to $desthost as $destuser."
-         else
-            debug "Connected to $desthost as $destuser successfully"
-         fi
+      result=`ssh $sshoptions -o PasswordAuthentication=no $desthost -l $destuser 'echo -n 1'`
+      if [ "$result" != "1" ]; then
+         fatal "Can't connect to $desthost as $destuser."
+      else
+         debug "Connected to $desthost as $destuser successfully"
       fi
    fi
 fi
@@ -124,9 +124,6 @@ execstr_command=
 execstr_options="$options --no-print-statistics"
 execstr_source=
 if [ -n "$desturl" ]; then
-   [ -z "$destuser" ] || warning 'the configured destuser is ignored since desturl is set'
-   [ -z "$desthost" ] || warning 'the configured desthost is ignored since desturl is set'
-   [ -z "$destdir" ] || warning 'the configured destdir is ignored since desturl is set'
    execstr_serverpart="$desturl"
 else
    execstr_serverpart="scp://$destuser@$desthost/$destdir"
@@ -152,8 +149,11 @@ if version_ge "$duplicity_version" '0.6.17'; then
    fi
    execstr_options="${execstr_options} --ssh-options '$sshoptions'"
    if [ "$bandwidthlimit" != 0 ]; then
-      [ -z "$desturl" ] || warning 'The bandwidthlimit option is not used when desturl is set.'
-      execstr_precmd="trickle -s -d $bandwidthlimit -u $bandwidthlimit"
+      if [ "`echo $desturl | @AWK@ -F ':' '{print $1}'`" == "file" ]; then
+         warning 'The bandwidthlimit option is not used with a local file path destination.'
+      else
+         execstr_precmd="trickle -s -d $bandwidthlimit -u $bandwidthlimit"
+      fi
    fi
 ## duplicity < 0.6.17 : scp/sftp backend
 else
@@ -166,24 +166,29 @@ else
    execstr_options="${execstr_options} --scp-command 'scp $scpoptions' --sftp-command 'sftp $sftpoptions'"
 fi
 
-### Symmetric or asymmetric (public/private key pair) encryption
+### Encryption and signing
 if [ -n "$encryptkey" ]; then
-   execstr_options="${execstr_options} --encrypt-key $encryptkey"
-   debug "Data will be encrypted with the GnuPG key $encryptkey."
+   if [ "$sign" = yes ]; then
+      if [ -n "$signkey" -a "$encryptkey" != "$signkey" ]; then
+         # encryptkey and signkey are different
+         debug "Data will be encrypted with the GnuPG key $encryptkey."
+         debug "Data will be signed with the GnuPG key $signkey."
+         execstr_options="${execstr_options} --encrypt-key $encryptkey --sign-key $signkey"
+      else
+         # encryptkey and signkey identical
+         debug "Data will be encrypted ang signed with the GnuPG key $encryptkey."
+         execstr_options="${execstr_options} --encrypt-sign-key $encryptkey"
+      fi
+   else
+      execstr_options="${execstr_options} --encrypt-key $encryptkey"
+      debug "Data will be encrypted with the GnuPG key $encryptkey."
+      debug "Data won't be signed."
+   fi
+elif [ "$sign" == yes ]; then
+   # duplicity is not able to sign data when using symmetric encryption
+   fatal "The encryptkey option must be set when signing."
 else
    debug "Data will be encrypted using symmetric encryption."
-fi
-
-### Data signing (or not)
-if [ "$sign" == yes ]; then
-   # duplicity is not able to sign data when using symmetric encryption
-   [ -n "$encryptkey" ] || fatal "The encryptkey option must be set when signing."
-   # if needed, initialize signkey to a value that is not empty (checked above)
-   [ -n "$signkey" ] || signkey="$encryptkey"
-   execstr_options="${execstr_options} --sign-key $signkey"
-   debug "Data will be signed will the GnuPG key $signkey."
-else
-   debug "Data won't be signed."
 fi
 
 ### Incremental or full backup mode
@@ -259,20 +264,6 @@ for i in $include; do
 done
 IFS=$SAVEIFS
 
-# vsincludes
-if [ $usevserver = yes ]; then
-   for vserver in $vsnames; do
-      SAVEIFS=$IFS
-      IFS=$(echo -en "\n\b")
-      for vi in $vsinclude; do
-         str="${vi//__star__/*}"
-         str="$VROOTDIR/$vserver$str"
-         execstr_source="${execstr_source} --include '$str'"
-      done
-      IFS=$SAVEIFS
-   done
-fi
-
 set +o noglob
 
 ### EXECUTE ####################################################################
@@ -305,13 +296,13 @@ fi
 ### Cleanup commands (duplicity >= 0.4.4)
 
 # cleanup
-debug "$execstr_precmd duplicity cleanup --force $execstr_options $execstr_serverpart"
-if [ ! $test ]; then
+debug "executing duplicity cleanup"
+debug "$nice $execstr_precmd duplicity cleanup --force $execstr_options $execstr_serverpart"
+if [ $test = 0 ]; then
    export PASSPHRASE=$password
    export SIGN_PASSPHRASE=$signpassword
    export FTP_PASSWORD=$ftp_password
-   output=`nice -n $nicelevel \
-             su -c \
+   output=`$nice su -c \
              "$execstr_precmd duplicity cleanup --force $execstr_options $execstr_serverpart 2>&1"`
    exit_code=$?
    if [ $exit_code -eq 0 ]; then
@@ -325,13 +316,13 @@ fi
 
 # remove-older-than
 if [ "$keep" != "yes" ]; then
-   debug "$execstr_precmd duplicity remove-older-than $keep --force $execstr_options $execstr_serverpart"
+   debug "executing duplicity remove-older-than"
+   debug "$nice $execstr_precmd duplicity remove-older-than $keep --force $execstr_options $execstr_serverpart"
    if [ ! $test ]; then
       export PASSPHRASE=$password
       export SIGN_PASSPHRASE=$signpassword
       export FTP_PASSWORD=$ftp_password
-      output=`nice -n $nicelevel \
-                su -c \
+      output=`$nice su -c \
                 "$execstr_precmd duplicity remove-older-than $keep --force $execstr_options $execstr_serverpart 2>&1"`
       exit_code=$?
       if [ $exit_code -eq 0 ]; then
@@ -348,13 +339,13 @@ fi
 if [ "$keep" != "yes" ]; then
    if [ "$keepincroffulls" != "all" ]; then
       if version_ge "$duplicity_version" '0.6.10'; then
-         debug "$execstr_precmd duplicity remove-all-inc-of-but-n-full $keepincroffulls --force $execstr_options $execstr_serverpart"
-         if [ ! $test ]; then
+         debug "executing duplicity remove-all-inc-of-but-n-full"
+         debug "$nice $execstr_precmd duplicity remove-all-inc-of-but-n-full $keepincroffulls --force $execstr_options $execstr_serverpart"
+         if [ $test = 0 ]; then
             export PASSPHRASE=$password
             export SIGN_PASSPHRASE=$signpassword
             export FTP_PASSWORD=$ftp_password
-            output=`nice -n $nicelevel \
-               su -c \
+            output=`$nice su -c \
                "$execstr_precmd duplicity remove-all-inc-of-but-n-full $keepincroffulls --force $execstr_options $execstr_serverpart 2>&1"`
             exit_code=$?
             if [ $exit_code -eq 0 ]; then
@@ -370,14 +361,14 @@ if [ "$keep" != "yes" ]; then
 fi
 
 ### Backup command
-debug "$execstr_precmd duplicity $execstr_command $execstr_options $execstr_source --exclude '**' / $execstr_serverpart"
-if [ ! $test ]; then
+debug "executing duplicity"
+debug "$nice $execstr_precmd duplicity $execstr_command $execstr_options $execstr_source --exclude '**' / $execstr_serverpart"
+if [ $test = 0 ]; then
    outputfile=`maketemp backupout`
    export PASSPHRASE=$password
    export SIGN_PASSPHRASE=$signpassword
    export FTP_PASSWORD=$ftp_password
-   output=`nice -n $nicelevel \
-             su -c \
+   output=`$nice su -c \
                 "$execstr_precmd duplicity $execstr_command $execstr_options $execstr_source --exclude '**' / $execstr_serverpart >$outputfile 2>&1"`
    exit_code=$?
    debug "$output"

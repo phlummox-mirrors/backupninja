@@ -186,7 +186,7 @@ function tolower() {
 
 # simple to integer function
 function toint() {
-   echo "$1" | tr -d '[:alpha:]'
+   echo "$1" | @SED@ 's/[^0-9]//g;s/^0\+//'
 }
 
 #
@@ -202,7 +202,7 @@ function toint() {
 # we grab the current time once, since processing
 # all the configs might take more than an hour.
 nowtime=`LC_ALL=C date +%H`
-nowday=`LC_ALL=C date +%d`
+nowday=`LC_ALL=C date +%-d`
 nowdayofweek=`LC_ALL=C date +%A`
 nowdayofweek=`tolower "$nowdayofweek"`
 
@@ -226,7 +226,7 @@ function isnow() {
        if [ "$whendayofweek" != "$nowdayofweek" ]; then
            whendayofweek=${whendayofweek%s}
            if [ "$whendayofweek" != "$nowdayofweek" ]; then
-               if [ "$whendayofweek" != "mondays" -a "$whendayofweek" != "tuesdays" -a "$whendayofweek" != "wednesdays" -a "$whendayofweek" != "thursdays" -a "$whendayofweek" != "fridays" -a "$whendayofweek" != "saturdays" -a "$whendayofweek" != "sundays" ]; then
+               if [ "$whendayofweek" != "monday" -a "$whendayofweek" != "tuesday" -a "$whendayofweek" != "wednesday" -a "$whendayofweek" != "thursday" -a "$whendayofweek" != "friday" -a "$whendayofweek" != "saturday" -a "$whendayofweek" != "sunday" ]; then
                    warning "The day in the 'when' option in the configuration is malformed. Please read the README for examples."
                fi
                if [ "$at" != "at" ]; then
@@ -234,13 +234,13 @@ function isnow() {
                fi
                if [[ "$whentimeoriginal" != @([0-9][0-9])?(:[0-9][0-9]) ]]; then
                    warning "The time in the 'when' option in the configuration is malformed or does not exist. Please read the README for examples."
-	       fi
+               fi
                return 0
            fi
        fi
    elif [ "$whenday" != "$nowday" ]; then
        if [ "$whenday" -lt 1 -o "$whenday" -gt 31 ]; then
-	   warning "The numeric value of the day in the 'when' option in the configuration does not match a day. Please read the README for examples."
+           warning "The numeric value of the day in the 'when' option in the configuration does not match a day. Please read the README for examples."
        fi
        if [ -z "$whentime" ]; then
            warning "The 'when' variable in the configuration file is malformed. You either didn't specify the day or the time. Please read the README for eamples."
@@ -278,6 +278,7 @@ script is run hourly from cron.
 
 The following options are available:
 -h, --help           This usage message
+-V, --version        Show backupninja version number
 -d, --debug          Run in debug mode, where all log messages are
                      output to the current shell.
 -f, --conffile FILE  Use FILE for the main configuration instead
@@ -374,8 +375,8 @@ function process_action() {
                [ $debug ] && colorize "$a"
             done
          )
-         retcode=$?
-         # ^^^^^^^^ we have a problem! we can't grab the return code "$?". grrr.
+         retcode=${PIPESTATUS[0]}
+         debug "handler returned exit code $retcode"
          echo_debug_msg=0
 
       else
@@ -431,12 +432,14 @@ function process_action() {
 setupcolors
 conffile="@CFGDIR@/backupninja.conf"
 loglevel=3
+version="@PACKAGE_VERSION@"
 
 ## process command line options
 
 while [ $# -ge 1 ]; do
    case $1 in
       -h|--help) usage;;
+      -V|--version) echo "backupninja $version";;
       -d|--debug) debug=1; export BACKUPNINJA_DEBUG=yes;;
       -t|--test) test=1;debug=1;;
       -n|--now) processnow=1;;
@@ -465,10 +468,9 @@ while [ $# -ge 1 ]; do
          ;;
       *)
          debug=1
-         echo "Unknown option $1"
-         fatal "Unknown option $1"
+         error "Unknown option $1"
          usage
-         exit
+         exit 3
          ;;
    esac
    shift
@@ -504,7 +506,6 @@ fi
 
 # include shared functions
 . $libdirectory/tools
-. $libdirectory/vserver
 
 setfile $conffile
 
@@ -543,10 +544,6 @@ getconf DSYNC /usr/bin/dsync
 getconf DOVEADM /usr/bin/doveadm
 getconf admingroup root
 
-# initialize vservers support
-# (get config variables and check real vservers availability)
-init_vservers nodialog
-
 if [ ! -d "$configdirectory" ]; then
    echo "Configuration directory '$configdirectory' not found."
    fatal "Configuration directory '$configdirectory' not found."
@@ -556,7 +553,7 @@ fi
 
 if [ "$UID" != "0" ]; then
    echo "`basename $0` can only be run as root"
-   exit 1
+   exit 3
 fi
 
 ## Process each configuration file
@@ -650,3 +647,11 @@ if [ -n "$reporthost" ]; then
    debug "send $logfile to $reportuser@$reporthost:$reportdirectory"
    rsync -qt $logfile $reportuser@$reporthost:$reportdirectory
 fi
+
+# return exit code
+[ $halts == 0 ] || exit 2
+[ $fatals == 0 ] || exit 2
+[ $errors == 0 ] || exit 1
+[ "$reportwarning" == "yes" -a $warnings != 0 ] && exit 1
+
+exit 0

@@ -21,6 +21,3 @@
 ## in /usr/share/doc/subversion/examples now if you wish to use
 ## it instead
 # HOTBACKUP = /usr/lib/subversion/hot-backup.py
-
-## the name of the vserver containing svn, if using vservers
-# vsname =
