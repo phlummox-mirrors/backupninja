@@ -21,10 +21,10 @@ BACKUPNINJA \- A lightweight, extensible meta-backup system
 .I
 "a silent flower blossom death strike to lost data."
 .SH SYNOPSIS
-.B "backupninja [ \-h ] [ \-d ] [ \-n ] [ \-t ] [ \-f filename ] [ \-\-run filename ]"
+.B "backupninja [ \-h ] [ \-v ] [ \-d ] [ \-n ] [ \-t ] [ \-f filename ] [ \-\-run filename ]"
 .br
 .SH DESCRIPTION
-.B Backupninja 
+.B Backupninja
 allows you to coordinate system backups by dropping a few
 simple configuration files into /etc/backup.d/. Most programs you
 might use for making backups don't have their own configuration file
@@ -47,8 +47,6 @@ console-based wizard (ninjahelper) makes it easy to create backup action configu
 passwords are never sent via the command line to helper programs.
 .IP -
 in order to backup a db or sql database, you cannot simply copy database files. backupninja helps you safely export the data to a format which you can backup.
-.IP -
-works with Linux-Vservers. 
 
 .B Backup types include:
 .IP - 2
@@ -60,27 +58,30 @@ encrypted remote backups (via duplicity).
 .IP -
 safe backup of MySQL, PostgreSQL, OpenLDAP, and subversion databases.
 .IP -
-burn CD/DVDs or create ISOs. 
-	 
+burn CD/DVDs or create ISOs.
+
 .\" TeX users may be more comfortable with the \fB<whatever>\fP and
-.\" \fI<whatever>\fP escape sequences to invoke bold face and italics, 
+.\" \fI<whatever>\fP escape sequences to invoke bold face and italics,
 .\" respectively.
 
 .SH OPTIONS
 .TP
-.B \-h, \-\-help           
+.B \-h, \-\-help
 Show summary of options
 .TP
-.B \-d, \-\-debug          
+.B \-V, \-\-version
+Show backupninja version number
+.TP
+.B \-d, \-\-debug
 Run in debug mode, where all log messages are output to the current shell.
 .TP
-.B \-f, \-\-conffile CONF_FILE  
+.B \-f, \-\-conffile CONF_FILE
 Use CONF_FILE for the main configuration instead of /etc/backupninja.conf
 .TP
-.B \-t, \-\-test           
+.B \-t, \-\-test
 Run in test mode, no actions are actually taken.
 .TP
-.B \-n, \-\-now            
+.B \-n, \-\-now
 Perform actions now, instead of when they might be scheduled.
 .TP
 .B \-\-run ACTION_FILE
@@ -110,6 +111,18 @@ root@srchost# ssh-copy-id \-i /root/.ssh/id_dsa.pub backup@desthost
 .TP
 Now, you should be able to ssh from user 'root' on srchost to user 'backup' on desthost without specifying a password. When prompted for a password by ssh-keygen, just leave it blank by hitting return. The "wizard" \fBninjahelper(1)\fP will walk you through these steps.
 
+.SH EXIT VALUES
+.PD 0
+\fB0\fP        success
+.br
+\fB1\fP        errors or warnings emitted during backup
+.br
+\fB2\fP        one or more backup actions failed
+.br
+\fB3\fP        syntax or usage error
+.br
+.PD
+
 .SH FILES
 .PD 0
 \fB/usr/sbin/backupninja\fP        main script
@@ -129,9 +142,9 @@ Now, you should be able to ssh from user 'root' on srchost to user 'backup' on d
 .PD
 
 .SH SEE ALSO
-.BR ninjahelper (1), 
-.BR backupninja.conf (5), 
-.BR backup.d (5), 
+.BR ninjahelper (1),
+.BR backupninja.conf (5),
+.BR backup.d (5),
 .br
 .SH AUTHOR
 BACKUPNINJA was written by the riseup.net collective.

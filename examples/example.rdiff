@@ -25,6 +25,16 @@
 ## Default
 # nicelevel = 0
 
+## ionicelevel is optional. If it is left undefined or empty, ionice will not
+## be used at all. If it is set to to an integer value from 0 to 7, then ionice
+## will be used with the best effort class (-c2) and with the ionicelevel as
+## the class data (-n).
+##
+## See the ionice(1) man page for more details about available levels.
+##
+## Default:
+# ionicelevel =
+
 ## default is yes. set to no to skip the test if the remote host is alive
 ##
 ## Default:
@@ -93,7 +103,7 @@ type = local
 # keep = 60
 
 ## A few notes about includes and excludes:
-## 1. include, exclude and vsinclude statements support globbing with '*'
+## 1. include and exclude statements support globbing with '*'
 ## 2. Symlinks are not dereferenced. Moreover, an include line whose path
 ##    contains, at any level, a symlink to a directory, will only have the
 ##    symlink backed-up, not the target directory's content. Yes, you have to
@@ -118,21 +128,6 @@ include = /usr/local/bin
 include = /usr/local/sbin
 include = /var/lib/dpkg/status
 include = /var/lib/dpkg/status-old
-
-## If vservers = yes in /etc/backupninja.conf then the following variables can
-## be used:
-## vsnames = all | <vserver1> <vserver2> ... (default = all)
-## vsinclude = <path>
-## vsinclude = <path>
-## ...
-## Any path specified in vsinclude is added to the include list for each vserver
-## listed in vsnames (or all if vsnames = all, which is the default).
-##
-## For example, vsinclude = /home will backup the /home directory in every
-## vserver listed in vsnames. If you have 'vsnames = foo bar baz', this
-## vsinclude will add to the include list /vservers/foo/home, /vservers/bar/home
-## and /vservers/baz/home.
-## Vservers paths are derived from $VROOTDIR.
 
 ## files to exclude from the backup
 exclude = /home/*/.gnupg

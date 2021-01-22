@@ -7,85 +7,39 @@
 getconf backupdir /var/backups/postgres
 getconf databases all
 getconf compress yes
-getconf vsname
 # format maps to pg_dump --format= option, old/default was plain
 getconf format plain
 
 localhost=`hostname`
 
-# Decide if the handler should operate on a vserver or on the host.
-# In the former case, check that $vsname exists and is running.
-usevserver=no
-vroot=''
-if [ $vservers_are_available = yes ]; then
-   if [ -n "$vsname" ]; then
-      # does it exist ?
-      if ! vservers_exist "$vsname" ; then
-         fatal "The vserver given in vsname ($vsname) does not exist."
-      fi
-      # is it running ?
-      vservers_running $vsname || fatal "The vserver $vsname is not running."
-      # everything ok
-      info "Using vserver '$vsname'."
-      usevserver=yes
-      vroot="$VROOTDIR/$vsname"
-   else
-      info "No vserver name specified, actions will be performed on the host."
-   fi
-fi
-
 # Make sure that the system to backup has the needed executables
-if [ $usevserver = yes ]; then
-   debug "Examining vserver '$vsname'."
-   if [ "$databases" == "all" ] && [ "$format" = "plain" ]; then
-      [ -x "$vroot`$VSERVER $vsname exec which $PGSQLDUMPALL`" ] || \
-         fatal "Can't find $PGSQLDUMPALL in vserver $vsname."
-   elif [ "$format" != "plain" ]; then
-      [ -x "$vroot`$VSERVER $vsname exec which $PGSQLDUMPALL`" ] || \
-         fatal "Can't find $PGSQLDUMPALL in vserver $vsname."
-      [ -x "$vroot`$VSERVER $vsname exec which $PGSQLDUMP`" ] || \
-         fatal "Can't find $PGSQLDUMP in vserver $vsname."
-      [ -x "$vroot`$VSERVER $vsname exec which $PSQL`" ] || \
-         fatal "Can't find $PSQL in vserver $vsname."
-   else
-      [ -x "$vroot`$VSERVER $vsname exec which $PGSQLDUMP`" ] || \
-         fatal "Can't find $PGSQLDUMP in vserver $vsname."
-   fi
+if [ "$databases" == "all" ] && [ "$format" = "plain" ]; then
+   [ -x "`which $PGSQLDUMPALL`" ] || \
+      fatal "Can't find $PGSQLDUMPALL."
+elif [ "$format" != "plain" ]; then
+   [ -x "`which $PGSQLDUMPALL`" ] || \
+      fatal "Can't find $PGSQLDUMPALL."
+   [ -x "`which $PGSQLDUMP`" ] || \
+      fatal "Can't find $PGSQLDUMP."
+   [ -x "`which $PSQL`" ] || \
+      fatal "Can't find $PSQL."
 else
-   if [ "$databases" == "all" ] && [ "$format" = "plain" ]; then
-      [ -x "`which $PGSQLDUMPALL`" ] || \
-         fatal "Can't find $PGSQLDUMPALL."
-   elif [ "$format" != "plain" ]; then
-      [ -x "`which $PGSQLDUMPALL`" ] || \
-         fatal "Can't find $PGSQLDUMPALL."
-      [ -x "`which $PGSQLDUMP`" ] || \
-         fatal "Can't find $PGSQLDUMP."
-      [ -x "`which $PSQL`" ] || \
-         fatal "Can't find $PSQL."
-   else
-      [ -x "`which $PGSQLDUMP`" ] || \
-         fatal "Can't find $PGSQLDUMP."
-   fi
+   [ -x "`which $PGSQLDUMP`" ] || \
+      fatal "Can't find $PGSQLDUMP."
 fi
 
-# create backup dir, the vroot variable will be empty if no vsname was specified
-# and will proceed to operate on the host
-[ -d $vroot$backupdir ] || (debug "mkdir -p $vroot$backupdir"; mkdir -p $vroot$backupdir)
-[ -d $vroot$backupdir ] || fatal "Backup directory '$vroot$backupdir' does not exist, and could not be created."
+# create backup dir
+[ -d $backupdir ] || (debug "mkdir -p $backupdir"; mkdir -p $backupdir)
+[ -d $backupdir ] || fatal "Backup directory '$backupdir' does not exist, and could not be created."
 
 # give backup dir the good uid and permissions
-# (in respect to the vserver, if $usevserver = yes)
-if [ $usevserver = yes ]; then
-   pguid=`$VSERVER $vsname exec getent passwd $PGSQLUSER | @AWK@ -F: '{print $3}'`
-else
-   pguid=`getent passwd $PGSQLUSER | @AWK@ -F: '{print $3}'`
-fi
-[ -n "$pguid" ] || \
-   fatal "No user called $PGSQLUSER`[ $usevserver = no ] || echo \" on vserver $vsname\"`."
-debug "chown $pguid $vroot$backupdir"
-chown $pguid $vroot$backupdir
-debug "chmod 700 $vroot$backupdir"
-chmod 700 $vroot$backupdir
+pguid=`getent passwd $PGSQLUSER | @AWK@ -F: '{print $3}'`
+[ -n "$pguid" ] || fatal "No user called $PGSQLUSER."
+
+debug "chown $pguid $backupdir"
+chown $pguid $backupdir
+debug "chmod 700 $backupdir"
+chmod 700 $backupdir
 
 
 # If we are using the custom (best) or tar pg_dump format, and
@@ -93,11 +47,7 @@ chmod 700 $vroot$backupdir
 # of all non-template databases to avoid the use of pg_dumpall.
 dumpglobals="no"
 if [ "$databases" = "all" ] && [ "$format" != "plain" ]; then
-   cmdprefix=""
-   if [ "$usevserver" = "yes" ]; then
-      	cmdprefix="$VSERVER $vsname exec "
-   fi
-   execstr="${cmdprefix} su - $PGSQLUSER -c 'psql -AtU $PGSQLUSER -c \"SELECT datname FROM pg_database WHERE NOT datistemplate\"'"
+   execstr="su - $PGSQLUSER -c 'psql -AtU $PGSQLUSER -c \"SELECT datname FROM pg_database WHERE NOT datistemplate\"'"
    debug execstr
    dblist=""
    for db in $(eval $execstr 2>&1); do
@@ -113,18 +63,10 @@ fi
 
 # if $databases = all, use pg_dumpall
 if [ "$databases" == "all" ]; then
-   if [ $usevserver = yes ]; then
-      if [ "$compress" == "yes" ]; then
-         execstr="$VSERVER $vsname exec su - $PGSQLUSER -s /bin/bash -c \"set -o pipefail ; $PGSQLDUMPALL | $GZIP $GZIP_OPTS > '$backupdir/${vsname}.sql.gz'\""
-      else
-         execstr="$VSERVER $vsname exec su - $PGSQLUSER -c \"$PGSQLDUMPALL > '$backupdir/${vsname}.sql'\""
-      fi
+   if [ "$compress" == "yes" ]; then
+      execstr="su - $PGSQLUSER -s /bin/bash -c \"set -o pipefail ; $PGSQLDUMPALL | $GZIP $GZIP_OPTS > '$backupdir/${localhost}-all.sql.gz'\""
    else
-      if [ "$compress" == "yes" ]; then
-         execstr="su - $PGSQLUSER -s /bin/bash -c \"set -o pipefail ; $PGSQLDUMPALL | $GZIP $GZIP_OPTS > '$backupdir/${localhost}-all.sql.gz'\""
-      else
-         execstr="su - $PGSQLUSER -c \"$PGSQLDUMPALL > '$backupdir/${localhost}-all.sql'\""
-      fi
+      execstr="su - $PGSQLUSER -c \"$PGSQLDUMPALL > '$backupdir/${localhost}-all.sql'\""
    fi
    debug "$execstr"
    if [ ! $test ]; then
@@ -151,11 +93,7 @@ else
       else
          globalscmd="$PGSQLDUMPALL -g > '$backupdir/globals.sql'"
       fi
-      if [ $usevserver = yes ]; then
-         execstr="$VSERVER $vsname exec su - $PGSQLUSER -s /bin/bash -c \"$globalscmd\""
-      else
-         execstr="su - $PGSQLUSER -s /bin/bash -c \"$globalscmd\""
-      fi
+      execstr="su - $PGSQLUSER -s /bin/bash -c \"$globalscmd\""
       debug "$execstr"
       if [ ! $test ]; then
          output=`eval $execstr 2>&1`
@@ -188,11 +126,7 @@ else
       else
          dumpcmd="$PGSQLDUMP --format=$format ${disablecustomcompress} $db > '$backupdir/${db}.${dumpext}'"
       fi
-      if [ $usevserver = yes ]; then
-         execstr="$VSERVER $vsname exec su - $PGSQLUSER -s /bin/bash -c \"$dumpcmd\""
-      else
-         execstr="su - $PGSQLUSER -s /bin/bash -c \"$dumpcmd\""
-      fi
+      execstr="su - $PGSQLUSER -s /bin/bash -c \"$dumpcmd\""
       debug "$execstr"
       if [ ! $test ]; then
          output=`eval $execstr 2>&1`

@@ -1,10 +1,5 @@
 ### backupninja PostgreSQL config file ###
 
-# vsname = <vserver> (no default)
-# what vserver to operate on, only used if vserver = yes in /etc/backupninja.conf
-# if you do not specify a vsname the host will be operated on
-# Note: if operating on a vserver, $VROOTDIR will be prepended to backupdir.
-
 # backupdir = <dir> (default: /var/backups/postgres)
 # where to dump the backups
 

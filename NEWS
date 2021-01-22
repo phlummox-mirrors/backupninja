@@ -39,7 +39,7 @@ backupninja (0.9.4-1) UNRELEASED
 	  situations, with weird behavious, due to incompatibilities
 	  between various readlink versions in this field. This has been made
 	  clear eventually: globbing is fully supported again, whereas no
-	  attempt is done to dereference symlinks anymore. 
+	  attempt is done to dereference symlinks anymore.
 	  Please read the new /usr/share/doc/backupninja/examples/example.dup
 	  or /usr/share/doc/backupninja/examples/example.rdiff file, and update
 	  your own configuration files if needed.
@@ -51,7 +51,7 @@ backupninja (0.9.4-1) UNRELEASED
 	    sshoptions = -i /root/.ssh/id_dsa_duplicity
 	  with:
 	    sshoptions = -o IdentityFile=/root/.ssh/id_dsa_duplicity
-	
+
 backupninja (0.9.2-1) unstable; urgency=low
 
 WARNING FOR DUPLICITY USERS

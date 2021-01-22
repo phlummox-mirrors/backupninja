@@ -79,11 +79,12 @@ do_borg_dest() {
 
    set -o noglob
    REPLY=
-   while [ -z "$REPLY" -o -z "$borg_directory" -o -z "$borg_host" -o -z "$borg_user" -o -z "$borg_archive" -o -z "$borg_compression" ]
+   while [ -z "$REPLY" -o -z "$borg_directory" -o -z "$borg_host" -o -z "$borg_port" -o -z "$borg_user" -o -z "$borg_archive" -o -z "$borg_compression" ]
    do
      formBegin "$borg_title - destination"
         formItem "directory" "$borg_directory"
         formItem "host" "$borg_host"
+        formItem "port" "$borg_port"
         formItem "user" "$borg_user"
         formItem "archive_name" "$borg_archive"
         formItem "compression" "$borg_compression"
@@ -93,9 +94,10 @@ do_borg_dest() {
      tmp_array=($REPLY)
      borg_directory=${tmp_array[0]}
      borg_host=${tmp_array[1]}
-     borg_user=${tmp_array[2]}
-     borg_archive=${tmp_array[3]}
-     borg_compression=${tmp_array[4]}
+     borg_port=${tmp_array[2]}
+     borg_user=${tmp_array[3]}
+     borg_archive=${tmp_array[4]}
+     borg_compression=${tmp_array[5]}
   done
   set +o noglob
 
@@ -179,13 +181,13 @@ do_borg_ssh_con() {
       read
    fi
 
-   ssh -o PreferredAuthentications=publickey $borg_host -l $borg_user "exit" 2> /dev/null
+   ssh -o PreferredAuthentications=publickey $borg_host -p $borg_port -l $borg_user "exit" 2> /dev/null
    if [ $? -ne 0 ]; then
       echo "Copying root's public ssh key to authorized_keys of $borg_user@$borg_host. When prompted, specify the password for user $borg_user@$borg_host."
       pubkeys=( /root/.ssh/id_[rd]sa.pub )
-      if ! ssh-copy-id -i ${pubkeys[0]} $borg_user@$borg_host; then
+      if ! ssh-copy-id -i ${pubkeys[0]} -p $borg_port $borg_user@$borg_host; then
          echo "FAILED: Couldn't copy root's public ssh key to authorized_keys of $borg_user@$borg_host."
-         ssh $borg_user@$borg_host 'test -w .ssh || test -w .'
+         ssh -p $borg_port $borg_user@$borg_host 'test -w .ssh || test -w .'
          result=$?
          echo "Hit return to continue."
          read
@@ -208,9 +210,9 @@ do_borg_ssh_con() {
 
    # test to see if the remote borg backup directory exists and is writable
    echo "Testing to see if remote borg backup directory exists and is writable"
-   ssh $borg_user@$borg_host "test -d ${borg_directory}"
+   ssh -p $borg_port $borg_user@$borg_host "test -d ${borg_directory}"
    if [ $? = 0 ]; then
-      ssh $borg_user@$borg_host "test -w $borg_directory"
+      ssh -p $borg_port $borg_user@$borg_host "test -w $borg_directory"
       if [ $? != 0 ]; then
          msgBox "destination directory is not writable!" "The remote destination directory is not writable by the user you specified. Please fix the permissions on the directory and then try again."
          remote_status=failed
@@ -218,7 +220,7 @@ do_borg_ssh_con() {
    else
       booleanBox "Remote directory does not exist" "The destination backup directory does not exist, do you want me to create it for you?"
       if [ $? = 0 ]; then
-         ssh $borg_user@$borg_host "mkdir -p ${borg_directory}"
+         ssh -p $borg_port $borg_user@$borg_host "mkdir -p ${borg_directory}"
          result=$?
          case $result in
             0) msgBox "$borg_title: success" "Creation of the remote destination directory was a success!";;
@@ -316,6 +318,7 @@ keep = "${borg_keep}d"
 [dest]
 directory = $borg_directory
 host = $borg_host
+port = $borg_port
 user = $borg_user
 archive = $borg_archive
 compression = $borg_compression
@@ -373,6 +376,7 @@ borg_wizard() {
    borg_directory=/backup/`hostname`
    borg_user=root
    borg_host=localhost
+   borg_port=22
    borg_archive='{now:%Y-%m-%dT%H:%M:%S}'
    borg_compression=lz4
    borg_encryption=none

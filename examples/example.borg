@@ -18,6 +18,16 @@
 ## Default
 # nicelevel = 0
 
+## ionicelevel is optional. If it is left undefined or empty, ionice will not
+## be used at all. If it is set to to an integer value from 0 to 7, then ionice
+## will be used with the best effort class (-c2) and with the ionicelevel as
+## the class data (-n).
+##
+## See the ionice(1) man page for more details about available levels.
+##
+## Default:
+# ionicelevel =
+
 ## default is yes. set to no to skip the test if the remote host is alive
 ##
 ## Default:
@@ -107,6 +117,16 @@ exclude = /var/lib/mysql
 ## Default:
 # prune_options =
 
+## by default borg emits a warning when a source file or directory
+## vanishes during the backup operations
+## set to yes to ignore such warnings
+##
+## Example:
+## ignore_missing = yes
+##
+## Default:
+# ignore_missing =
+
 ######################################################
 ## destination section
 ## (where the files are copied to)
@@ -180,3 +200,17 @@ exclude = /var/lib/mysql
 ##
 ## Default:
 # passphrase =
+
+## Path to the directory that will hold borg's cache files. By default this is
+## empty, which will let borg use its default path of "~/.cache/borg".
+##
+## Default:
+# cache_directory =
+
+## command-line options to use with ssh
+##
+## an example setting would be:
+## sshoptions = -i /root/.ssh/id_rsa_borg
+##
+## Default:
+# sshoptions = 
