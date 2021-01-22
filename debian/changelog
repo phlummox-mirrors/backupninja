@@ -1,9 +1,15 @@
-backupninja (UNRELEASED) unstable; urgency=medium
+backupninja (1.2.0-1) unstable; urgency=medium
 
-  * Update debian/copyright
+  * Import new upstream release (Closes: #409239, #726119, #956206, #974770,
+    #976650).
+  * Add missing borg example file (Closes: #912448)
+  * Update debian/control to reflect support for restic
+  * Change mailx | mailutils from Depends to Recommends (Closes: #457955)
   * Change Riseup Labs to Liberate in debian/control
+  * Update debian/copyright
+  * Declare compliance with Standards-Version 4.5.1 (no change needed)
 
- -- Micah Anderson <micah@riseup.net>  Sat, 02 Jan 2021 15:49:50 -0400
+ -- Jerome Charaoui <jerome@riseup.net>  Fri, 22 Jan 2021 09:52:09 -0500
 
 backupninja (1.1.0-2.1) unstable; urgency=medium
 
