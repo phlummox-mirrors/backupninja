@@ -33,8 +33,8 @@
 ## Default:
 # testconnect = yes
 
-## default is not to limit bandwidth. 
-## set to a number in kiBytes/second to limit bandwidth usage. 
+## default is not to limit bandwidth.
+## set to a number in kiBytes/second to limit bandwidth usage.
 ##
 ## Default:
 # bwlimit = 0
@@ -164,7 +164,7 @@ exclude = /var/lib/mysql
 ## for more info see : borg help create
 ##
 ## Default:
-# archive = {now:%Y-%m-%dT%H:%M:%S} 
+# archive = {now:%Y-%m-%dT%H:%M:%S}
 
 ## compression algorithm
 ## can be "none", "lz4", "zstd[,L]", "zlib[,L]", "lzma[,L]", "auto,C[,L]".
@@ -213,4 +213,4 @@ exclude = /var/lib/mysql
 ## sshoptions = -i /root/.ssh/id_rsa_borg
 ##
 ## Default:
-# sshoptions = 
+# sshoptions =

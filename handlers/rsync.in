@@ -101,18 +101,18 @@
 # function definitions
 
 function eval_config {
-  
+
   # system section
-  
+
   setsection system
   getconf rm rm
   getconf cp cp
   getconf touch touch
   getconf mv mv
   getconf fsck fsck
-  
+
   # general section
-  
+
   setsection general
   getconf log /var/log/backup/rsync.log
   getconf partition
@@ -130,14 +130,14 @@ function eval_config {
   getconf enable_mv_timestamp_bug no
   getconf tmp /tmp
   getconf multiconnection no
-  
+
   # source section
-  
+
   setsection source
   getconf from local
   getconf rsync $RSYNC
   getconf rsync_options "-av --delete --recursive"
-  
+
   if [ "$from" == "remote" ]; then
     getconf testconnect no
     getconf protocol ssh
@@ -156,7 +156,7 @@ function eval_config {
     getconf remote_rsync rsync
     getconf id_file /root/.ssh/id_rsa
   fi
-  
+
   getconf batch no
 
   if [ "$batch" == "yes" ]; then
@@ -172,13 +172,13 @@ function eval_config {
   getconf exclude
   getconf numericids 0
   getconf compress 0
-  
+
   # dest section
-  
+
   setsection dest
   getconf dest local
   getconf fakesuper no
-  
+
   if [ "$dest" == "remote" ]; then
     getconf testconnect no
     getconf protocol ssh
@@ -197,7 +197,7 @@ function eval_config {
     getconf remote_rsync rsync
     getconf id_file /root/.ssh/id_rsa
   fi
-  
+
   getconf batch no
 
   if [ "$batch" != "yes" ]; then
@@ -212,9 +212,9 @@ function eval_config {
 
   getconf numericids 0
   getconf compress 0
-  
+
   # services section
-  
+
   setsection services
   getconf initscripts /etc/init.d
   getconf service
@@ -231,7 +231,7 @@ function eval_config {
 
   backupdir="$mountpoint/$backupdir"
 
-  if [ "$dest" == "local" ] && [ ! -d "$backupdir" ]; then 
+  if [ "$dest" == "local" ] && [ ! -d "$backupdir" ]; then
     fatal "Backupdir $backupdir does not exist"
   fi
 
@@ -247,9 +247,9 @@ function eval_config {
     fi
   fi
 
-  if [ ! -z "$nicelevel" ]; then 
+  if [ ! -z "$nicelevel" ]; then
     nice="nice -n $nicelevel"
-  else 
+  else
     nice=""
   fi
 
@@ -419,7 +419,7 @@ function rotate_long {
       warning "Warning: metadata does not exist for $dir.1. This backup may be only partially completed. Skipping rotation."
       continue 1
     fi
-    
+
     # Rotate the current list of backups, if we can.
     oldest=`find $backuproot -maxdepth 1 -type d -name $rottype'.*' | @SED@ -e 's/^.*\.//' | sort -n | tail -1`
     [ "$oldest" == "" ] && oldest=0
@@ -488,7 +488,7 @@ function rotate_long {
     max=$((keep${rottype}+1))
     dir="$backuproot/$rottype"
     oldest=`find $backuproot -maxdepth 1 -type d -name $rottype'.*' | @SED@ -e 's/^.*\.//' | sort -n | tail -1`
-    [ "$oldest" == "" ] && oldest=0 
+    [ "$oldest" == "" ] && oldest=0
     # if we've rotated the last backup off the stack, remove it.
     for (( i=$oldest; i >= $max; i-- )); do
       if [ -d $dir.$i ]; then
@@ -546,7 +546,7 @@ function rotate_long_remote {
       echo "Warning: metadata does not exist for \$dir.1. This backup may be only partially completed. Skipping rotation."
       continue 1
     fi
-    
+
     # Rotate the current list of backups, if we can.
     oldest=\`find $backuproot -maxdepth 1 -type d -name \$rottype'.*' | @SED@ -e 's/^.*\.//' | sort -n | tail -1\`
     [ "\$oldest" == "" ] && oldest=0
@@ -615,7 +615,7 @@ function rotate_long_remote {
     max=\$((keep\${rottype}+1))
     dir="$backuproot/\$rottype"
     oldest=\`find $backuproot -maxdepth 1 -type d -name \$rottype'.*' | @SED@ -e 's/^.*\.//' | sort -n | tail -1\`
-    [ "\$oldest" == "" ] && oldest=0 
+    [ "\$oldest" == "" ] && oldest=0
     # if we've rotated the last backup off the stack, remove it.
     for (( i=\$oldest; i >= \$max; i-- )); do
       if [ -d \$dir.\$i ]; then
@@ -847,7 +847,7 @@ function set_orig {
 
 }
 
-function set_dest { 
+function set_dest {
 
   if [ "$dest" == "local" ]; then
     dest_path="$backupdir/$SECTION/$suffix/"
@@ -981,7 +981,7 @@ function set_rsync_options {
     if [ ! -z "$bandwidthlimit" ]; then
       rsync_options="$rsync_options --bwlimit=$bandwidthlimit"
     fi
-    
+
     if [ "$fakesuper" == "yes" ]; then
       remote_rsync="$remote_rsync --fake-super"
     fi

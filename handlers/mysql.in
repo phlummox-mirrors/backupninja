@@ -63,7 +63,7 @@ then
    home=`getent passwd "root" | @AWK@ -F: '{print $6}'`
 
    [ -d $home ] || fatal "Can't find root's home directory ($home)."
-    
+
    mycnf="$home/.my.cnf"
 
    workcnf="$mycnf"
@@ -75,7 +75,7 @@ then
       debug "mv $workcnf $tmpcnf"
       mv $workcnf $tmpcnf
    fi
-    
+
    oldmask=`umask`
    umask 077
    cat > $workcnf <<EOF

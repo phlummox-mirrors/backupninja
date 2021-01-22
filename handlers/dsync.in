@@ -26,18 +26,18 @@
 #  For the backup rotation to work, destuser must be able to run
 #  arbitrary bash commands on the desthost.
 #
-#  If 'remove' is set to 'yes' (default), then any mail directory 
+#  If 'remove' is set to 'yes' (default), then any mail directory
 #  which is deleted from the source will be moved to a "deleted"
-#  directory in the destination. It is up to you to periodically 
+#  directory in the destination. It is up to you to periodically
 #  remove this directory or old maildirs in it.
 #
 #  Limitations:
 #    . because we are not dynamically looking up anything with
-#      dovecot's userdb, we expect all data to be under the same 
+#      dovecot's userdb, we expect all data to be under the same
 #      tree on both the source and destination
-#    
-#    . we are assuming a backup to a backup server, so the 
-#      destination host should have its dovecot mail_location 
+#
+#    . we are assuming a backup to a backup server, so the
+#      destination host should have its dovecot mail_location
 #      configured to put the mail into
 #      $stripped_destdir/$letter/$user/$current_backup
 #
@@ -53,7 +53,7 @@ getconf keepmonthly 1
 
 getconf srcconffile
 getconf destconffile
-getconf srcdir 
+getconf srcdir
 getconf destdir
 getconf current_backup current_backup
 getconf desthost
@@ -89,7 +89,7 @@ fi
 function do_user() {
    local user=$1
    local btype=$2
-   local letter=${user:0:1} 
+   local letter=${user:0:1}
    local target="$stripped_destdir/$letter/$user/$btype.1"
    local failedcount=0
    local ret=0
@@ -202,7 +202,7 @@ function do_rotate() {
                echo "Debug: skipping rotation of \$dir.\$i because it was created" \$(( (now-created)/86400)) "days ago ("\$(( (now-cutoff_time)/86400))" needed)."
             fi
          fi
-      done     
+      done
    done
 
    max=\$((keepdaily+1))

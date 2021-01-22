@@ -356,7 +356,7 @@ incremental = $dup_incremental
 
 # how many days of incremental backups before doing a full backup again ;
 # default is 30 days (one can also use the time format of duplicity).
-# if increments = keep, never automatically perform a new full backup ; 
+# if increments = keep, never automatically perform a new full backup ;
 # only perform incremental backups.
 #increments = 30
 #increments = keep
@@ -398,9 +398,9 @@ keepincroffulls = $dup_keepincroffulls
 ## cfauthurl = YOUR_CF_AUTH_URL
 ##
 ## Default:
-# cfusername = 
-# cfapikey = 
-# cfauthurl = 
+# cfusername =
+# cfapikey =
+# cfauthurl =
 
 ## Dropbox requires a valid authentication token. To obtain one, you will need
 ## to create a Dropbox API application at https://www.dropbox.com/developers/apps/create.
@@ -413,7 +413,7 @@ keepincroffulls = $dup_keepincroffulls
 # dropboxaccesstoken =
 
 # FTP password, needed for backups using desturl = ftp://...
-#ftp_password = 
+#ftp_password =
 
 # bandwith limit, in KB/s ; default is 0, i.e. no limit
 # if using 'desturl' above, 'bandwidthlimit' must not be set
@@ -436,7 +436,7 @@ bandwidthlimit = $dup_bandwidth
 ## warning: requires no space beetween "-o" and "IdentityFile=...".
 ##
 ## Default:
-# sshoptions = 
+# sshoptions =
 sshoptions = $dup_sshoptions
 
 # put the backups under this destination directory

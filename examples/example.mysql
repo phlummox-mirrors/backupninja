@@ -30,11 +30,11 @@ compress    = yes
 # configfile = < path/to/file > (default = /etc/mysql/debian.cnf)
 # The config file is passed to mysql with --defaults-file.
 # On debian, this default will allow backupninja to make backups
-# of mysql without configuring any additional options. 
+# of mysql without configuring any additional options.
 # (this option is not compatible with "user" or "dbusername").
 #
 # user = <user> (default = root)
-# Run mysql commands as 'user'. A valid .my.cnf must exist with a 
+# Run mysql commands as 'user'. A valid .my.cnf must exist with a
 # database username and password in the user's home directory.
 # (this option is not compatible with "configfile" or "dbusername").
 #
@@ -43,14 +43,14 @@ compress    = yes
 # (this option is not compatible with "configfile" or "user").
 #
 # dbpassword = <dbpass> (no default)
-# The password used with dbusername. this password will NOT be passed 
+# The password used with dbusername. this password will NOT be passed
 # on the command line and is not readable using "ps aux".
 #
 # dbhost = <host> (default = localhost)
 # only localhost works right now.
 #
 # databases = < all | db1 db2 db3 > (default = all)
-# which databases to backup. should either be the word 'all' or a 
+# which databases to backup. should either be the word 'all' or a
 # space separated list of database names.
 #
 # nodata = < db.table1 db.table2 db.table3 > (no default)
@@ -60,10 +60,10 @@ compress    = yes
 # isn't necessary to backup, but you still need the structure to exist
 # on a restore. You *must* specify the table as part of a database, such
 # as "drupal.cache", where the database name is "drupal" and the table that
-# you do not want to dump the data for is called "cache". 
+# you do not want to dump the data for is called "cache".
 #
 # backupdir = < path/to/destination > (default = /var/backups/mysql)
-# where to dump the backups. hotcopy backups will be in a subdirectory 
+# where to dump the backups. hotcopy backups will be in a subdirectory
 # 'hotcopy' and sqldump backups will be in a subdirectory 'sqldump'
 #
 # hotcopy = < yes | no > (default = no)
@@ -78,4 +78,4 @@ compress    = yes
 # arguments to pass to mysqldump
 #
 # compress = < yes | no > (default = yes)
-# if yes, compress the sqldump output. 
+# if yes, compress the sqldump output.

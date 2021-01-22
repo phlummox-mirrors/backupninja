@@ -1,4 +1,4 @@
-## This is an example duplicity configuration file. 
+## This is an example duplicity configuration file.
 ##
 ## Here you can find all the possible duplicity options, details of
 ## what the options provide and possible settings. The defaults are set
@@ -12,7 +12,7 @@
 ## options = --s3-european-buckets --s3-use-new-style
 ##
 ## Default:
-# options = 
+# options =
 
 ## default is 0, but set to something like 19 if you want to lower the priority.
 ##
@@ -37,7 +37,7 @@
 
 ## temporary directory used by duplicity, set to some other location if your /tmp is small
 ## default is either /tmp or /usr/tmp, depending on the system
-## 
+##
 ## Default:
 # tmpdir = /tmp
 
@@ -78,14 +78,14 @@
 ## encryptkey = 04D9EA79
 ##
 ## Default:
-# encryptkey = 
+# encryptkey =
 
 ## ID of the GnuPG private key used for data signing.
 ## if not set, encryptkey will be used, an example setting would be:
 ## signkey = 04D9EA79
-## 
+##
 ## Default:
-# signkey = 
+# signkey =
 
 ## password used to unlock the encryption key
 ## NB: neither quote this, nor should it contain any quotes,
@@ -93,7 +93,7 @@
 ## password = a_very_complicated_passphrase
 ##
 ## Default:
-# password = 
+# password =
 
 ## password used to unlock the signature key, used only if
 ## it differs from the encryption key
@@ -150,12 +150,12 @@ exclude = /var/cache/backupninja/duplicity
 ## perform an incremental backup? (default = yes)
 ## if incremental = no, perform a full backup in order to start a new backup set
 ##
-## Default: 
+## Default:
 # incremental = yes
 
 ## how many days of incremental backups before doing a full backup again ;
 ## default is 30 days (one can also use the time format of duplicity).
-## if increments = keep, never automatically perform a new full backup ; 
+## if increments = keep, never automatically perform a new full backup ;
 ## only perform incremental backups.
 ##
 ## Default:
@@ -188,7 +188,7 @@ exclude = /var/cache/backupninja/duplicity
 ## the default value of this configuration option is not set:
 ##
 ## Default:
-# desturl = 
+# desturl =
 
 ## Amazon Web Services Access Key ID and Secret Access Key, needed for backups
 ## to S3 buckets.
@@ -196,8 +196,8 @@ exclude = /var/cache/backupninja/duplicity
 ## awssecretaccesskey = YOUR_AWS_SECRET_KEY
 ##
 ## Default:
-# awsaccesskeyid = 
-# awssecretaccesskey = 
+# awsaccesskeyid =
+# awssecretaccesskey =
 
 ## RackSpace's CloudFiles username, API key, and authentication URL.
 ## cfusername = YOUR_CF_USERNAME
@@ -205,9 +205,9 @@ exclude = /var/cache/backupninja/duplicity
 ## cfauthurl = YOUR_CF_AUTH_URL
 ##
 ## Default:
-# cfusername = 
-# cfapikey = 
-# cfauthurl = 
+# cfusername =
+# cfapikey =
+# cfauthurl =
 
 ## Dropbox requires a valid authentication token. To obtain one, you will need
 ## to create a Dropbox API application at https://www.dropbox.com/developers/apps/create.
@@ -222,7 +222,7 @@ exclude = /var/cache/backupninja/duplicity
 ## FTP password, needed for backups using desturl = ftp://...
 ##
 ## Default:
-# ftp_password = 
+# ftp_password =
 
 ## bandwith limit, in KB/s ; default is 0, i.e. no limit
 ## if using 'desturl' above, 'bandwidthlimit' must not be set
@@ -247,25 +247,25 @@ exclude = /var/cache/backupninja/duplicity
 ## warning: requires no space beetween "-o" and "IdentityFile=...".
 ##
 ## Default:
-# sshoptions = 
+# sshoptions =
 
 ## put the backups under this destination directory
 ## if using 'desturl' above, this must not be set
 ## in all other cases, this must be set!
 ## an example setting would be:
 ## destdir = /backups
-## 
+##
 ## Default:
-# destdir = 
+# destdir =
 
 ## the machine which will receive the backups
 ## if using 'desturl' above, this must not be set
 ## in all other cases, this must be set!
 ## an example setting would be:
 ## desthost = backuphost
-## 
-## Default: 
-# desthost = 
+##
+## Default:
+# desthost =
 
 ## make the files owned by this user
 ## if using 'desturl' above, this must not be set
