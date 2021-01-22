@@ -261,7 +261,7 @@ backupninja (0.9.7-1) experimental; urgency=low
     . new reportinfo option to include in email (Closes: #563734)
     . fix reportspace to skip non-directories (Closes: #536049)
     . set BACKUPNINJA_DEBUG when invoked with -d (Closes: #537266)
-    . allow form fields input to grow up to 100 chars (Closes: #562249)    
+    . allow form fields input to grow up to 100 chars (Closes: #562249)
     . customizable mysqldump options, thanks Chris Lamb! (Closes: #502966)
     . fix rdiff-backup include/exclude paths with spaces (Closes: #398435)
     . fix confusing error if rdiff-backup cant be found on remote server
@@ -274,7 +274,7 @@ backupninja (0.9.7-1) experimental; urgency=low
     . duplicity output now "info" so reportinfo can include (Closes: #563734)
     . do not propose to exclude /home/*/.gnupg twice anymore (Closes: #563044)
     . add support for Amazon S3 buckets, thanks Stefan!
-  
+
  -- Micah Anderson <micah@riseup.net>  Wed, 27 Jan 2010 18:20:39 -0500
 
 backupninja (0.9.6-4) unstable; urgency=low
@@ -282,12 +282,12 @@ backupninja (0.9.6-4) unstable; urgency=low
   * Fix df error message from cron (Closes: #497535)
   * Removed Lenny unsupported desturl example (Closes: #507679)
   * Fixed Lintain warning: maintainer-script-ignores-errors preinst
-	
+
  -- Micah Anderson <micah@riseup.net>  Mon, 08 Dec 2008 09:41:22 -0500
 
 backupninja (0.9.6-3) unstable; urgency=low
 
-  * Removed configure.ac and regenerate the autoconf junk so 
+  * Removed configure.ac and regenerate the autoconf junk so
     that substitution variables get set properly (Closes: #494728)
 
  -- Micah Anderson <micah@riseup.net>  Fri, 25 Jul 2008 16:19:54 -0400
@@ -365,8 +365,8 @@ backupninja (0.9.5-1) unstable; urgency=low
   * Added Homepage and Vcs-Svn fields to debian/control
   * Fixed tr construct reporting a warning (Closes: #452669)
   * Add depends on mailx | mailutils (Closes: #452670)
-  * New upstream release 
-    . ldap quoting, compress=yes now doesn't create empty files (Closes: #394935) 
+  * New upstream release
+    . ldap quoting, compress=yes now doesn't create empty files (Closes: #394935)
     . fixed mysql config combination empty file problem (Closes: #402679)
     . added 'nodata' to mysql to backup only table structure (Closes: #408829)
     . removed mysqldump header in selecting databases, and cleanup (Closes: #452039)
@@ -382,7 +382,7 @@ backupninja (0.9.5-1) unstable; urgency=low
   * Added missing parameter in documentation and example file for rsync handler
   * Added /tmp dir config option for duplicity
   * Add fix from r523 for duplicity handler
-  * Add version restriction to duplicity Suggests because backupninja's 
+  * Add version restriction to duplicity Suggests because backupninja's
     duplicity handler doesn't support 0.4.4
 
  -- Micah Anderson <micah@riseup.net>  Sat, 10 Nov 2007 21:13:29 -0500
@@ -482,7 +482,7 @@ backupninja (0.9.3-4) unstable; urgency=low
 
 backupninja (0.9.3-3) unstable; urgency=low
 
-  * Fixed improper readlink syntax (Closes: #351083) 
+  * Fixed improper readlink syntax (Closes: #351083)
   * Included fixes to mysql, pgsql, and svn handlers to also fix inverted
     vsname test
 
@@ -505,7 +505,7 @@ backupninja (0.9.3-1) unstable; urgency=low
     . warnings if vsnames or vsincludes are enabled but vserver support
       is enabled in backupninja.conf
     . multiple vsnames in configs now functional
-    . rdiff handler now can have configured exactly which vservers should be 
+    . rdiff handler now can have configured exactly which vservers should be
       backed up
     . ninjahelper now reports an error if the helper script has a syntax error
     . lib/vserver improvements in testing VROOTDIR, availability and
@@ -534,7 +534,7 @@ backupninja (0.9.2-2) unstable; urgency=low
 backupninja (0.9.2-1) unstable; urgency=low
 
   * New upstream release
-    . Update backupninja.conf.5 man page to include "when" 
+    . Update backupninja.conf.5 man page to include "when"
       and "vservers" (Closes: #338512)
     . Updated debian/control to Depend: on bash (Closes: #338795)
     . Fixed broken toint() causing backups not to run when set to "everyday"
@@ -562,19 +562,19 @@ backupninja (0.9.1-1) unstable; urgency=low
     . makecd ninjahelper added
     . ninjahelper generated files now created with more sane
       permissions (Closes: #336992)
-    . subversion handler now uses svnadmin hotcopy (Closes: #336994) 
+    . subversion handler now uses svnadmin hotcopy (Closes: #336994)
 
  -- Micah Anderson <micah@riseup.net>  Sat, 29 Oct 2005 00:28:00 -0400
 
 backupninja (0.9-1) unstable; urgency=low
 
   * Upgraded to the new release
-    . Upstream includes fix for CAN-2005-3111 (fixed in 0.8-2)	
+    . Upstream includes fix for CAN-2005-3111 (fixed in 0.8-2)
     . fixed incorrect find positional
     . changed direct grep of /etc/passwd to getent passwd.
     . rdiff helper has much better information on failed ssh attempt
       (patch from cmccallum@thecsl.org).
-    . rdiff handler now supports remote source and local dest. 
+    . rdiff handler now supports remote source and local dest.
       (patch from cmccallum@thecsl.org).
     . man pages are greatly improved (also new backup.d.5 man page)
 
@@ -670,12 +670,12 @@ backupninja (0.4.4-1) unstable; urgency=low
   * New upstream release:
     . Fixes pathing problem causing sfdisk not to be found (Closes: #297091)
     . Adds some new experimental handlers and options to existing handlers
-    . Fixes the terminal escape sequences bug by adding a configuration option 
+    . Fixes the terminal escape sequences bug by adding a configuration option
       to turn these off (Closes: #285939)
   * Added Suggests on hwinfo
   * Changed copyright to reflect upstream svn repo path change and
     new address
-  * Added patch to fix duplicate root problem with the mysql 
+  * Added patch to fix duplicate root problem with the mysql
     handler (Closes: #300717)
   * Added patch to fix svn handler always reporting a failure
 
@@ -728,7 +728,7 @@ backupninja (0.3.3-2) unstable; urgency=low
  -- Micah Anderson <micah@riseup.net>  Mon, 22 Nov 2004 18:09:24 -0600
 
 backupninja (0.3.3-1) unstable; urgency=low
-  
+
   * Modified description in debian/control
   * Dependency on awk can now be satisfied by gawk or mawk
   * Removed dependency on stat or coreutils
@@ -746,7 +746,7 @@ backupninja (0.3.2-1) unstable; urgency=low
 
   * Added dependency on stat (woody) or coreutils (sarge)
   * Updated copyright page to include the svn repository
-  * Upgraded to 0.3.2, solving the handler executable problem 
+  * Upgraded to 0.3.2, solving the handler executable problem
 
  -- Micah Anderson <micah@riseup.net>  Sun, 14 Nov 2004 17:11:53 -0600
 

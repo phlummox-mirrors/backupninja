@@ -44,11 +44,11 @@ Description: lightweight, extensible meta-backup system
  By creating simple drop-in handler scripts, backupninja can learn new skills.
  Backupninja is a silent flower blossom death strike to lost data.
  .
- In addition to backing up regular files, Backupninja has handlers to ease 
+ In addition to backing up regular files, Backupninja has handlers to ease
  backing up: Maildir, MySQL, PostgreSQL, SVN, Trac, hardware and system
  information, as well as the output from custom shell scripts.
  .
- Backupninja currently supports common backup utilities, easing their 
+ Backupninja currently supports common backup utilities, easing their
  configuration, currently supported are: rdiff-backup, duplicity, rsync,
  borgbackup, restic and CD/DVD.
  .

@@ -3,22 +3,22 @@ set -e
 
 # Remove the erroneous /etc/logrotate.d/backupninja directory if it exists
 
-if [ -d /etc/logrotate.d/backupninja ] 
+if [ -d /etc/logrotate.d/backupninja ]
 then
 	rm -f /etc/logrotate.d/backupninja/backupninja
 	rmdir /etc/logrotate.d/backupninja
 	if [ $? -ne 0 ]
-	then 
+	then
 		cat << EOF
 
-The /etc/logrotate.d/backupninja directory was created incorrectly by an earlier 
+The /etc/logrotate.d/backupninja directory was created incorrectly by an earlier
 version of this package. When trying to remove this directory file(s) were found
-inside this directory. There should be no files in this directory at all. 
-Installation of this package will not proceed until you have cleaned this 
+inside this directory. There should be no files in this directory at all.
+Installation of this package will not proceed until you have cleaned this
 directory out.
 
 EOF
-	
+
 		exit 1
 	fi
 fi
