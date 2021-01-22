@@ -9,6 +9,8 @@ TMP = $(CURDIR)/debian/$(PACKAGE)
 
 override_dh_auto_configure:
 	dh_auto_configure -- \
+	   MKTEMP=/bin/mktemp BASH=/bin/bash SED=/bin/sed \
+	   AWK=/usr/bin/awk STAT=/usr/bin/stat \
 	   --libdir=\$${prefix}/lib \
 	   --libexecdir=\$${prefix}/lib
 

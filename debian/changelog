@@ -5,6 +5,16 @@ backupninja (UNRELEASED) unstable; urgency=medium
 
  -- Micah Anderson <micah@riseup.net>  Sat, 02 Jan 2021 15:49:50 -0400
 
+backupninja (1.1.0-2.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Add debian/patches/unbreak-AC_PATH_PROG-bash.patch
+  * Pass BASH,SED,MKTEMP to configure specifying correct paths
+    - fixes reproducible build on merged-usr vs non-merged system
+      (Closes: #915222)
+
+ -- Andreas Henriksson <andreas@fatal.se>  Sat, 01 Dec 2018 21:39:53 +0100
+
 backupninja (1.1.0-2) unstable; urgency=medium
 
   * Fix FTBFS (Closes: #903168)

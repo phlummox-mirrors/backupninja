@@ -1,0 +1,25 @@
+From: Andreas Henriksson <andreas@fatal.se>
+Subject: unbreak AC_PATH_PROG bash
+
+Being able to set the variable name in the environment before
+running configure is a documented feature of AC_PATH_PROG.
+Explicitly unsetting the variable ofcourse breaks that feature.
+
+If someone thinks BASH is not a good variable name because it
+might be used for something else already, then either sanitize
+your build environment or use a different variable name!
+
+The hypothetical case in the comment isn't relevant in our build
+environment, so unbreak things here by commenting out the unset....
+
+--- backupninja-1.1.0.orig/configure.ac
++++ backupninja-1.1.0/configure.ac
+@@ -11,7 +11,7 @@ AM_INIT_AUTOMAKE([foreign])
+
+ # BASH may already be set in the shell, if the admin then changes the
+ # the /bin/sh symlink to a non-bash shell, all hell will break lose.
+-unset BASH
++#unset BASH
+ AC_PATH_PROGS(BASH, bash, "no", [$PATH:/bin:/usr/bin:/usr/sbin])
+ if test x$BASH = "xno"; then
+     AC_MSG_ERROR([bash is required])
