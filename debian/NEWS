@@ -1,3 +1,10 @@
+backupninja (1.2.0-1) unstable; urgency=medium
+
+  Beginning with version 1.2.0, support for vservers is completely dropped
+  from backupninja.
+
+ -- Jerome Charaoui <jerome@riseup.net>  Thu, 21 Jan 2021 21:09:43 -0500
+
 backupninja (1.0~rc1-1) unstable; urgency=low
 
   duplicity 0.6.17 and later has moved to a new sftp/scp backend
