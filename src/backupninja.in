@@ -376,8 +376,8 @@ function process_action() {
             done
          )
          retcode=${PIPESTATUS[0]}
-         debug "handler returned exit code $retcode"
          echo_debug_msg=0
+         debug "handler returned exit code $retcode"
 
       else
          # a backup is probably ongoing already, so display an error message
