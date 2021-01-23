@@ -9,9 +9,6 @@ AM_INIT_AUTOMAKE([foreign])
 
 # Checks for programs.
 
-# BASH may already be set in the shell, if the admin then changes the
-# the /bin/sh symlink to a non-bash shell, all hell will break lose.
-unset BASH
 AC_PATH_PROGS(BASH, bash, "no", [$PATH:/bin:/usr/bin:/usr/sbin])
 if test x$BASH = "xno"; then
     AC_MSG_ERROR([bash is required])
