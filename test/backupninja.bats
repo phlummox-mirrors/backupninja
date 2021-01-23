@@ -68,14 +68,21 @@ create_test_action() {
     echo "${lines[0]}" | grep -qe '^Configuration files must not be writable/readable by group staff!'
 }
 
-@test "reports: error report is mailed" {
+@test "reports: report is mailed when halts > 0" {
+    create_test_action halt test_halt
+    run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
+    sleep 0.1
+    grep -q "\*halt\* -- ${BATS_TMPDIR}/backup.d/test.sh" /var/mail/vagrant
+}
+
+@test "reports: report is mailed when fatals > 0" {
     create_test_action fatal test_error
     run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
     sleep 0.1
     grep -q "\*failed\* -- ${BATS_TMPDIR}/backup.d/test.sh" /var/mail/vagrant
 }
 
-@test "reports: warning report is mailed" {
+@test "reports: report is mailed when reportwarning = yes and warnings > 0" {
     create_test_action warning test_warning
     setconfig backupninja.conf reportsuccess no
     setconfig backupninja.conf reportwarning yes
@@ -84,7 +91,7 @@ create_test_action() {
     grep -q "Warning: test_warning" /var/mail/vagrant
 }
 
-@test "reports: success report is mailed" {
+@test "reports: report is mailed when reportsuccess = yes" {
     create_test_action
     setconfig backupninja.conf reportsuccess yes
     run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"

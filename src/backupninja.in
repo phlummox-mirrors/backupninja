@@ -606,6 +606,7 @@ if [ $actions_run == 0 ]; then doit=0
 elif [ "$reportemail" == "" ]; then doit=0
 elif [ $fatals != 0 ]; then doit=1
 elif [ $errors != 0 ]; then doit=1
+elif [ $halts != 0 ]; then doit=1
 elif [ "$reportsuccess" == "yes" ]; then doit=1
 elif [ "$reportwarning" == "yes" -a $warnings != 0 ]; then doit=1
 else doit=0
@@ -617,6 +618,7 @@ if [ $doit == 1 ]; then
    [ $warnings == 0 ] || subject="WARNING"
    [ $errors == 0 ] || subject="ERROR"
    [ $fatals == 0 ] || subject="FAILED"
+   [ $halts == 0 ] || subject="HALTED"
 
    {
       for ((i=0; i < ${#messages[@]} ; i++)); do
