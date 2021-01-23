@@ -20,7 +20,7 @@ create_test_action() {
 
 @test "general: error thrown on attempt to run as non-root user" {
     run sudo -u vagrant backupninja -f "${BATS_TMPDIR}/backupninja.conf"
-    [ "$status" -eq 2 ]
+    [ "$status" -eq 3 ]
     [ "${lines[1]}" = "backupninja can only be run as root" ]
 }
 
