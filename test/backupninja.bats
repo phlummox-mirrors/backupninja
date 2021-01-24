@@ -2,6 +2,7 @@ load common
 
 teardown_backupninja() {
     [ -x /usr/bin/mail.moved ] && mv /usr/bin/mail.moved /usr/bin/mail
+    [ -x /usr/bin/rsync.moved ] && mv /usr/bin/rsync.moved /usr/bin/rsync
 }
 
 create_test_action() {
@@ -155,6 +156,83 @@ create_test_action() {
     run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
     sleep 0.1
     grep -q '^=\{100\}$' /var/mail/vagrant
+}
+
+@test "reports: reporthost sends report to remote host" {
+    cleanup_backups remote
+    create_test_action info test_info
+    setconfig backupninja.conf reportsuccess yes
+    setconfig backupninja.conf reportinfo yes
+    setconfig backupninja.conf reporthost "$BN_REMOTEHOST"
+    setconfig backupninja.conf reportuser "$BN_REMOTEUSER"
+    setconfig backupninja.conf reportdirectory "$BN_BACKUPDIR"
+    run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
+    [ "$status" -eq 0 ]
+    ssh "${BN_REMOTEUSER}@${BN_REMOTEHOST}" test -s "${BN_BACKUPDIR}/backupninja.log"
+}
+
+@test "reports: emits error when reportuser is empty" {
+    create_test_action info test_info
+    setconfig backupninja.conf reportsuccess yes
+    setconfig backupninja.conf reportinfo yes
+    setconfig backupninja.conf reporthost "$BN_REMOTEHOST"
+    setconfig backupninja.conf reportdirectory "$BN_BACKUPDIR"
+    run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
+    [ "$status" -eq 1 ]
+}
+
+@test "reports: emits error when reportdirectory is empty" {
+    create_test_action info test_info
+    setconfig backupninja.conf reportsuccess yes
+    setconfig backupninja.conf reportinfo yes
+    setconfig backupninja.conf reporthost "$BN_REMOTEHOST"
+    setconfig backupninja.conf reportuser "$BN_REMOTEUSER"
+    run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
+    [ "$status" -eq 1 ]
+}
+
+@test "reports: emits error when rsync is not found" {
+    create_test_action info test_info
+    setconfig backupninja.conf reportsuccess yes
+    setconfig backupninja.conf reportinfo yes
+    setconfig backupninja.conf reporthost "$BN_REMOTEHOST"
+    setconfig backupninja.conf reportuser "$BN_REMOTEUSER"
+    mv /usr/bin/rsync /usr/bin/rsync.moved
+    run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
+    [ "$status" -eq 1 ]
+}
+
+@test "reports: emits error when reporthost is invalid" {
+    create_test_action info test_info
+    setconfig backupninja.conf reportsuccess yes
+    setconfig backupninja.conf reportinfo yes
+    setconfig backupninja.conf reporthost foo
+    setconfig backupninja.conf reportuser "$BN_REMOTEUSER"
+    setconfig backupninja.conf reportdirectory "$BN_BACKUPDIR"
+    run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
+    [ "$status" -eq 1 ]
+}
+
+@test "reports: emits error when reportuser is invalid" {
+    create_test_action info test_info
+    setconfig backupninja.conf reportsuccess yes
+    setconfig backupninja.conf reportinfo yes
+    setconfig backupninja.conf reporthost "$BN_REMOTEHOST"
+    setconfig backupninja.conf reportuser foo
+    setconfig backupninja.conf reportdirectory "$BN_BACKUPDIR"
+    run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
+    [ "$status" -eq 1 ]
+}
+
+@test "reports: emits error when reportdirectory is unwritable" {
+    create_test_action info test_info
+    setconfig backupninja.conf reportsuccess yes
+    setconfig backupninja.conf reportinfo yes
+    setconfig backupninja.conf reporthost "$BN_REMOTEHOST"
+    setconfig backupninja.conf reportuser "$BN_REMOTEUSER"
+    setconfig backupninja.conf reportdirectory "/foo"
+    run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
+    [ "$status" -eq 1 ]
 }
 
 @test "scheduling: runs when = 'everyday at 01' and time matches" {
