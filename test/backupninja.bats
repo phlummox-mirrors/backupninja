@@ -1,5 +1,9 @@
 load common
 
+teardown_backupninja() {
+    [ -x /usr/bin/mail.moved ] && mv /usr/bin/mail.moved /usr/bin/mail
+}
+
 create_test_action() {
     echo '#!/bin/sh' > "${BATS_TMPDIR}/backup.d/test.sh"
     echo "$1 $2" >> "${BATS_TMPDIR}/backup.d/test.sh"
@@ -92,7 +96,7 @@ create_test_action() {
 }
 
 @test "reports: report is mailed when reportsuccess = yes" {
-    create_test_action
+    create_test_action info test_info
     setconfig backupninja.conf reportsuccess yes
     run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
     sleep 0.1
@@ -109,13 +113,22 @@ create_test_action() {
 }
 
 @test "reports: success report contains disk space info" {
-    create_test_action
+    create_test_action info test_info
     echo "directory = /" >> "${BATS_TMPDIR}/backup.d/test.sh"
     setconfig backupninja.conf reportsuccess yes
     setconfig backupninja.conf reportspace yes
     run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
     sleep 0.1
     grep -q "/dev/sda1" /var/mail/vagrant
+}
+
+@test "reports: emits error if mail executable is not found" {
+    create_test_action info test_info
+    setconfig backupninja.conf reportsuccess yes
+    mv /usr/bin/mail /usr/bin/mail.moved
+    run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
+    [ "$status" -eq 1 ]
+    false
 }
 
 @test "scheduling: runs when = 'everyday at 01' and time matches" {

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- [core] raise error if mail isn't found in $PATH and reportemail = yes
+
 ### Fixed
 
 - [build] make build reproducible regardless of usrmerge (DEBBUG-915222)
