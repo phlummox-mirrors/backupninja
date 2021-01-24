@@ -51,10 +51,30 @@ Send a summary of the backup status to this email address.
 If set to 'yes', a report email will be generated even if all modules reported success.
 
 .TP
+.B reportinfo
+If set to 'yes', info messages from handlers will be sent into the email.
+
+.TP
 .B reportwarning
 If set to 'yes', a report email will be generated even if there was no error.
 
 .TP
+.B reportspace
+If set to 'yes', disk space usage will be included in the backup email report.
+
+.TP
+.B reporthost
+Where to rsync the backupninja.log to be aggregated in a ninjareport.
+
+.Ts
+.B reportuser
+What user to connect to reporthost to sync the backupninja.log
+
+.TP
+.B reportdirectory
+Where on the reporthost should the report go.
+
+.Te
 .B reportwrap
 Number of columns the email report body should wrap to.
 
@@ -113,7 +133,15 @@ reportemail = root
 .br
 reportsuccess = yes
 .br
-reportwarning = yes
+reportinfo = no
+.br
+reportspace = no
+.br
+reporthost =
+.br
+reportuser = ninja
+.br
+reportdirectory = /var/lib/backupninja/reports
 .br
 reportwrap = 1000
 .br

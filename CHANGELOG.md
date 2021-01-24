@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [core] backup halt should trigger email report if enabled
 - [core] wrap report email body to 1000 characters by default (DEBBUG-871793)
 - [core] improve error handling around `reporthost` feature
+- [docs] add missing parameters to `backupninja.conf` manpage
 
 ## [1.2.0] - 2021-01-21
 
