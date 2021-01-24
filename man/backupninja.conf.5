@@ -67,6 +67,10 @@ The path of the logfile.
 The directory where all the backup action configuration files live.
 
 .TP
+.B admingroup
+Administration user group that is allowed to read/write configuration files in \fBconfigdirectory\fB.
+
+.TP
 .B scriptdirectory
 Where backupninja handler scripts are found
 
@@ -116,6 +120,8 @@ reportwrap = 1000
 logfile = /var/log/backupninja.log
 .br
 configdirectory = /etc/backup.d
+.br
+admingroup = root
 .br
 scriptdirectory = /usr/share/backupninja
 .br
