@@ -652,8 +652,24 @@ if [ $actions_run != 0 ]; then
 fi
 
 if [ -n "$reporthost" ]; then
-   debug "send $logfile to $reportuser@$reporthost:$reportdirectory"
-   rsync -qt $logfile $reportuser@$reporthost:$reportdirectory
+   if [ -z "$reportuser" ] || [ -z "$reportdirectory" ]; then
+      error "Unable to send report, reportuser and reportdirectory must be specified."
+      let "errors += 1"
+   elif [ ! -x "$(which rsync 2>/dev/null)" ]; then
+      error "Unable to locate rsync executable, report could not be sent to ${reporthost}."
+      let "errors += 1"
+   else
+      info "Sending $logfile to $reportuser@$reporthost:$reportdirectory"
+      execstr="rsync -qt $logfile $reportuser@$reporthost:$reportdirectory"
+      debug $execstr
+      output=$(eval $execstr 2>&1)
+      ret=$?
+      if [ $ret -ne 0 ]; then
+         error $output
+         error "An error was encountered attempting to send report to ${reporthost}."
+         let "errors += 1"
+      fi
+   fi
 fi
 
 # return exit code
