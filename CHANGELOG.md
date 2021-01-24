@@ -9,20 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- [core] implement reportwrap configuration parameter
+- [core] implement `reportwrap` configuration parameter
 
 ### Changed
 
-- [core] raise error if mail isn't found in $PATH and reportemail = yes
-- [core] unset BACKUPNINJA_DEBUG before exit
+- [core] raise error if mail isn't found in `$PATH` and `reportemail = yes`
+- [core] unset `BACKUPNINJA_DEBUG` before exit
 
 ### Fixed
 
 - [build] make build reproducible regardless of usrmerge (DEBBUG-915222)
-- [core] silence exit code message unless --debug is used
+- [core] silence exit code message unless `--debug` is used
 - [core] backup halt should trigger email report if enabled
 - [core] wrap report email body to 1000 characters by default (DEBBUG-871793)
-- [core] improve error handling around reporthost feature
+- [core] improve error handling around `reporthost` feature
 
 ## [1.2.0] - 2021-01-21
 
