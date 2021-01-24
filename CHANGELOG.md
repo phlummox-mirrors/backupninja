@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [core] implement reportwrap configuration parameter
+
 ### Changed
 
 - [core] raise error if mail isn't found in $PATH and reportemail = yes
@@ -16,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [build] make build reproducible regardless of usrmerge (DEBBUG-915222)
 - [core] silence exit code message unless --debug is used
 - [core] backup halt should trigger email report if enabled
+- [core] wrap report email body to 1000 characters by default (DEBBUG-871793)
 
 ## [1.2.0] - 2021-01-21
 

@@ -55,6 +55,10 @@ If set to 'yes', a report email will be generated even if all modules reported s
 If set to 'yes', a report email will be generated even if there was no error.
 
 .TP
+.B reportwrap
+Number of columns the email report body should wrap to.
+
+.TP
 .B logfile
 The path of the logfile.
 
@@ -106,6 +110,8 @@ reportemail = root
 reportsuccess = yes
 .br
 reportwarning = yes
+.br
+reportwrap = 1000
 .br
 logfile = /var/log/backupninja.log
 .br

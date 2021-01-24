@@ -128,7 +128,25 @@ create_test_action() {
     mv /usr/bin/mail /usr/bin/mail.moved
     run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
     [ "$status" -eq 1 ]
-    false
+}
+
+@test "reports: wraps report text to 1000 columns by default" {
+    create_test_action info "$(printf \'=%.0s\' {1..2000})"
+    setconfig backupninja.conf reportsuccess yes
+    setconfig backupninja.conf reportinfo yes
+    run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
+    sleep 0.1
+    grep -q '^=\{1000\}$' /var/mail/vagrant
+}
+
+@test "reports: wraps report text according to reportwrap" {
+    create_test_action info "$(printf \'=%.0s\' {1..2000})"
+    setconfig backupninja.conf reportsuccess yes
+    setconfig backupninja.conf reportinfo yes
+    setconfig backupninja.conf reportwrap 100
+    run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
+    sleep 0.1
+    grep -q '^=\{100\}$' /var/mail/vagrant
 }
 
 @test "scheduling: runs when = 'everyday at 01' and time matches" {
