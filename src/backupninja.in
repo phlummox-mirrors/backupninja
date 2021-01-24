@@ -672,6 +672,9 @@ if [ -n "$reporthost" ]; then
    fi
 fi
 
+# unset exported envvars
+unset BACKUPNINJA_DEBUG
+
 # return exit code
 [ $halts == 0 ] || exit 2
 [ $fatals == 0 ] || exit 2

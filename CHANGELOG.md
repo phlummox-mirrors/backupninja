@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - [core] raise error if mail isn't found in $PATH and reportemail = yes
+- [core] unset BACKUPNINJA_DEBUG before exit
 
 ### Fixed
 
