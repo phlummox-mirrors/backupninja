@@ -72,6 +72,14 @@ create_test_action() {
     echo "${lines[0]}" | grep -qe '^Configuration files must not be writable/readable by group staff!'
 }
 
+@test "permissions: admingroup allows non-root group ownership of backup action" {
+    create_test_action
+    setconfig backupninja.conf admingroup staff
+    chgrp staff "${BATS_TMPDIR}/backup.d/test.sh"
+    run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf"
+    [ "$status" -eq 0 ]
+}
+
 @test "reports: report is mailed when halts > 0" {
     create_test_action halt test_halt
     run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
