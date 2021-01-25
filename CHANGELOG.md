@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [core] wrap report email body to 1000 characters by default (DEBBUG-871793)
 - [core] improve error handling around `reporthost` feature
 - [docs] add missing parameters to `backupninja.conf` manpage
+- [sys] improve device selection for MBR backup (#11303)
 
 ## [1.2.0] - 2021-01-21
 
