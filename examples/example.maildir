@@ -13,10 +13,10 @@
 ## We handle each maildir individually because it becomes very
 ## unweldy to hardlink and rsync many hundreds of thousands
 ## of files at once. It is much faster to take on smaller
-## chunks at a time. 
+## chunks at a time.
 ##
 ## Any maildir which is deleted from the source will be moved to
-## "deleted" directory in the destination. It is up to you to 
+## "deleted" directory in the destination. It is up to you to
 ## periodically remove this directory or old maildirs in it.
 ##
 ## Note: This handler assumes that the remote shell is set to bash
@@ -27,7 +27,7 @@
 when = everyday at 21:00
 
 ## each users maildir will contain these files:
-## daily.1, daily.2, daily.3, daily.4, daily.5, weekly.1, weekly.2, 
+## daily.1, daily.2, daily.3, daily.4, daily.5, weekly.1, weekly.2,
 ## weekly.3, monthly.1
 ## if keepdaily is 5, keepweekly is 3, and keepmonthly is 1
 keepdaily = 5
@@ -53,7 +53,7 @@ destuser = backer
 # For alternate ports from the default 22, specify here
 destport = 4444
 
-# If you need to specify an alternate ssh public key authentication file 
+# If you need to specify an alternate ssh public key authentication file
 # do that here. Default: /root/.ssh/id_rsa
 destid_file = /home/backupkeys/.ssh/maildirbackup_id_rsa
 

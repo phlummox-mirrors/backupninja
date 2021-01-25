@@ -11,7 +11,7 @@ edit = sed \
     -e "s,@AWK\@,$(AWK),g" \
     -e "s,@SED\@,$(SED),g" \
     -e "s,@MKTEMP\@,$(MKTEMP),g" \
-    -e "s,@libdir\@,$(pkglibdir),g" 
+    -e "s,@libdir\@,$(pkglibdir),g"
 
 easydialog: $(srcdir)/easydialog.in
 	rm -f easydialog

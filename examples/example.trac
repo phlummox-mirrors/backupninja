@@ -1,6 +1,6 @@
 ##
 ## Perform backups of trac environment
-## 
+##
 ## REQUIRES: apt-get install trac
 ##
 ## This file can be empty, the defaults are usually good.

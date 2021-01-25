@@ -4,19 +4,19 @@
 # where to dump the backups
 
 # databases = < all | db1 db2 db3 > (default = all)
-# which databases to backup. should either be the word 'all' or a 
+# which databases to backup. should either be the word 'all' or a
 # space separated list of database names.
 # Note: when using 'all', pg_dumpall is used instead of pg_dump, which means
 # that cluster-wide data (such as users and groups) are saved.
 
 # compress = < yes | no > (default = yes)
-# if yes, compress the pg_dump/pg_dumpall output. 
+# if yes, compress the pg_dump/pg_dumpall output.
 
 # format = < plain | tar | custom > (default = plain)
 # plain -  Output a plain-text SQL script file with the extension .sql.
 #          When dumping all databases, a single file is created via pg_dumpall.
-# tar -    Output a tar archive suitable for input into pg_restore. More 
-#          flexible than plain and can be manipulated by standard Unix tools 
+# tar -    Output a tar archive suitable for input into pg_restore. More
+#          flexible than plain and can be manipulated by standard Unix tools
 #          such as tar. Creates a globals.sql file and an archive per database.
 # custom - Output a custom PostgreSQL pg_restore archive. This is the most
 #          flexible format allowing selective import and reordering of database

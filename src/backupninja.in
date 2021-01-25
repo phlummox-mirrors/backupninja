@@ -376,8 +376,8 @@ function process_action() {
             done
          )
          retcode=${PIPESTATUS[0]}
-         debug "handler returned exit code $retcode"
          echo_debug_msg=0
+         debug "handler returned exit code $retcode"
 
       else
          # a backup is probably ongoing already, so display an error message
@@ -543,6 +543,7 @@ getconf RSYNC /usr/bin/rsync
 getconf DSYNC /usr/bin/dsync
 getconf DOVEADM /usr/bin/doveadm
 getconf admingroup root
+getconf reportwrap 1000
 
 if [ ! -d "$configdirectory" ]; then
    echo "Configuration directory '$configdirectory' not found."
@@ -606,34 +607,41 @@ if [ $actions_run == 0 ]; then doit=0
 elif [ "$reportemail" == "" ]; then doit=0
 elif [ $fatals != 0 ]; then doit=1
 elif [ $errors != 0 ]; then doit=1
+elif [ $halts != 0 ]; then doit=1
 elif [ "$reportsuccess" == "yes" ]; then doit=1
 elif [ "$reportwarning" == "yes" -a $warnings != 0 ]; then doit=1
 else doit=0
 fi
 
 if [ $doit == 1 ]; then
-   debug "send report to $reportemail"
-   hostname=`hostname`
-   [ $warnings == 0 ] || subject="WARNING"
-   [ $errors == 0 ] || subject="ERROR"
-   [ $fatals == 0 ] || subject="FAILED"
+   if [ -x "$(which mail 2>/dev/null)" ]; then
+      debug "send report to $reportemail"
+      hostname=`hostname`
+      [ $warnings == 0 ] || subject="WARNING"
+      [ $errors == 0 ] || subject="ERROR"
+      [ $fatals == 0 ] || subject="FAILED"
+      [ $halts == 0 ] || subject="HALTED"
 
-   {
-      for ((i=0; i < ${#messages[@]} ; i++)); do
-         echo ${messages[$i]}
-      done
-      echo -e "$errormsg"
-      if [ "$reportspace" == "yes" ]; then
-         previous=""
-         for i in $(ls "$configdirectory"); do
-            backuploc=$(grep ^directory "$configdirectory"/"$i" | @AWK@ '{print $3}')
-            if [ "$backuploc" != "$previous" -a -n "$backuploc" -a -d "$backuploc" ]; then
-               df -h "$backuploc"
-               previous="$backuploc"
-            fi
+      {
+         for ((i=0; i < ${#messages[@]} ; i++)); do
+            echo ${messages[$i]}
          done
-      fi
-   } | mail -s "backupninja: $hostname $subject" $reportemail
+         echo -e "$errormsg"
+         if [ "$reportspace" == "yes" ]; then
+            previous=""
+            for i in $(ls "$configdirectory"); do
+               backuploc=$(grep ^directory "$configdirectory"/"$i" | @AWK@ '{print $3}')
+               if [ "$backuploc" != "$previous" -a -n "$backuploc" -a -d "$backuploc" ]; then
+                  df -h "$backuploc"
+                  previous="$backuploc"
+               fi
+            done
+         fi
+      } | fold -s -w "$reportwrap" | mail -s "backupninja: $hostname $subject" $reportemail
+   else
+      error "Unable to locate mail executable, email report not sent!"
+      let "errors += 1"
+   fi
 fi
 
 if [ $actions_run != 0 ]; then
@@ -644,9 +652,28 @@ if [ $actions_run != 0 ]; then
 fi
 
 if [ -n "$reporthost" ]; then
-   debug "send $logfile to $reportuser@$reporthost:$reportdirectory"
-   rsync -qt $logfile $reportuser@$reporthost:$reportdirectory
+   if [ -z "$reportuser" ] || [ -z "$reportdirectory" ]; then
+      error "Unable to send report, reportuser and reportdirectory must be specified."
+      let "errors += 1"
+   elif [ ! -x "$(which rsync 2>/dev/null)" ]; then
+      error "Unable to locate rsync executable, report could not be sent to ${reporthost}."
+      let "errors += 1"
+   else
+      info "Sending $logfile to $reportuser@$reporthost:$reportdirectory"
+      execstr="rsync -qt $logfile $reportuser@$reporthost:$reportdirectory"
+      debug $execstr
+      output=$(eval $execstr 2>&1)
+      ret=$?
+      if [ $ret -ne 0 ]; then
+         error $output
+         error "An error was encountered attempting to send report to ${reporthost}."
+         let "errors += 1"
+      fi
+   fi
 fi
+
+# unset exported envvars
+unset BACKUPNINJA_DEBUG
 
 # return exit code
 [ $halts == 0 ] || exit 2

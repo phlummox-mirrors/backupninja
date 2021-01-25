@@ -3,15 +3,12 @@
 
 # The maintainer mode is causing me grief with newest versions of autotools
 #AM_MAINTAINER_MODE
-AC_INIT([backupninja],[1.2.0],[backupninja@lists.riseup.net])
+AC_INIT([backupninja],[1.2.1],[backupninja@lists.riseup.net])
 AC_CONFIG_SRCDIR([src/backupninja.in])
 AM_INIT_AUTOMAKE([foreign])
 
 # Checks for programs.
 
-# BASH may already be set in the shell, if the admin then changes the
-# the /bin/sh symlink to a non-bash shell, all hell will break lose.
-unset BASH
 AC_PATH_PROGS(BASH, bash, "no", [$PATH:/bin:/usr/bin:/usr/sbin])
 if test x$BASH = "xno"; then
     AC_MSG_ERROR([bash is required])

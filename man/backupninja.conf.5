@@ -44,15 +44,39 @@ How verbose to make the logs.
 
 .TP
 .B reportemail
-Send a summary of the backup status to this email address
+Send a summary of the backup status to this email address.
 
 .TP
 .B reportsuccess
 If set to 'yes', a report email will be generated even if all modules reported success.
 
 .TP
+.B reportinfo
+If set to 'yes', info messages from handlers will be sent into the email.
+
+.TP
 .B reportwarning
 If set to 'yes', a report email will be generated even if there was no error.
+
+.TP
+.B reportspace
+If set to 'yes', disk space usage will be included in the backup email report.
+
+.TP
+.B reporthost
+Where to rsync the backupninja.log to be aggregated in a ninjareport.
+
+.TP
+.B reportuser
+What user to connect to reporthost to sync the backupninja.log
+
+.TP
+.B reportdirectory
+Where on the reporthost should the report go.
+
+.TP
+.B reportwrap
+Number of columns the email report body should wrap to.
 
 .TP
 .B logfile
@@ -63,8 +87,12 @@ The path of the logfile.
 The directory where all the backup action configuration files live.
 
 .TP
+.B admingroup
+Administration user group that is allowed to read/write configuration files in \fBconfigdirectory\fB.
+
+.TP
 .B scriptdirectory
-Where backupninja handler scripts are found
+Where backupninja handler scripts are found.
 
 .TP
 .B usecolors
@@ -105,11 +133,23 @@ reportemail = root
 .br
 reportsuccess = yes
 .br
-reportwarning = yes
+reportinfo = no
+.br
+reportspace = no
+.br
+reporthost =
+.br
+reportuser = ninja
+.br
+reportdirectory = /var/lib/backupninja/reports
+.br
+reportwrap = 1000
 .br
 logfile = /var/log/backupninja.log
 .br
 configdirectory = /etc/backup.d
+.br
+admingroup = root
 .br
 scriptdirectory = /usr/share/backupninja
 .br
