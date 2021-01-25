@@ -1,8 +1,10 @@
-backupninja (UNRELEASED) unstable; urgency=medium
+backupninja (1.2.1-1) unstable; urgency=medium
 
   * Remove intrigeri from Uploaders (Closes: #919041)
+  * Import new upstream release (Closes: #915222, #871793)
+  * Remove debian/patches/unbreak-AC_PATH_PROG-bash.patch, integrated upstream
 
- -- Jerome Charaoui <jerome@riseup.net>  Fri, 22 Jan 2021 11:14:06 -0500
+ -- Jerome Charaoui <jerome@riseup.net>  Mon, 25 Jan 2021 10:40:53 -0500
 
 backupninja (1.2.0-1) unstable; urgency=medium
 
