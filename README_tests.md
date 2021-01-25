@@ -17,12 +17,15 @@ Once the requirements are in place, the test suite may be run in this manner:
     git clone git@0xacab.org:liberate/backupninja.git
     cd backupninja
     vagrant up
-    vagrant rsync
     vagrant ssh -c "sudo /vagrant/test/test.sh"
 
 It's possible to only test a specific handler with:
 
     vagrant ssh -c "sudo /vagrant/test/test.sh rdiff"
+
+To synchronise changes in the source code and rebuild backupninja:
+
+    vagrant rsync local && vagrant ssh -c "build-backupninja.sh"
 
 Please report any problems with the test suite on the issue tracker at:
 

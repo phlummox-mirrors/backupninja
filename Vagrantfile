@@ -41,11 +41,16 @@ Vagrant.configure("2") do |config|
       locale-gen
       apt-get update
       apt-get install -y automake make dialog sshpass
-      cd /vagrant
-      ./autogen.sh
-      ./configure --prefix=/usr --mandir=/usr/share/man --sysconfdir=/etc --localstatedir=/var --libdir=/usr/lib --libexecdir=/usr/lib
-      make
-      make install
+      BUILDSCRIPT="/usr/local/bin/build-backupninja.sh"
+      echo "#!/bin/sh" >> $BUILDSCRIPT
+      echo "cd /vagrant" >> $BUILDSCRIPT
+      echo "make clean" >> $BUILDSCRIPT
+      echo "./autogen.sh" >> $BUILDSCRIPT
+      echo "./configure --prefix=/usr --mandir=/usr/share/man --sysconfdir=/etc --localstatedir=/var --libdir=/usr/lib --libexecdir=/usr/lib" >> $BUILDSCRIPT
+      echo "make" >> $BUILDSCRIPT
+      echo "sudo make install" >> $BUILDSCRIPT
+      chmod +x $BUILDSCRIPT
+      $BUILDSCRIPT
       mkdir -p /root/.ssh
       yes y | ssh-keygen -t ed25519 -f /root/.ssh/id_ed25519 -N ''
       echo "StrictHostKeyChecking accept-new" >> /root/.ssh/config
