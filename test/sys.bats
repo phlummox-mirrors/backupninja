@@ -43,6 +43,7 @@ finish_sys() {
     dd if=/dev/zero of=/dev/sdd2 bs=512 count=2048 conv=notrunc
     dd if=/dev/zero of=/dev/sdd bs=512 count=1 conv=notrunc
     dd if=/dev/zero of=/dev/sde bs=512 count=2048 conv=notrunc
+    partprobe
 }
 
 @test "action runs without errors" {
