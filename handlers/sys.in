@@ -597,11 +597,6 @@ if [ "$partitions" == "yes" ]; then
          fi
       done
    fi
-   if [ "$dohwinfo" == "yes" ]; then
-      debug "Using $HWINFO to get all available disk information"
-      echo -e "\n\n====================== $disk ======================\n" >>  $hardwarefile
-      $HWINFO --disk >> $hardwarefile
-   fi
 fi
 
 if [ "$luksheaders" == "yes" ]; then
