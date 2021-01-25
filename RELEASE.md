@@ -1,6 +1,11 @@
 Upstream
 ========
 
+* run the full testsuite
+
+        vagrant rsync local && \
+        vagrant ssh -c "build-backupninja.sh && sudo /vagrant/test/test.sh"
+
 * prepare the environment:
 
         export VERSION=x.y.z
@@ -15,11 +20,11 @@ Upstream
            "s{^## \[Unreleased\].*}{## [$VERSION] - $RELEASE_DATE}" \
            CHANGELOG.md
 
-* commit, tag and create the tarball:
+* commit and created signed tag
 
         git commit configure.ac CHANGELOG.md \
             -m "Releasing backupninja $VERSION" && \
-        git clean -fdx && \
+        git clean -fdx -e .vagrant && \
         git tag -s "backupninja-$VERSION" \
             -m "Releasing backupninja $VERSION" && \
         ./autogen.sh && \
@@ -29,15 +34,15 @@ Upstream
 * compare the content of the generated tarball with the content of the
   previous one
 
-* move the tarball outside of the Git working copy and clean up:
+        diffoscope --text-color=always ../tarballs/backupninja-x.y.z.tar.gz \
+            backupninja-$VERSION.tar.gz | less -R
+
+* move the tarball outside of the Git working copy and clean up
 
         mkdir -p ../tarballs && \
         mv backupninja-$VERSION.tar.gz ../tarballs/ && \
         make distclean && \
-        git clean -fdx
-
-* Install (extract tarball, `.configure && make && sudo make install`)
-  and test.
+        git clean -fdx -e .vagrant
 
 Debian
 ======
@@ -59,10 +64,8 @@ Install the `.deb` and test.
 Release
 =======
 
-* sign the release and push it to Git:
+* push the release to GitLab
 
-        gpg --armor --detach-sign \
-            ../tarballs/backupninja-$VERSION.tar.gz && \
         git checkout debian && \
         gbp buildpackage --git-tag-only --git-sign-tags && \
         git push --follow-tags origin \
@@ -71,10 +74,11 @@ Release
             pristine-tar:pristine-tar \
             upstream:upstream
 
-* upload the upstream tarball and detached signature to the GitLab
-  milestone page with *Edit* → *Attach a file*
+* create a new GitLab release
+
 * announce the release on the backupninja mailing-list,
   pointing to the milestone web page
+
 * upload to Debian or ask someone listed in the `Uploaders` control
   field to review and upload
 
@@ -82,4 +86,5 @@ Open the next development cycle
 ===============================
 
 * `git checkout master`
+
 * Add an empty new section in `CHANGELOG.md`, commit and push.
