@@ -46,6 +46,9 @@ reportuser = ninja
 # use a globally unique name, preferably the hostname
 reportdirectory = /var/lib/backupninja/reports
 
+# number of columns the report email body should wrap to
+#reportwrap = 80
+
 # set to the administration group that is allowed to
 # read/write configuration files in /etc/backup.d
 admingroup = root

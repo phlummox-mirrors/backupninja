@@ -554,24 +554,39 @@ fi
 
 ## PARTITIONS #############################
 
-# here we use sfdisk to dump a listing of all the partitions.
-# these files can be used to directly partition a disk of the same size.
+if [ "$partitions" == "yes" ] || [ "$luksheaders" == "yes" ] || [ "$mbr" == "yes" ]; then
+   # get a list of block devices on the system
+   debug "LC_ALL=C $LSBLK --output NAME,TYPE --list --paths 2>/dev/null | grep \"disk$\" | grep -v '^/dev/zram' | @AWK@ '{print \$1}'"
+   devices=`LC_ALL=C $LSBLK --output NAME,TYPE --list --paths 2>/dev/null | grep "disk$" | grep -v '^/dev/zram' | @AWK@ '{print $1}'`
+
+   if [ "$devices" == "" ]; then
+      warning "Unable to find any block devices on this system."
+   else
+      info "$(echo "Devices found: $devices" |  tr "\n" " ")"
+   fi
+
+   # get a list of block device partitions on the system
+   debug "LC_ALL=C $SFDISK -l 2>/dev/null | grep \"^/dev\" | @AWK@ '{print \$1}'"
+   devparts=`LC_ALL=C $SFDISK -l 2>/dev/null | grep "^/dev" | @AWK@ '{print $1}'`
+
+   if [ "$devparts" == "" ]; then
+      info "No partitions found on this system."
+   else
+      info "$(echo "Partitions found: $partitions" | tr "\n" " ")"
+   fi
+fi
 
 if [ "$partitions" == "yes" ]; then
    if [ "$dosfdisk" == "yes" ]; then
-      devices=`LC_ALL=C $LSBLK --output NAME,TYPE --list --paths 2>/dev/null | grep "disk$" | grep -v '^/dev/zram' | @AWK@ '{print $1}'`
-      partitions=`LC_ALL=C $SFDISK -l 2>/dev/null |grep "^/dev" | @AWK@ '{print $1}'`
-      if [ "$devices" == "" ]; then
-         warning "No harddisks found"
-      fi
       for dev in $devices; do
-         debug "$SFDISK will try to backup partition tables for device $dev"
          [ -b $dev ] || continue
-         echo "${partitions}" | grep -q "${dev}"
-         if [ $? -ne 0 ] ; then
+         if ! echo "${devparts}" | grep -q "${dev}"; then
              info "The device $dev does not appear to have any partitions"
              continue
          fi
+         # here we use sfdisk to dump a listing of all the partitions.
+         # these files can be used to directly partition a disk of the same size.
+         debug "$SFDISK will try to backup partition tables for device $dev"
          label=${dev#/dev/}
          label=${label//\//-}
          outputfile=${partitionsfile//__star__/$label}
@@ -582,60 +597,45 @@ if [ "$partitions" == "yes" ]; then
          fi
       done
    fi
-   if [ "$dohwinfo" == "yes" ]; then
-      debug "Using $HWINFO to get all available disk information"
-      echo -e "\n\n====================== $disk ======================\n" >>  $hardwarefile
-      $HWINFO --disk >> $hardwarefile
-   fi
 fi
 
 if [ "$luksheaders" == "yes" ]; then
-   devices=`LC_ALL=C $LSBLK --output NAME,TYPE --list --paths 2>/dev/null | grep "disk$" | grep -v '^/dev/zram' | @AWK@ '{print $1}'`
-   if [ "$devices" == "" ]; then
-      warning "No harddisks found"
-   fi
-   partitions=`LC_ALL=C $SFDISK -l 2>/dev/null |grep "^/dev" | @AWK@ '{print $1}'`
-   [ -n "$partitions" ] || warning "No partitions found"
-   targetdevices=""
-   for dev in $devices $partitions; do
+   for dev in $devices $devparts; do
       [ -b $dev ] || continue
-      debug "$CRYPTSETUP isLuks $dev"
-      $CRYPTSETUP isLuks $dev
-      [ $? -eq 0 ] && targetdevices="$targetdevices $dev"
-   done
-   for dev in $targetdevices; do
-      label=${dev#/dev/}
-      label=${label//\//-}
-      outputfile=${luksheadersfile//__star__/$label}
-      debug "Let us backup the LUKS header of $dev"
-      debug "$CRYPTSETUP luksHeaderBackup \"${dev}\" --header-backup-file \"${outputfile}\""
-      output=`$CRYPTSETUP luksHeaderBackup "${dev}" --header-backup-file "${outputfile}" 2>&1`
-      exit_code=$?
-      if [ $exit_code -eq 0 ]; then
-         debug "$output"
-         info "The LUKS header of $dev was saved to $outputfile."
-      else
-         debug "$output"
-         fatal "The LUKS header of $dev could not be saved."
+      if $CRYPTSETUP isLuks $dev; then
+         label=${dev#/dev/}
+         label=${label//\//-}
+         outputfile=${luksheadersfile//__star__/$label}
+         debug "$CRYPTSETUP will try to backup the LUKS header for device $dev"
+         debug "$CRYPTSETUP luksHeaderBackup \"${dev}\" --header-backup-file \"${outputfile}\""
+         output=`$CRYPTSETUP luksHeaderBackup "${dev}" --header-backup-file "${outputfile}" 2>&1`
+         exit_code=$?
+         if [ $exit_code -eq 0 ]; then
+            debug "$output"
+            info "The LUKS header of $dev was saved to $outputfile."
+         else
+            debug "$output"
+            fatal "The LUKS header of $dev could not be saved."
+         fi
       fi
    done
 fi
 
 if [ "$mbr" == "yes" ]; then
-   devices=`LC_ALL=C $SFDISK -l 2>/dev/null | grep "^Disk /dev" | @AWK@ '{print $2}' | cut -d: -f1`
-   if [ "$devices" == "" ]; then
-      warning "No harddisks found"
-   fi
    for dev in $devices; do
-      debug "Will try to backup MBR tables for device $dev"
       [ -b $dev ] || continue
-      label=${dev#/dev/}
-      label=${label//\//-}
-      outputfile=${mbrfile//__star__/$label}
-      debug "$DD if=$dev of=$outputfile bs=512 count=1 2>/dev/null"
-      $DD if=$dev of=$outputfile bs=512 count=1 2>/dev/null
-      if [ $? -ne 0 ]; then
-         warning "The MBR for $dev could not be saved."
+      if $SFDISK -d $dev 2>/dev/null | head -n1 | grep "label: dos"; then
+         debug "$SFDISK will try to backup MBR tables for device $dev"
+         label=${dev#/dev/}
+         label=${label//\//-}
+         outputfile=${mbrfile//__star__/$label}
+         debug "$DD if=$dev of=$outputfile bs=512 count=1 2>/dev/null"
+         $DD if=$dev of=$outputfile bs=512 count=1 2>/dev/null
+         if [ $? -ne 0 ]; then
+            warning "The MBR for $dev could not be saved."
+         fi
+      else
+         info "The device $dev does not appear to contain an MBR."
       fi
    done
 fi
