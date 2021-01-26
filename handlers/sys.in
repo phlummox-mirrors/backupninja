@@ -514,12 +514,6 @@ if [ "$partitions" == "yes" ]; then
          partitions="no"
       fi
    fi
-   if [ "$dohwinfo" == "yes" ]; then
-      if [ ! -x "$HWINFO" ]; then
-         warning "can't find hwinfo, skipping partition report."
-         partitions="no"
-      fi
-   fi
 fi
 
 if [ "$hardware" == "yes" ]; then
