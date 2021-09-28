@@ -1,0 +1,586 @@
+# -*- mode: sh; sh-basic-offset: 2; indent-tabs-mode: nil; -*-
+# vim: set filetype=sh sw=2 sts=2 expandtab autoindent:
+#
+# restic script for backupninja
+#
+
+### GETCONF ###################################################################
+
+setsection general
+
+getconf nicelevel
+getconf ionicelevel
+
+getconf run_backup        "no"
+getconf run_forget        "no"
+getconf run_check         "no"
+getconf run_prune         "no"
+
+getconf cacert
+getconf cache_dir
+getconf cleanup_cache
+getconf json
+getconf limit_download
+getconf limit_upload
+getconf no_cache
+getconf no_lock
+getconf option
+getconf password
+getconf password_file
+getconf quiet
+getconf repository
+getconf tls_client_cert
+
+setsection s3
+
+getconf aws_access_key_id
+getconf aws_secret_access_key
+getconf aws_session_token
+
+setsection swift
+
+getconf os_auth_url
+getconf os_tenant_id
+getconf os_tenant_name
+getconf os_username
+getconf os_password
+getconf os_region_name
+
+setsection b2
+
+getconf b2_account_id
+getconf b2_account_key
+
+setsection azure
+
+getconf azure_account_name
+getconf azure_account_key
+
+setsection gs
+
+getconf google_project_id
+getconf google_application_credentials
+
+# Check that the ionicelevel is valid
+if [ -n "$nicelevel" ] && { [ "$nicelevel" -lt -20 ] || [ "$nicelevel" -gt 19 ]; }; then
+   fatal "The value of nicelevel is expected to be either empty or an integer from -20 to 19. Got: $nicelevel"
+fi
+
+# Check that the ionicelevel is valid
+if [ -n "$ionicelevel" ] && echo "$ionicelevel" | grep -vq "^[0-7]$"; then
+   fatal "The value of ionicelevel is expected to be either empty or an integer from 0 to 7. Got: $ionicelevel"
+fi
+
+### HELPERS ###################################################################
+
+function export_debug {
+  export "$1"="$2"
+  debug "$1=${!1}"
+}
+
+### PRE-COMMANDS ##############################################################
+
+[ -n "$nicelevel" ] && \
+  precmd+="nice -n $nicelevel "
+
+[ -n "$ionicelevel" ] && \
+  precmd+="ionice -c2 -n $ionicelevel "
+
+### GLOBAL OPTIONS ############################################################
+
+[ -z "$repository" ] && \
+  fatal "The repository option must be set."
+
+[ -z "$password" ] && [ -z "$password_file" ] && \
+    fatal "The password must be set by option 'password' or 'password_file'."
+
+[ -n "$repository" ] && \
+  cmd_global_options+="--repo $repository "
+
+[ -n "$password" ] && \
+  export_debug RESTIC_PASSWORD "$password"
+
+[ -n "$password_file" ] && \
+  cmd_global_options+="--password-file $password_file "
+
+[ -n "$cacert" ] && \
+  cmd_global_options+="--cacert $cacert "
+
+[ -n "$cache_dir" ] && \
+  cmd_global_options+="--cache-dir $cache_dir "
+
+[ -n "$cleanup_cache" ] && \
+  cmd_global_options+="--cleanup-cache "
+
+[ -n "$json" ] && \
+  cmd_global_options+="--json "
+
+[ -n "$limit_download" ] && \
+  cmd_global_options+="--limit-download $limit_download "
+
+[ -n "$limit_upload" ] && \
+  cmd_global_options+="--limit-upload $limit_upload "
+
+[ -n "$no_cache" ] && \
+  cmd_global_options+="--no-cache "
+
+[ -n "$no_lock" ] && \
+  cmd_global_options+="--no-lock "
+
+[ -n "$option" ] && \
+  cmd_global_options+="$(for i in "${option[@]}"; do echo "--option $i "; done)"
+
+[ -n "$quiet" ] && \
+  cmd_global_options+="--quiet "
+
+[ -n "$tls_client_cert" ] && \
+  cmd_global_options+="--tls-client-cert $tls_client_cert "
+
+### REPOSITORY ################################################################
+
+# Amazon S3 repository
+if [ "$(echo "$repository" | @AWK@ -F ':' '{print $1}')" == "s3" ]; then
+
+  ( [ -z "$aws_access_key_id" ] || [ -z "$aws_secret_access_key" ] ) && \
+    fatal "Missing some S3 credentials."
+
+  export_debug AWS_ACCESS_KEY_ID "$aws_access_key_id"
+  export_debug AWS_SECRET_ACCESS_KEY "$aws_secret_access_key"
+  [ -n "$aws_session_token" ] && \
+    export_debug AWS_SESSION_TOKEN "$aws_session_token"
+
+fi
+
+# OpenStack Swift repository
+if [ "$(echo "$repository" | @AWK@ -F ':' '{print $1}')" == "swift" ]; then
+
+  (
+    [ -z "$os_auth_url" ] || [ -z "$os_tenant_id" ] || [ -z "$os_tenant_name" ] || \
+    [ -z "$os_username" ] || [ -z "$os_password" ] || [ -z "$os_region_name" ]
+  ) && \
+    fatal "Missing some Swift credentials."
+
+  export_debug OS_AUTH_URL "$os_auth_url"
+  export_debug OS_TENANT_ID "$os_tenant_id"
+  export_debug OS_TENANT_NAME "$os_tenant_name"
+  export_debug OS_USERNAME "$os_username"
+  export_debug OS_PASSWORD "$os_password"
+  export_debug OS_REGION_NAME "$os_region_name"
+
+fi
+
+# Backblaze B2 repository
+if [ "$(echo "$repository" | @AWK@ -F ':' '{print $1}')" == "b2" ]; then
+
+  ( [ -z "$b2_account_id" ] || [ -z "$b2_account_key" ] ) && \
+    fatal "Missing some B2 credentials."
+
+  export_debug B2_ACCOUNT_ID "$b2_account_id"
+  export_debug B2_ACCOUNT_KEY "$b2_account_key"
+
+fi
+
+# Microsoft Azure Blob Storage repository
+if [ "$(echo "$repository" | @AWK@ -F ':' '{print $1}')" == "azure" ]; then
+
+  ( [ -z "$azure_account_name" ] || [ -z "$azure_account_key" ] ) && \
+    fatal "Missing some Azure credentials."
+
+  export_debug AZURE_ACCOUNT_NAME "$azure_account_name"
+  export_debug AZURE_ACCOUNT_KEY "$azure_account_key"
+
+fi
+
+# Google Cloud Storage repository
+if [ "$(echo "$repository" | @AWK@ -F ':' '{print $1}')" == "gs" ]; then
+
+  ( [ -z "$google_project_id" ] || [ -z "$google_application_credentials" ] ) && \
+    fatal "Missing some Google credentials."
+
+  export_debug GOOGLE_PROJECT_ID "$google_project_id"
+  export_debug GOOGLE_APPLICATION_CREDENTIALS "$google_application_credentials"
+
+fi
+
+### TEST #######################################################################
+
+info "Attempting to connect to repository at ${repository}"
+
+cmd="restic snapshots"
+execstr="${cmd} ${cmd_global_options//$'\n'}"
+
+debug "executing restic snapshots"
+debug "$execstr"
+output=$(eval $execstr 2>&1)
+ret=$?
+
+if [ $ret -eq 0 ]; then
+  debug $output
+  info "Connected successfully."
+else
+  setsection backup
+  getconf init yes
+  if [ "$init" = "yes" ]; then
+    debug $output
+    info "Unable to find a repository at ${repository}, will attempt to create one."
+    need_init="yes"
+  else
+    error $output
+    fatal "The specified repository is absent or unusable!"
+  fi
+fi
+
+[ -n "$test" ] || test=0
+
+### INIT #######################################################################
+
+if [ "$need_init" = "yes" ]; then
+
+  cmd="restic init"
+  execstr="${cmd} ${cmd_global_options//$'\n'}"
+
+  debug "executing restic init"
+  debug "$execstr"
+
+  if [ $test -eq 1 ]; then
+    info "Test mode enabled, skipping restic init."
+  else
+    info "Initializing repository at $repository"
+
+    output=$(eval $execstr 2>&1)
+    ret=$?
+
+    if [ $ret -eq 0 ]; then
+      warning $output
+      warning "Repository has been initialized."
+    else
+      error $output
+      fatal "Unable to initialize repository, aborting!"
+    fi
+  fi
+
+fi
+
+### BACKUP #####################################################################
+
+if [ "$run_backup" == "yes" ]; then
+
+  setsection backup
+
+  getconf include
+  getconf exclude
+  getconf exclude_caches
+  getconf exclude_file
+  getconf exclude_if_present
+  getconf options
+  getconf files_from
+  getconf force
+  getconf hostname
+  getconf one_file_system
+  getconf parent
+  getconf tag
+  getconf time
+  getconf with_atime
+
+  set -o noglob
+  SAVEIFS=$IFS
+  IFS=$(echo -en "\n\b")
+
+  [ -z "$include" ] && [ -z "$files_from" ] && \
+    fatal "No files or directories specified for backup."
+
+  [ -n "$include" ] && \
+    cmd_options+="$(for i in $include; do echo "'$i' "; done)"
+
+  [ -n "$files_from" ] && \
+    cmd_options+="$(for i in $files_from; do echo "--files-from '$i' "; done)"
+
+  [ -d "$repository" ] && \
+    cmd_options+="--exclude $repository "
+
+  [ -n "$exclude" ] && \
+    cmd_options+="$(for i in $exclude; do echo "--exclude '$i' "; done)"
+
+  [ "$exclude_caches" == "yes" ] && \
+    cmd_options+="--exclude-caches "
+
+  [ -n "$exclude_file" ] && \
+    cmd_options+="$(for i in $exclude_file; do echo "--exclude-file '$i' "; done)"
+
+  [ -n "$exclude_if_present" ] && \
+    cmd_options+="$(for i in $exclude_if_present; do echo "--exclude-if-present '$i' "; done)"
+
+  [ "$force" == "yes" ] && \
+    cmd_options+="--force "
+
+  [ -n "$hostname" ] && \
+    cmd_options+="--hostname $hostname "
+
+  [ -n "$one_file_system" ] && \
+    cmd_options+="--one-file-system "
+
+  [ -n "$parent" ] && \
+    cmd_options+="--parent $parent "
+
+  [ -n "$tag" ] && \
+    cmd_options+="$(for i in $tag; do echo "--tag='$i' "; done)"
+
+  [ -n "$time" ] && \
+    cmd_options+="--time $time "
+
+  [ "$with_atime" == "yes" ] && \
+    cmd_options+="--with_atime "
+
+  IFS=$SAVEIFS
+  set +o noglob
+
+  # format command
+  cmd="restic backup"
+  execstr="${precmd}${cmd} ${options} ${cmd_global_options//$'\n'}${cmd_options//$'\n'}"
+
+  # debug
+  debug "executing restic backup"
+  debug "$execstr"
+
+  # execute
+  if [ $test -eq 1 ]; then
+    info "Test mode enabled, skipping restic backup."
+  else
+    info "Creating new backup snapshot."
+    output=$(eval $execstr 2>&1)
+    ret=$?
+    if [ $ret -eq 0 ]; then
+      debug $output
+      info "Restic backup successful."
+    else
+      error $output
+      fatal "Restic backup failed."
+    fi
+  fi
+
+  debug "Unsetting variables"
+  unset cmd_options
+  unset execstr
+  unset output
+  unset ret
+
+fi
+
+### FORGET #####################################################################
+
+if [[ "$run_forget" == "yes" ]]; then
+
+  setsection forget
+
+  getconf keep_last "7"
+  getconf keep_hourly
+  getconf keep_daily
+  getconf keep_weekly
+  getconf keep_monthly
+  getconf keep_yearly
+  getconf keep_within
+  getconf keep_tag
+  getconf host
+  getconf tag
+  getconf path
+  getconf compact
+  getconf group_by
+  getconf dry_run
+  getconf prune
+
+  set -o noglob
+  SAVEIFS=$IFS
+  IFS=$(echo -en "\n\b")
+
+  [ -n "$keep_last" ] && \
+    cmd_options+="--keep-last $keep_last "
+
+  [ -n "$keep_hourly" ] && \
+    cmd_options+="--keep-hourly $keep_hourly "
+
+  [ -n "$keep_daily" ] && \
+    cmd_options+="--keep-daily $keep_daily "
+
+  [ -n "$keep_weekly" ] && \
+    cmd_options+="--keep-weekly $keep_weekly "
+
+  [ -n "$keep_monthly" ] && \
+    cmd_options+="--keep-monthly $keep_monthly "
+
+  [ -n "$keep_yearly" ] && \
+    cmd_options+="--keep-yearly $keep_yearly "
+
+  [ -n "$keep_within" ] && \
+    cmd_options+="--keep-within $keep_within "
+
+  [ -n "$keep_tag" ] && \
+    cmd_options+="$(for i in $keep_tag; do echo "--keep-tag=$i "; done)"
+
+  [ -n "$host" ] && \
+    cmd_options+="--host $host "
+
+  [ -n "$tag" ] && \
+    cmd_options+="$(for i in $tag; do echo "--tag=$i "; done)"
+
+  [ -n "$path" ] && \
+    cmd_options+="$(for i in $path; do echo "--path=$i "; done)"
+
+  [ -n "$compact" ] && \
+    cmd_options+="--compact "
+
+  [ -n "$group_by" ] && \
+    cmd_options+="--group-by $group_by "
+
+  [ -n "$dry_run" ] && \
+    cmd_options+="--dry-run "
+
+  [ -n "$prune" ] && \
+    cmd_options+="--prune "
+
+  IFS=$SAVEIFS
+  set +o noglob
+
+  # format command
+  cmd="restic forget"
+  execstr="${precmd}${cmd} ${cmd_global_options//$'\n'}${cmd_options//$'\n'}"
+
+  # debug
+  debug "executing restic forget"
+  debug "$execstr"
+
+  # execute
+  if [ $test -eq 1 ]; then
+    info "Test mode enabled, skipping restic forget."
+  else
+    info "Removing old snapshots based on defined retention policy."
+    output=$(eval $execstr 2>&1)
+    ret=$?
+    if [ $ret -eq 0 ]; then
+      debug $output
+      info "Restic forget successful."
+    else
+      error $output
+      fatal "Restic forget failed."
+    fi
+  fi
+
+  debug "Unsetting variables"
+  unset cmd_options
+  unset execstr
+  unset output
+  unset ret
+
+fi
+
+### PRUNE ######################################################################
+
+if [ "$run_prune" == "yes" ]; then
+
+  # format command
+  cmd="restic prune"
+  execstr="${precmd}${cmd} ${cmd_global_options//$'\n'}"
+
+  # debug
+  debug "executing restic prune"
+  debug "$execstr"
+
+  # execute
+  if [ $test -eq 1 ]; then
+    info "Test mode enabled, skipping restic prune."
+  else
+    info "Removing unreferenced data from repository."
+    output=$(eval $execstr 2>&1)
+    ret=$?
+    if [ $ret -eq 0 ]; then
+      debug $output
+      info "Restic prune successful."
+    else
+      error $output
+      fatal "Restic prune failed."
+    fi
+  fi
+
+  debug "Unsetting variables"
+  unset execstr
+  unset output
+  unset ret
+
+fi
+
+### CHECK ######################################################################
+
+if [ "$run_check" == "yes" ]; then
+
+  setsection check
+
+  getconf check_unused
+  getconf read_data
+  getconf read_data_subset
+  getconf with_cache
+
+  [ -n "$check_unused" ] && \
+    cmd_options+="--check-unused "
+
+  [ -n "$read_data" ] && \
+    cmd_options+="--read-data "
+
+  [ -n "$read_data_subset" ] && \
+    cmd_options+="--read-data-subset $read_data_subset "
+
+  [ -n "$with_cache" ] && \
+    cmd_options+="--with-cache "
+
+  # format command
+  cmd="restic check"
+  execstr="${precmd}${cmd} ${cmd_global_options//$'\n'}${cmd_options//$'\n'}"
+
+  # debug
+  debug "executing restic check"
+  debug "$execstr"
+
+  # execute
+  if [ $test -eq 1 ]; then
+    info "Test mode enabled, skipping restic check."
+  else
+    info "Checking repository integrity and consistency."
+    output=$(eval $execstr 2>&1)
+    ret=$?
+    if [ $ret -eq 0 ]; then
+      debug $output
+      info "Restic check successful."
+    else
+      error $output
+      fatal "Restic check failed."
+    fi
+  fi
+
+  debug "Unsetting variables"
+  unset cmd_options
+  unset execstr
+  unset output
+  unset ret
+
+fi
+
+### CLEAN UP ###################################################################
+
+debug "Unsetting environment variables"
+unset RESTIC_PASSWORD
+unset AWS_ACCESS_KEY_ID
+unset AWS_SECRET_ACCESS_KEY
+unset AWS_SESSION_TOKEN
+unset OS_AUTH_URL
+unset OS_TENANT_ID
+unset OS_TENANT_NAME
+unset OS_USERNAME
+unset OS_PASSWORD
+unset OS_REGION_NAME
+unset B2_ACCOUNT_ID
+unset B2_ACCOUNT_KEY
+unset AZURE_ACCOUNT_NAME
+unset AZURE_ACCOUNT_KEY
+unset GOOGLE_PROJECT_ID
+unset GOOGLE_APPLICATION_CREDENTIALS
+unset cmd_global_options
+
+return 0

@@ -1,0 +1,216 @@
+##
+## This is an example borgbackup configuration file.
+##
+## Here you can find all the possible borgbackup options, details of
+## what the options provide and possible settings. The defaults are set
+## as the commented out option, uncomment and change when
+## necessary. Options which are uncommented in this example do not have
+## defaults, and the settings provided are recommended.
+##
+## The defaults are useful in most cases, just make sure to configure the
+## destination host and user.
+##
+
+## default is 0, but set to 19 if you want to lower the priority.
+## an example setting would be:
+## nicelevel = 19
+##
+## Default
+# nicelevel = 0
+
+## ionicelevel is optional. If it is left undefined or empty, ionice will not
+## be used at all. If it is set to to an integer value from 0 to 7, then ionice
+## will be used with the best effort class (-c2) and with the ionicelevel as
+## the class data (-n).
+##
+## See the ionice(1) man page for more details about available levels.
+##
+## Default:
+# ionicelevel =
+
+## default is yes. set to no to skip the test if the remote host is alive
+##
+## Default:
+# testconnect = yes
+
+## default is not to limit bandwidth.
+## set to a number in kiBytes/second to limit bandwidth usage.
+##
+## Default:
+# bwlimit = 0
+
+######################################################
+## source section
+## (where the files to be backed up are coming from)
+
+[source]
+
+## default is to initialize the backup repository if absent
+## set to no to skip this step
+##
+## Default:
+# init = yes
+
+## A few notes about includes and excludes:
+## 1. include paths do not support any kind of pattern matching
+## 2. exclude paths support several types of pattern matching, the default being
+##    shell-style matching, where, for example, '*' matches any number of
+##    characters. for more info, see : borg help patterns
+## 3. Symlinks are preserved (not followed).
+##
+## for more info see : borg help patterns
+##
+## files to include in the backup
+include = /opt
+include = /srv
+include = /etc
+include = /root
+include = /home
+include = /usr/local
+include = /var
+
+## files to exclude from the backup
+exclude = /var/lock
+exclude = /var/run
+exclude = /var/cache
+exclude = /var/tmp
+exclude = /var/lib/mongodb/journal
+exclude = /var/lib/clamav
+exclude = /var/lib/mlocate
+exclude = /var/lib/postgresql
+exclude = /var/lib/mysql
+
+## define extra command-line options for the "borg create" operation.
+##
+## Example:
+## create_options = --exclude-caches
+##
+## for more info see : borg help create
+##
+## Default:
+# create_options =
+
+## whether to prune (remove) older backups
+##
+## Default:
+# prune = yes
+
+## keep all backups within this time frame.
+## must be defined as a number followed by one of the
+## following characters: "H", "d", "w", "m", "y"
+##
+## this option will be ignored if set to 0
+##
+## the default is to keep all backups made within the
+## last 30 days
+##
+## Default:
+# keep = 30d
+
+## define extra command-line options for the "borg prune" operation.
+##
+## Example:
+## prune_options = --keep-daily=7 --keep-weekly=4 --keep-monthly=6
+##
+## for more info see : borg help prune
+##
+## Default:
+# prune_options =
+
+## by default borg emits a warning when a source file or directory
+## vanishes during the backup operations
+## set to yes to ignore such warnings
+##
+## Example:
+## ignore_missing = yes
+##
+## Default:
+# ignore_missing =
+
+######################################################
+## destination section
+## (where the files are copied to)
+
+[dest]
+
+## put the backups under this directory, this must be set!
+## an example setting would be:
+## directory = /backups
+##
+## Default:
+# directory =
+
+## the machine which will receive the backups.
+## an example setting would be:
+## host = backuphost
+##
+## set host = localhost for local backups (no ssh)
+##
+## Default
+# host =
+
+## make the files owned by this user. you must be able to
+## `su -c "ssh backupuser@backhost"` without specifying a password.
+## an example setting would be:
+## user = backupuser
+##
+## Default:
+# user =
+
+## archive name, should be unique every day.
+## Format tags available :
+## {now}, {utcnow}, {fqdn}, {hostname}, {user}, {pid}
+##
+## for more info see : borg help create
+##
+## Default:
+# archive = {now:%Y-%m-%dT%H:%M:%S}
+
+## compression algorithm
+## can be "none", "lz4", "zstd[,L]", "zlib[,L]", "lzma[,L]", "auto,C[,L]".
+## - "none" stands for "no compression"
+## - "lz4" offers very high speed, very low compression
+## - "zstd" is a modern wide-range algorithm
+## - "zlib" offers medium speed, medium compression
+## - "lzma" offers low speed, high compression
+## - "auto,C" will use a heuristic to decide whether to compress using
+##            selected algorithm C
+##
+## for more info see : borg help compression
+##
+## Default:
+# compression = lz4
+
+## encryption mode to use for repository creation
+##
+## common options are "none", "repokey" or "keyfile"
+## - "none" = no encryption
+## - "repokey" = encryption with key stored inside the repository
+## - "keyfile" = encryption with key stored in ~/.config/borg/keys/
+##
+## for other options and more info, see : borg help init
+##
+## Default:
+# encryption = none
+
+## passphrase of the key used for repository encryptions
+##
+## must be set if encryption is not "none"
+## encryption is disabled by default
+##
+## Default:
+# passphrase =
+
+## Path to the directory that will hold borg's cache files. By default this is
+## empty, which will let borg use its default path of "~/.cache/borg".
+##
+## Default:
+# cache_directory =
+
+## command-line options to use with ssh
+##
+## an example setting would be:
+## sshoptions = -i /root/.ssh/id_rsa_borg
+##
+## Default:
+# sshoptions =
