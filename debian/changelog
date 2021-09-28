@@ -1,3 +1,13 @@
+backupninja (1.2.2-1) unstable; urgency=medium
+
+  * New feature: allow arbitrary command-line options to be passed through to
+    `restic backup`
+  * Remove old luks header when doing sys backup
+  * Fix non-working duplicity wizard in ninjahelper
+  * Fix runtime errors when restic handler with `--debug`
+
+ --  <phlummox@localhost>  Tue, 28 Sep 2021 09:49:46 +0000
+
 backupninja (1.2.0-1) unstable; urgency=medium
 
   * Import new upstream release (Closes: #409239, #726119, #956206, #974770,
