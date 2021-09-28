@@ -1,0 +1,48 @@
+
+## default is 0, but set to 19 if you want to lower the priority.
+## an example setting would be:
+## nicelevel = 19
+##
+## Default
+# nicelevel = 0
+
+## ionicelevel is optional. If it is left undefined or empty, ionice will not
+## be used at all. If it is set to to an integer value from 0 to 7, then ionice
+## will be used with the best effort class (-c2) and with the ionicelevel as
+## the class data (-n).
+##
+## See the ionice(1) man page for more details about available levels.
+##
+## Default:
+# ionicelevel =
+
+# TYP is cd or dvd AS WELL AS the disk inside!!
+burnertype = cd
+
+# system (yes) or directory/files (no)
+# this function not yet implemented
+#system = yes
+
+# location for image file
+backupdir = /var/backups/makecd
+
+# image filename
+imagefile = example.iso
+
+# iso or burn to cd/dvd?
+isoonly = no
+
+# cd/dvd burner device
+device=/dev/hdc
+
+# base directory to include in the backup
+target = /
+
+# files or directories to be excluded
+exclude = /proc
+exclude = /lost+found
+exclude = /tmp
+
+# backupninja will perfrom this at gvien date/time
+when = wednesday at 02:00
+

@@ -1,0 +1,146 @@
+# -*- mode: sh; sh-basic-offset: 3; indent-tabs-mode: nil; -*-
+# vim: set filetype=sh sw=3 sts=3 expandtab autoindent:
+#
+# PostgreSQL handler script for backupninja
+#
+
+getconf backupdir /var/backups/postgres
+getconf databases all
+getconf compress yes
+# format maps to pg_dump --format= option, old/default was plain
+getconf format plain
+
+localhost=`hostname`
+
+# Make sure that the system to backup has the needed executables
+if [ "$databases" == "all" ] && [ "$format" = "plain" ]; then
+   [ -x "`which $PGSQLDUMPALL`" ] || \
+      fatal "Can't find $PGSQLDUMPALL."
+elif [ "$format" != "plain" ]; then
+   [ -x "`which $PGSQLDUMPALL`" ] || \
+      fatal "Can't find $PGSQLDUMPALL."
+   [ -x "`which $PGSQLDUMP`" ] || \
+      fatal "Can't find $PGSQLDUMP."
+   [ -x "`which $PSQL`" ] || \
+      fatal "Can't find $PSQL."
+else
+   [ -x "`which $PGSQLDUMP`" ] || \
+      fatal "Can't find $PGSQLDUMP."
+fi
+
+# create backup dir
+[ -d $backupdir ] || (debug "mkdir -p $backupdir"; mkdir -p $backupdir)
+[ -d $backupdir ] || fatal "Backup directory '$backupdir' does not exist, and could not be created."
+
+# give backup dir the good uid and permissions
+pguid=`getent passwd $PGSQLUSER | @AWK@ -F: '{print $3}'`
+[ -n "$pguid" ] || fatal "No user called $PGSQLUSER."
+
+debug "chown $pguid $backupdir"
+chown $pguid $backupdir
+debug "chmod 700 $backupdir"
+chmod 700 $backupdir
+
+
+# If we are using the custom (best) or tar pg_dump format, and
+# dumping "all" databases, we will substitute "all" for a list
+# of all non-template databases to avoid the use of pg_dumpall.
+dumpglobals="no"
+if [ "$databases" = "all" ] && [ "$format" != "plain" ]; then
+   execstr="su - $PGSQLUSER -c 'psql -AtU $PGSQLUSER -c \"SELECT datname FROM pg_database WHERE NOT datistemplate\"'"
+   debug execstr
+   dblist=""
+   for db in $(eval $execstr 2>&1); do
+      dblist="$dblist $db"
+   done
+   if [ "$dblist" != "" ]; then
+      databases="$dblist"
+   fi
+   # Dump globals (pg_dumpall -g) for roles and tablespaces
+   dumpglobals="yes"
+fi
+
+
+# if $databases = all, use pg_dumpall
+if [ "$databases" == "all" ]; then
+   if [ "$compress" == "yes" ]; then
+      execstr="su - $PGSQLUSER -s /bin/bash -c \"set -o pipefail ; $PGSQLDUMPALL | $GZIP $GZIP_OPTS > '$backupdir/${localhost}-all.sql.gz'\""
+   else
+      execstr="su - $PGSQLUSER -c \"$PGSQLDUMPALL > '$backupdir/${localhost}-all.sql'\""
+   fi
+   debug "$execstr"
+   if [ ! $test ]; then
+      output=`eval $execstr 2>&1`
+      code=$?
+      if [ "$code" == "0" ]; then
+         debug "$output"
+         info "Successfully finished dump of pgsql cluster"
+      else
+         warning "$output"
+         warning "Failed to dump pgsql cluster"
+      fi
+   fi
+
+# else use pg_dump on each specified database
+else
+   # If we're not doing plain format, database=all may now be database=list
+   # so we track the database=all selection in dumpglobals which tells us
+   # to also dump the roles and tablespaces via pg_dumpall -g
+   if [ "$dumpglobals" = "yes" ]; then
+      globalscmd=""
+      if [ "$compress" == "yes" ]; then
+         globalscmd="set -o pipefail ; $PGSQLDUMPALL -g | $GZIP $GZIP_OPTS > '$backupdir/globals.sql.gz'"
+      else
+         globalscmd="$PGSQLDUMPALL -g > '$backupdir/globals.sql'"
+      fi
+      execstr="su - $PGSQLUSER -s /bin/bash -c \"$globalscmd\""
+      debug "$execstr"
+      if [ ! $test ]; then
+         output=`eval $execstr 2>&1`
+         code=$?
+         if [ "$code" == "0" ]; then
+            debug "$output"
+            info "Successfully finished pgsql globals (roles and tablespaces) dump"
+         else
+            warning "$output"
+            warning "Failed to dump pgsql globals (roles and tablespaces)"
+         fi
+      fi
+   fi
+   for db in $databases; do
+      dumpext="sql"
+      if [ "$format" != "plain" ]; then
+         dumpext="pg_dump"
+      fi
+      # To better support the backupninja global GZIP and rsync-friendly GZIP_OPTS
+      # the custom archive format is told to disable compression. The plain format
+      # is uncompressed by default and the tar format doesn't support pg_dump compression.
+      disablecustomcompress=""
+      if [ "$format" = "custom" ]; then
+         disablecustomcompress="--compress=0"
+      fi
+      dumpcmd=""
+      globalscmd=""
+      if [ "$compress" == "yes" ]; then
+         dumpcmd="set -o pipefail ; $PGSQLDUMP --format=$format ${disablecustomcompress} $db | $GZIP $GZIP_OPTS > '$backupdir/${db}.${dumpext}.gz'"
+      else
+         dumpcmd="$PGSQLDUMP --format=$format ${disablecustomcompress} $db > '$backupdir/${db}.${dumpext}'"
+      fi
+      execstr="su - $PGSQLUSER -s /bin/bash -c \"$dumpcmd\""
+      debug "$execstr"
+      if [ ! $test ]; then
+         output=`eval $execstr 2>&1`
+         code=$?
+         if [ "$code" == "0" ]; then
+            debug "$output"
+            info "Successfully finished dump of pgsql database ${db}"
+         else
+            warning "$output"
+            warning "Failed to dump pgsql database ${db}"
+         fi
+      fi
+   done
+fi
+
+return 0
+
