@@ -1,0 +1,5 @@
+# Upstream does not publish any tarball other than GitLab-generated ones,
+# that should not be imported directly via uscan and gbp import-orig,
+# so debian/watch is voluntarily not provided in order to avoid malformed
+# imports.
+backupninja: debian-watch-file-is-missing

@@ -1,0 +1,65 @@
+Source: backupninja
+Section: admin
+Priority: optional
+Maintainer: Debian backupninja maintainers <pkg-backupninja@lists.riseup.net>
+Uploaders: Micah Anderson <micah@riseup.net>,
+ Jerome Charaoui <jerome@riseup.net>
+Build-Depends:
+ debhelper (>= 10)
+Build-Conflicts: autoconf2.13
+Standards-Version: 4.5.1
+Homepage: https://0xacab.org/liberate/backupninja
+Vcs-Browser: https://0xacab.org/liberate/backupninja/tree/debian
+Vcs-Git: https://0xacab.org/liberate/backupninja.git
+
+Package: backupninja
+Architecture: all
+Depends:
+ gawk | mawk,
+ dialog,
+ bash (>=2.05b-26),
+ ${misc:Depends}
+Recommends:
+ bsd-mailx | mailx | mailutils
+Suggests:
+ bzip2,
+ debconf-utils,
+ duplicity,
+ genisoimage,
+ fdisk | util-linux (<< 2.29.2-3~),
+ hwinfo,
+ mdadm,
+ rdiff-backup,
+ rsync,
+ subversion,
+ trickle,
+ wodim,
+ borgbackup,
+ restic
+Description: lightweight, extensible meta-backup system
+ Backupninja lets you drop simple config files in /etc/backup.d to
+ coordinate system backups. Backupninja is a master of many arts,
+ including incremental remote filesystem backup, and MySQL backup.
+ By creating simple drop-in handler scripts, backupninja can learn new skills.
+ Backupninja is a silent flower blossom death strike to lost data.
+ .
+ In addition to backing up regular files, Backupninja has handlers to ease
+ backing up: Maildir, MySQL, PostgreSQL, SVN, Trac, hardware and system
+ information, as well as the output from custom shell scripts.
+ .
+ Backupninja currently supports common backup utilities, easing their
+ configuration, currently supported are: rdiff-backup, duplicity, rsync,
+ borgbackup, restic and CD/DVD.
+ .
+ Most handlers have their own dependencies/recommendations, shown in brackets
+ below:
+ .
+  - dup [duplicity, trickle]
+  - rdiff [rdiff-backup]
+  - sys [debconf-utils, hwinfo, mdadm]
+  - makecd [genisoimage, wodim]
+  - rsync [rsync]
+  - svn [subversion]
+  - tar [bzip2]
+  - borg [borgbackup]
+  - restic [restic]
