@@ -230,6 +230,8 @@ else
   fi
 fi
 
+[ -n "$test" ] || test=0
+
 ### INIT #######################################################################
 
 if [ "$need_init" = "yes" ]; then
@@ -270,6 +272,7 @@ if [ "$run_backup" == "yes" ]; then
   getconf exclude_caches
   getconf exclude_file
   getconf exclude_if_present
+  getconf options
   getconf files_from
   getconf force
   getconf hostname
@@ -333,7 +336,7 @@ if [ "$run_backup" == "yes" ]; then
 
   # format command
   cmd="restic backup"
-  execstr="${precmd}${cmd} ${cmd_global_options//$'\n'}${cmd_options//$'\n'}"
+  execstr="${precmd}${cmd} ${options} ${cmd_global_options//$'\n'}${cmd_options//$'\n'}"
 
   # debug
   debug "executing restic backup"
