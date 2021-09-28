@@ -7,7 +7,6 @@
 
   See <https://github.com/phlummox-patches/backupninja/pull/1>
 
-
 - Fix these bugs (<https://0xacab.org/liberate/backupninja/-/issues/11332>,
   <https://0xacab.org/liberate/backupninja/-/issues/11336>), whereby the duplicity
   "helper" (wizard) won't work at all.
@@ -24,10 +23,12 @@
 
   (Pull request <https://github.com/phlummox-patches/backupninja/pull/3>).
 
+  This patch adds that feature.
+
 [dup-example-l9]: https://github.com/phlummox-patches/backupninja/blob/backupninja-1.2.1/examples/example.dup#L9
 [dup-conf-l8]: https://github.com/phlummox-patches/backupninja/blob/backupninja-1.2.1/handlers/dup.in#L8
 
-This patch adds that feature.
+
 [luks-merge]: https://0xacab.org/liberate/backupninja/-/merge_requests/58
 [luks-bug]: https://0xacab.org/liberate/backupninja/-/issues/11333
 
@@ -56,7 +57,7 @@ apt-get install \
 
 (All needed? Dunno.)
 
-2\. This process creates a lot of Debian-sppecific files in the parent directory of your
+2\. This process creates a lot of Debian-specific files in the parent directory of your
 git repo, it can make things cleaner to do something like
 
 ```
@@ -198,7 +199,7 @@ git archive --format=tar --prefix=${PACKAGE}_${VERSION}/ ${PACKAGE}-${VERSION} |
 
 2\. Switch to `debian-debian`, and import tgz.
 
-``
+```
 git checkout debian-debian
 gbp import-orig --no-interactive ../${PACKAGE}_${VERSION}.orig.tar.gz
 ```
