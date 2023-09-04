@@ -1,7 +1,7 @@
 load common
 
 begin_rdiff() {
-    apt-get -qq install debootstrap rdiff-backup cstream
+    install_pkgs debootstrap rdiff-backup cstream
     if [ ! -d /var/cache/bntest ]; then
         debootstrap --variant=minbase testing /var/cache/bntest
     fi
@@ -397,12 +397,13 @@ finish_rdiff() {
 }
 
 @test "verify local backup" {
+    rm -f "${BATS_TMPDIR}/_rdiff-verify.log"
     rdiff-backup -v5 --verify "${BN_BACKUPDIR}/testrdiff" > "${BATS_TMPDIR}/_rdiff-verify.log"
 }
 
 @test "verify number of files in local backup matches source" {
     SRC_FILES="$(find "${BN_SRCDIR}" -type f -not -path "${BN_SRCDIR}/var/*" | wc -l)"
-    BACKUP_FILES="$(grep '^Verified SHA1 digest of' "${BATS_TMPDIR}/_rdiff-verify.log" | wc -l)"
+    BACKUP_FILES="$(grep -c 'Verified SHA1 digest of' "${BATS_TMPDIR}/_rdiff-verify.log")"
     [ "$SRC_FILES" -eq "$BACKUP_FILES" ]
 }
 
@@ -416,12 +417,14 @@ finish_rdiff() {
 }
 
 @test "verify remote backup" {
-    rdiff-backup -v5 --verify "${BN_BACKUPDIR}/testrdiff" > "${BATS_TMPDIR}/_rdiff-verify.log"
+    rm -f "${BATS_TMPDIR}/_rdiff-verify.log"
+    ssh "${BN_REMOTEUSER}@${BN_REMOTEHOST}" -- rdiff-backup -v5 --verify "${BN_BACKUPDIR}/testrdiff" > "${BATS_TMPDIR}/_rdiff-verify.log"
 }
 
 @test "verify number of files in remote backup matches source" {
     SRC_FILES="$(find "${BN_SRCDIR}" -type f -not -path "${BN_SRCDIR}/var/*" | wc -l)"
-    BACKUP_FILES="$(grep '^Verified SHA1 digest of' "${BATS_TMPDIR}/_rdiff-verify.log" | wc -l)"
+    BACKUP_FILES="$(grep -c 'Verified SHA1 digest of' "${BATS_TMPDIR}/_rdiff-verify.log")"
+    echo "$SRC_FILES $BACKUP_FILES"
     [ "$SRC_FILES" -eq "$BACKUP_FILES" ]
 }
 

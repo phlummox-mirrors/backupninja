@@ -241,3 +241,7 @@ makegpgkeys() {
     BN_SIGNKEY=$(gpg --keyid-format long -k sign@bntest0 | sed -n '2p' | grep -o '\S\+')
     export BN_SIGNKEY
 }
+
+install_pkgs() {
+    TMPDIR=/tmp DEBIAN_FRONTEND=noninteractive apt-get -qq install $@
+}

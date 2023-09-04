@@ -1,7 +1,7 @@
 load common
 
 begin_tar() {
-    apt-get -qq install debootstrap ncompress zstd
+    install_pkgs debootstrap ncompress zstd
     if [ ! -d "$BN_SRCDIR" ]; then
         debootstrap --variant=minbase testing "$BN_SRCDIR"
     fi

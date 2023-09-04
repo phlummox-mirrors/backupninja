@@ -1,7 +1,7 @@
 load common
 
 begin_sys() {
-    apt-get -qq install debconf-utils hwinfo lvm2 cryptsetup-bin parted
+    install_pkgs debconf-utils hwinfo lvm2 cryptsetup-bin parted
 
     cat << EOF > "${BATS_TMPDIR}/backup.d/test.sys"
 when = manual
@@ -25,6 +25,8 @@ EOF
     # Setup LUKS
     parted -s /dev/sdd mklabel msdos mkpart p 1MiB 50% mkpart p 50% 100%
     partprobe
+    test -b /dev/sdd1
+    test -b /dev/sdd2
     cryptsetup -q --type luks1 luksFormat /dev/sdd1 <<< 123test
     cryptsetup -q --type luks2 luksFormat /dev/sdd2 <<< 123test
     cryptsetup -q --type luks2 luksFormat /dev/sde <<< 123test
@@ -37,12 +39,11 @@ finish_sys() {
     lvremove -f vgtest/lvtest
     vgremove vgtest
     pvremove /dev/sdc
-    # cleanup luks data and partition tables
-    dd if=/dev/zero of=/dev/sdc bs=512 count=1 conv=notrunc
-    dd if=/dev/zero of=/dev/sdd1 bs=512 count=2048 conv=notrunc
-    dd if=/dev/zero of=/dev/sdd2 bs=512 count=2048 conv=notrunc
-    dd if=/dev/zero of=/dev/sdd bs=512 count=1 conv=notrunc
-    dd if=/dev/zero of=/dev/sde bs=512 count=2048 conv=notrunc
+    # cleanup luks headers and partition tables
+    for d in /dev/sdc /dev/sdd1 /dev/sdd2 /dev/sdd /dev/sde; do
+        cryptsetup isLuks $dev && cryptsetup luksErase $dev <<< YES
+        test -b $dev && dd if=/dev/zero of=$dev bs=512 count=2048 conv=notrunc
+    done
     partprobe
 }
 
