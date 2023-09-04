@@ -17,6 +17,7 @@ Vagrant.configure("2") do |config|
     remote.vm.hostname = "bntest1"
     remote.vm.network "private_network", ip: "192.168.181.5"
     remote.vm.provision "shell", inline: <<-SHELL
+      export DEBIAN_FRONTEND=noninteractive
       echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
       locale-gen
       apt-get update
@@ -36,6 +37,7 @@ Vagrant.configure("2") do |config|
     local.vm.hostname = "bntest0"
     local.vm.network "private_network", ip: "192.168.181.4"
     local.vm.provision "shell", inline: <<-SHELL
+      export DEBIAN_FRONTEND=noninteractive
       echo "root: vagrant" >> /etc/aliases
       echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
       locale-gen

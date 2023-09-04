@@ -1,7 +1,7 @@
 load common
 
 begin_pgsql() {
-    apt-get -qq install postgresql
+    install_pkgs postgresql
     systemctl is-active postgresql || systemctl start postgresql
     sudo -u postgres createuser --superuser root
     createdb bntest_p8Cz8k

@@ -566,7 +566,7 @@ if [ "$partitions" == "yes" ] || [ "$luksheaders" == "yes" ] || [ "$mbr" == "yes
    if [ "$devparts" == "" ]; then
       info "No partitions found on this system."
    else
-      info "$(echo "Partitions found: $partitions" | tr "\n" " ")"
+      info "$(echo "Partitions found: $devparts" | tr "\n" " ")"
    fi
 fi
 
