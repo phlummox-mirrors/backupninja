@@ -1,7 +1,7 @@
 load common
 
 begin_mysql() {
-    apt-get -qq install default-mysql-server
+    install_pkgs default-mysql-server
     systemctl is-active mysql || systemctl start mysql
     zcat "${BATS_TEST_DIRNAME}/samples/bntest_p8Cz8k.sql.gz" | mysql --defaults-file=/etc/mysql/debian.cnf
     zcat "${BATS_TEST_DIRNAME}/samples/bntest_v11vJj.sql.gz" | mysql --defaults-file=/etc/mysql/debian.cnf

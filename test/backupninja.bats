@@ -1,8 +1,14 @@
 load common
 
+begin_backupninja() {
+    install_pkgs prometheus-node-exporter
+}
+
 teardown_backupninja() {
     [ -x /usr/bin/mail.moved ] && mv /usr/bin/mail.moved /usr/bin/mail
     [ -x /usr/bin/rsync.moved ] && mv /usr/bin/rsync.moved /usr/bin/rsync
+    rm -f /var/mail/vagrant
+    rm -f /var/lib/prometheus/node-exporter/backupninja.prom
 }
 
 create_test_action() {
@@ -233,6 +239,24 @@ create_test_action() {
     setconfig backupninja.conf reportdirectory "/foo"
     run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
     [ "$status" -eq 1 ]
+}
+
+@test "reports: email not sent when reportemail is no" {
+    create_test_action info test_info
+    setconfig backupninja.conf reportsuccess yes
+    setconfig backupninja.conf reportinfo yes
+    setconfig backupninja.conf reportemail no
+    run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
+    [ "$status" -eq 0 ]
+    ! test -f /var/mail/vagrant
+}
+
+@test "reports: writes prometheus metrics when reportprom is yes" {
+    create_test_action info test_info
+    setconfig backupninja.conf reportprom yes
+    run backupninja --now -f "${BATS_TMPDIR}/backupninja.conf" --run "${BATS_TMPDIR}/backup.d/test.sh"
+    [ "$status" -eq 0 ]
+    grep -q "^backupninja_actions{host=\"$(hostname)\"} 1$" /var/lib/prometheus/node-exporter/backupninja.prom
 }
 
 @test "scheduling: runs when = 'everyday at 01' and time matches" {

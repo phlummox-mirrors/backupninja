@@ -1,7 +1,7 @@
 load common
 
 begin_rsync() {
-    apt-get -qq install debootstrap rsync
+    install_pkgs debootstrap rsync
     if [ ! -d "$BN_SRCDIR" ]; then
         debootstrap --variant=minbase testing "$BN_SRCDIR"
     fi

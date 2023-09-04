@@ -24,7 +24,7 @@ if [ ! "$(which backupninja)" ]; then
 fi
 
 # Install basic test dependencies
-apt-get -qq install bats mailutils faketime crudini
+DEBIAN_FRONTEND=noninteractive apt install -y bats mailutils faketime crudini
 
 # Create a temporary base directory
 TMPDIR=$(mktemp -t -d bntest.XXXXXX)
