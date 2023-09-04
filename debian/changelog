@@ -1,3 +1,12 @@
+backupninja (1.2.99-1) UNRELEASED; urgency=medium
+
+  [ phlummox ]
+  * Imported Upstream version 1.2.99
+
+  [  ]
+
+ -- phlummox <phlummox@users.noreply.github.com>  Mon, 04 Sep 2023 06:51:46 +0000
+
 backupninja (1.2.2-1) unstable; urgency=medium
 
   * New feature: allow arbitrary command-line options to be passed through to
